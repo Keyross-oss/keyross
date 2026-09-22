@@ -1,4 +1,4 @@
-# keyross.yaml — la configuration du compilateur (celle du dépôt lui-même : il se vérifie)
+# keyross.yaml — the compiler configuration of this repository (it verifies itself)
 gauges: [core]
 adapters: []
 oracles_dir: oracles

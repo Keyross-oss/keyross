@@ -27,5 +27,5 @@ def bad_totals_doc(tmp_path):
     return make_xlsx(tmp_path / "bad.xlsx", [
         ("1.1", "Terrassement", "m3", 10, 25.0, 250.0),
         ("1.2", "Remblai", "m3", 4, 12.5, 50.0),
-        (None, "Sous-total lot 1", None, None, None, 295.0),   # faux : 300 attendu
+        (None, "Sous-total lot 1", None, None, None, 295.0),   # wrong: 300 expected
     ])

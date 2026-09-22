@@ -11,6 +11,6 @@ jobs:
         with: { python-version: "${{ matrix.python }}" }
       - run: pip install -e ".[dev]"
       - run: pytest -q
-      - run: keyross test          # les tests des tests
-      - run: keyross lint          # aucun modèle dans un oracle
-      - run: keyross lock --check  # l'épinglage est respecté
+      - run: keyross test          # the tests of the tests
+      - run: keyross lint          # no model inside an oracle
+      - run: keyross lock --check  # pinning is respected

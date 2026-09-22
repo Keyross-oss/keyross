@@ -209,7 +209,15 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("outdated", help="are we on the latest rules? installed gauges vs registry").set_defaults(fn=cmd_outdated)
     y = sub.add_parser("yoke", help="couple an agent to its gauges: deepagents · claude-code · mcp"); y.add_argument("harness"); y.set_defaults(fn=cmd_yoke)
     args = p.parse_args(argv)
+    _utf8_output()
     return args.fn(args)
+
+
+def _utf8_output() -> None:
+    """Flags are printed with ✔ / ✘; a Windows console or pipe defaults to cp1252, which cannot encode them."""
+    for stream in (sys.stdout, sys.stderr):
+        if (getattr(stream, "encoding", "") or "").lower().replace("-", "") != "utf8" and hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
 
 
 if __name__ == "__main__":

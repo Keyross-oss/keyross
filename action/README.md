@@ -1,3 +1,3 @@
-# keyross/conformance — action CI (0.4)
+# keyross/conformance — CI action (0.4)
 
-`uses: keyross/conformance@v1` : crée un cluster kind éphémère, déploie l'image de l'agent avec le chart, lance le Job de conformité, rend le rapport et l'exit code.
+`uses: keyross/conformance@v1`: creates an ephemeral kind cluster, deploys the agent image with the chart, runs the conformance Job, returns the report and the exit code.

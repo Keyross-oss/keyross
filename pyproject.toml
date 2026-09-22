@@ -22,8 +22,8 @@ classifiers = [
 dependencies = ["openpyxl>=3.1", "pyyaml>=6.0"]
 
 [project.optional-dependencies]
-doctor = ["pyyaml>=6.0"]            # gitleaks / trivy / conftest sont appelés par sous-processus s'ils sont présents
-adapters = []                        # deepagents / langchain sont importés paresseusement, jamais requis
+doctor = ["pyyaml>=6.0"]            # gitleaks / trivy / conftest are called as subprocesses when present
+adapters = []                        # deepagents / langchain are imported lazily, never required
 dev = ["pytest>=8", "ruff>=0.6"]
 
 [project.scripts]

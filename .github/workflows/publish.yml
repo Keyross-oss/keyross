@@ -5,7 +5,7 @@ jobs:
   pypi:
     runs-on: ubuntu-latest
     environment: pypi
-    permissions: { id-token: write, contents: read }   # Trusted Publisher (OIDC) : aucun jeton stocké
+    permissions: { id-token: write, contents: read }   # Trusted Publisher (OIDC): no stored token
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

@@ -1,7 +1,7 @@
 import keyross
 from keyross import load, run, registry
 from keyross.core.verdict import Status
-import keyross.gauges.core  # noqa: F401 — enregistre les oracles
+import keyross.gauges.core  # noqa: F401 — registers the oracles
 
 
 def test_load_and_blocks(good_doc):
@@ -30,8 +30,8 @@ def test_sentinel_conservation_is_silent(good_doc, bad_totals_doc):
     rep = run(after, gauge="core", ids=["core.rows.conserved"], ctx={"before": before})
     v = rep.verdicts[0]
     assert v.failed and v.silent
-    assert rep.minimal() == []            # jamais renvoyée à l'agent
-    assert rep.sentinel_failures and rep.exit_code == 0   # journalisée, pas bloquante par elle-même
+    assert rep.minimal() == []            # never returned to the agent
+    assert rep.sentinel_failures and rep.exit_code == 0   # logged, not blocking on its own
 
 
 def test_units_vocabulary_soft(good_doc):

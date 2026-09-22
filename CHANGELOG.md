@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- fix(cli): force UTF-8 output — flags (✔ / ✘) crashed the CLI on a Windows console or pipe (cp1252)
+- docs: last traces of the old vocabulary and of French removed from public files — `new_pack.md` issue template renamed `new_gauge.md`; comments in CI workflows, `pyproject.toml`, `keyross.yaml`, tests, `action/` and `demo-k8s/` translated; README points to each gauge's `adapters/`
+
 ## 0.1.0.dev0 — skeleton (21 September 2026)
 - core: canonical document (xlsx, csv), Verdict, registry (@oracle, @contract, sentinels), runner, lock
 - core gauge: schema, totals.match, duplicates, units.vocabulary, numbering.continuous, rows.conserved (sentinel); delete_rows contract

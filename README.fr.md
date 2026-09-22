@@ -14,7 +14,7 @@ Pour **rendre les agents responsables devant les compilateurs que les documents 
 
 **Le produit, c'est le registre** : tous les oracles documentaires agrégés dans des gauges versionnés, testés, signés, mis à jour depuis un seul endroit — `keyross add einvoice@1.2`, `keyross outdated`. Comme le registre de règles de Semgrep, pour les documents.
 
-**Pensez pre-commit, pour les sorties d'agents.** pre-commit n'a écrit aucun linter ; il a mis tous les linters au même endroit, épinglés, avec une config et une commande. Keyross met tous les oracles qu'un agent doit satisfaire au même endroit : validateurs officiels adaptés (`adapters/`), oracles maison ajoutés (`oracles/`), un contrat de verdict, un lock, une gate, un rapport, un exit code.
+**Pensez pre-commit, pour les sorties d'agents.** pre-commit n'a écrit aucun linter ; il a mis tous les linters au même endroit, épinglés, avec une config et une commande. Keyross met tous les oracles qu'un agent doit satisfaire au même endroit : validateurs officiels adaptés (les `adapters/` de chaque gauge), oracles maison ajoutés (`oracles/`), un contrat de verdict, un lock, une gate, un rapport, un exit code.
 
 ## En cinq minutes
 
