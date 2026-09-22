@@ -1,4 +1,5 @@
-"""The yoke for Deep Agents / LangChain (sketch, v0.2): couples the agent to its gauges. after every writing tool, run the oracles on the working copy;
+"""The yoke for Deep Agents / LangChain (sketch, v0.2): couples the agent to its gauges and keeps them aligned — like a wheel alignment:
+the model and the rules each run straight; the yoke makes them run parallel. After every writing tool, run the oracles on the working copy;
 hard red → revert and minimal feedback; never any evidence nor the list of oracles reaches the model.
 LangChain 1.x signature: wrap_tool_call(request, handler) — verify against the project's pinned version."""
 from __future__ import annotations
@@ -9,7 +10,7 @@ from keyross.core.document import Document
 from keyross.core.runner import run, run_contract
 
 
-class KeyrossMiddleware:  # inherits from AgentMiddleware when deepagents is installed; dependency-free sketch
+class Yoke:  # inherits from AgentMiddleware when deepagents is installed; dependency-free sketch
     def __init__(self, *, gauge: str = "core", write_tools: tuple[str, ...] = ("apply_edits",), snapshot: Callable[[], Document] | None = None,
                  restore: Callable[[Document], None] | None = None, recorder: Any = None, ctx: dict | None = None) -> None:
         self.gauge, self.write_tools, self.snapshot, self.restore, self.recorder, self.ctx = gauge, write_tools, snapshot, restore, recorder, ctx or {}
@@ -31,3 +32,6 @@ class KeyrossMiddleware:  # inherits from AgentMiddleware when deepagents is ins
             self.restore(before)                      # revert
             return {"status": "error", "content": f"{hard[0].category}: retry"}   # minimal sufficient feedback
         return result
+
+
+KeyrossMiddleware = Yoke  # alias kept for readers who expect the LangChain naming

@@ -77,3 +77,10 @@ def test_cli_refuses_a_missing_file_without_a_report(tmp_path, capsys, monkeypat
     (tmp_path / "notes.yaml").write_text("a: 1\n", encoding="utf-8")
     assert main(["check", "notes.yaml"]) == 2 and "unsupported format" in capsys.readouterr().err
     assert main(["gate", "no-such-dir"]) == 2
+
+
+def test_yoke_exports_and_first_pass_rate(good_doc, bad_totals_doc):
+    from keyross.yoke import Yoke, KeyrossMiddleware
+    assert KeyrossMiddleware is Yoke and Yoke(gauge="core").gauge == "core"
+    assert run(load(good_doc), gauge="core", ctx={"units": ["m3", "m2"]}).aligned          # first pass: green, no retry
+    assert not run(load(bad_totals_doc), gauge="core", ids=["core.totals.match"]).aligned

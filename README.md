@@ -83,6 +83,21 @@ A Claude Code skill, a system prompt, a `CLAUDE.md`: text that a model reads and
 
 `keyross lint` refuses a gauge that imports a model client or the network; a gauge that ships a prompt file is not a gauge. This is the whole point: verification you can put in front of an auditor is code with published rules, not a wish addressed to a model.
 
+## The yoke
+
+The yoke is what couples your agent to its gauges — and the one line that changes an agent from *hoping* to *measuring*:
+
+```python
+from keyross.yoke import Yoke
+agent = create_deep_agent(..., middleware=[Yoke(gauge="einvoice")])   # Deep Agents / LangGraph
+```
+
+Think of a wheel alignment. The model runs straight; the rules run straight; without a yoke they do not run *parallel*, and the output drifts a little at every step — until an error ships with a confident sentence. The yoke measures after every writing tool: snapshot → tool → gauges → flag. Red means revert and retry (a pit stop, if you like) — and only the category comes back, nothing else. Green means continue. Over time the **first-pass rate** — green without a retry — is the health of the whole system: a falling rate means the model, the data or the rules drifted.
+
+![Without a yoke the output drifts until it ships; with a yoke every writing tool pulls it back — first-pass rate, measured](docs/yoke.gif)
+
+The yoke measures; it does not bound. Budgets, protected columns and deletion caps stay in your harness (its limiters). Three yokes exist or are planned: the Deep Agents / LangGraph middleware, the Claude Code `PostToolUse` hook, the MCP server (guard mode) — `keyross yoke <harness>` prints the recipe.
+
 ## Where the gauges run
 
 ![One run: the agent writes, the compiler runs the gauges, red flag → pit stop, green → scrutineering ships](docs/loop.gif)
@@ -113,7 +128,7 @@ Every verdict carries a flag: **green** (ok), **yellow** (soft failure — signa
 | Level | How | Time |
 |---|---|---|
 | 0 — scrutineering in CI | `keyross gate outputs/ --fail-on hard` — every gauge replayed outside the agent, an exit code, like pytest | 10 min |
-| 1 — the yoke, in the loop | `KeyrossMiddleware(gauge="core")` for Deep Agents / LangChain: measures after every writing tool, pit stop on red, minimal feedback *(sketch, v0.2)*. For Claude Code, a **hook** (`PostToolUse`) runs `keyross check` on files the agent writes — code executed by the harness, not a skill the model reads. `keyross yoke <harness>` prints the recipe | 1 h |
+| 1 — the yoke, in the loop | `Yoke(gauge="core")` for Deep Agents / LangChain: measures after every writing tool, pit stop on red, minimal feedback *(sketch, v0.2)*. For Claude Code, a **hook** (`PostToolUse`) runs `keyross check` on files the agent writes — code executed by the harness, not a skill the model reads. `keyross yoke <harness>` prints the recipe | 1 h |
 | 2 — the yoke, as a service | `keyross serve --mcp`: guard mode, called by the platform and invisible to the model; or tool mode with minimal feedback *(v0.5)* | 1 h |
 | 3 — the audit | `keyross audit`: the nine-section report and the governance gauge on the telemetry *(0.3)* | 1 day |
 

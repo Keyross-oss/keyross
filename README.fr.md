@@ -69,6 +69,21 @@ Un skill Claude Code, un prompt système, un `CLAUDE.md` : du texte qu'un modèl
 
 `keyross lint` refuse un gauge qui importe un client de modèle ou le réseau ; un gauge qui livre un fichier de prompt n'est pas un gauge. C'est tout le sujet : une vérification qu'on peut présenter à un auditeur est du code avec des règles publiées, pas un souhait adressé à un modèle.
 
+## Le yoke
+
+Le yoke est ce qui attelle l'agent à ses gauges — et la ligne qui fait passer un agent de *l'espoir* à *la mesure* :
+
+```python
+from keyross.yoke import Yoke
+agent = create_deep_agent(..., middleware=[Yoke(gauge="einvoice")])   # Deep Agents / LangGraph
+```
+
+Pense au parallélisme des roues. Le modèle roule droit ; les règles roulent droit ; sans yoke, ils ne roulent pas *parallèles*, et la sortie dérive un peu à chaque étape — jusqu'à ce qu'une erreur parte avec une phrase confiante. Le yoke mesure après chaque outil d'écriture : snapshot → outil → gauges → flag. Rouge = revert et retry (un pit stop, si on veut), et seule la catégorie revient. Vert = on continue. Dans le temps, le **first-pass rate** — vert sans retry — est la santé du système : s'il baisse, le modèle, les données ou les règles ont dérivé.
+
+![Sans yoke la sortie dérive jusqu'à la livraison ; avec, chaque outil d'écriture la ramène — first-pass rate, mesuré](docs/yoke.gif)
+
+Le yoke mesure ; il ne borne pas. Budgets, colonnes protégées, plafonds de suppression restent dans le harness (ses limiters). Trois yokes : la middleware Deep Agents / LangGraph, le hook `PostToolUse` de Claude Code, le serveur MCP (mode garde) — `keyross yoke <harness>` imprime la recette.
+
 ## Où tournent les gauges
 
 ![Un run : l'agent écrit, le compilateur exécute les gauges, drapeau rouge → pit stop, vert → le scrutineering livre](docs/loop.gif)
@@ -99,7 +114,7 @@ Chaque verdict porte un flag : **green** (ok), **yellow** (échec souple — sig
 | Niveau | Comment | Temps |
 |---|---|---|
 | 0 — le scrutineering en CI | `keyross gate outputs/ --fail-on hard` — exit code, comme pytest | 10 min |
-| 1 — le yoke, dans la boucle | `KeyrossMiddleware(gauge="core")` pour Deep Agents / LangChain : vérifie après chaque outil d'écriture, revert si rouge, retour minimal *(esquisse v0.2)* | 1 h |
+| 1 — le yoke, dans la boucle | `Yoke(gauge="core")` pour Deep Agents / LangChain : vérifie après chaque outil d'écriture, revert si rouge, retour minimal *(esquisse v0.2)* | 1 h |
 | 2 — le yoke, en service | `keyross serve --mcp` : l'outil `verify` en mode garde, appelé par le harness *(v0.5)* | 1 h |
 | 3 — l'audit | `keyross audit` : le rapport en neuf sections et le gauge governance sur la telemetry *(0.3)* | 1 jour |
 

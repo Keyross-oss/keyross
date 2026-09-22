@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- yoke: `Yoke` class (`KeyrossMiddleware` alias), `Report.aligned` (first-pass rate), README section "The yoke" with the drift animation (docs/yoke.gif)
 - cli: a missing file, an unsupported format or a missing directory is a usage error — clear message on stderr, exit 2, no report — instead of a red verdict or a traceback
 - docs: `SECURITY.md` (private reporting, scope: false greens, network or file access during a check, unpinned changes, leaks into minimal feedback); README EN/FR — `einvoice` in the five-minute tour and in 0.1, `keyross add einvoice`; registry index and CI action point to the `Keyross-oss` organization
 - **einvoice gauge 0.1.0** — the official CEN/TC 434 EN 16931 validation artefacts 1.3.16 (UBL, CII), vendored unmodified with their SHA-256 and executed offline by Saxon-HE (`pip install 'keyross[einvoice]'`); no rule rewritten

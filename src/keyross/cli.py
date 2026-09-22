@@ -197,7 +197,7 @@ def cmd_outdated(args: argparse.Namespace) -> int:
 def cmd_yoke(args: argparse.Namespace) -> int:
     """The yoke: couple an agent to its gauges (0.2: prints the integration recipe for the chosen harness)."""
     recipes = {
-        "deepagents": "from keyross.yoke.deepagents import KeyrossMiddleware\nagent = create_deep_agent(..., middleware=[..., KeyrossMiddleware(gauge=\"core\")])",
+        "deepagents": "from keyross.yoke import Yoke\nagent = create_deep_agent(..., middleware=[..., Yoke(gauge=\"core\")])",
         "claude-code": "# .claude/settings.json → hooks.PostToolUse: on Write|Edit run `keyross check \"$FILE\" --json`\n# code executed by the harness — not a skill the model reads",
         "mcp": "keyross serve --mcp --mode guard   # 0.5 — called by the platform; --mode tool exposes verify with minimal feedback",
     }

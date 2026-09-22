@@ -39,6 +39,12 @@ class Report:
         return "red" if self.hard_failures else ("yellow" if self.soft_failures else "green")
 
     @property
+    def aligned(self) -> bool:
+        """First pass: green with no retry. Tracked over time, the first-pass rate is the health of the yoke:
+        a falling rate means the model, the data or the rules drifted. (Not "alignment": that word belongs to model safety.)"""
+        return self.flag == "green"
+
+    @property
     def exit_code(self) -> int:
         if self.hard_failures:
             return EXIT_HARD
