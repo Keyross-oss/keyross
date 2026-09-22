@@ -12,7 +12,7 @@ Pour **rendre les agents responsables devant les compilateurs que les documents 
 
 **Le vocabulaire est anglais, un mot par pièce** : *gauge* — l'instrument installable, un ensemble d'oracles calibrés pour une famille de documents, homologué sur les validateurs officiels ; *yoke* — ce qui attelle l'agent à ses gauges (middleware, hook Claude Code, serveur MCP) ; *flags* — vert, jaune, rouge, noir ; *scrutineering* — la gate, tout rejoué hors de l'agent ; *seal* — le run scellé, lock et attestation ; *telemetry* — les événements de chaque run.
 
-**Le produit, c'est le registre** : tous les oracles documentaires agrégés dans des gauges versionnés, testés, signés, mis à jour depuis un seul endroit — `keyross add einvoice@1.2`, `keyross outdated`. Comme le registre de règles de Semgrep, pour les documents.
+**Le produit, c'est le registre** : tous les oracles documentaires agrégés dans des gauges versionnés, testés, signés, mis à jour depuis un seul endroit — `keyross add einvoice`, `keyross outdated`. Comme le registre de règles de Semgrep, pour les documents.
 
 **Pensez pre-commit, pour les sorties d'agents.** pre-commit n'a écrit aucun linter ; il a mis tous les linters au même endroit, épinglés, avec une config et une commande. Keyross met tous les oracles qu'un agent doit satisfaire au même endroit : validateurs officiels adaptés (les `adapters/` de chaque gauge), oracles maison ajoutés (`oracles/`), un contrat de verdict, un lock, une gate, un rapport, un exit code.
 
@@ -22,6 +22,7 @@ Pour **rendre les agents responsables devant les compilateurs que les documents 
 pip install keyross
 keyross init                  # keyross.yaml, oracles/, badset/
 keyross check devis.xlsx      # les oracles du gauge core sur une sortie → exit 0 / 1 / 2
+keyross check facture.xml     # une facture EN 16931 (UBL / CII) → les règles officielles du CEN — pip install "keyross[einvoice]"
 keyross test                  # chaque oracle attrape-t-il son cas faux ? (les tests des tests)
 keyross lint                  # refuse un oracle qui appelle un modèle ou le réseau
 keyross lock                  # épingle les oracles : la réponse à « qu'est-ce qui vérifiait ce run ? »
@@ -112,7 +113,7 @@ Chaque oracle a un **identifiant** (`gauge.sujet.propriete`), une **version**, u
 
 ## État et feuille de route
 
-`0.1` — check, gauge core, test, lint, lock, rapport, doctor statique, `gauges` / `add` / `outdated` / `yoke` · `0.2` — le gauge homologué `einvoice` (Schematron EN 16931 officiel adapté) et le yoke Deep Agents · `0.3` — gauges depuis git, `update` / `audit`, le seal, doctor sur images · `0.4` — gauges signés, doctor sur cluster jetable (kind), action CI, démo en boîte · `0.5` — le yoke MCP, le hook et le plugin Claude Code · puis `dora.register`, `aiact.annex4`, `governance`.
+`0.1` — check, gauge core, test, lint, lock, rapport, doctor statique, `gauges` / `add` / `outdated` / `yoke`, et le gauge homologué [`einvoice`](src/keyross/gauges/einvoice/README.md) (les artefacts officiels du CEN EN 16931 1.3.16, exécutés sans modification) · `0.2` — le yoke Deep Agents, les oracles delta `einvoice` et le PDF Factur-X · `0.3` — gauges depuis git, `update` / `audit`, le seal, doctor sur images · `0.4` — gauges signés, doctor sur cluster jetable (kind), action CI, démo en boîte · `0.5` — le yoke MCP, le hook et le plugin Claude Code · puis `dora.register`, `aiact.annex4`, `governance`.
 
 Ce dépôt se vérifie lui-même : sa CI lance `keyross test`, `keyross lint` et `keyross lock --check` à chaque commit.
 

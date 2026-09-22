@@ -65,15 +65,27 @@ def cmd_init(args: argparse.Namespace) -> int:
     return 0
 
 
+def _fail(message: str) -> int:
+    """A usage error (missing file, unsupported format): a clear message, no report, exit 2 — never a verdict on a document."""
+    print(f"keyross: {message}", file=sys.stderr)
+    return 2
+
+
 def cmd_check(args: argparse.Namespace) -> int:
+    if not Path(args.file).is_file():
+        return _fail(f"no such file: {args.file}")
     cfg = _load_config(); _load_oracles(cfg)
     ctx = dict(cfg.get("context", {}))
     if Path(args.file).suffix.lower() in ADAPTER_SUFFIXES:
         rep = run_adapters(args.file, gauge=args.gauge, only=cfg.get("adapters") or None)
     else:
-        if args.before:
-            ctx["before"] = load(args.before)
-        rep = run(load(args.file), gauge=args.gauge, ctx=ctx)
+        try:
+            if args.before:
+                ctx["before"] = load(args.before)
+            doc = load(args.file)
+        except (ValueError, OSError) as e:
+            return _fail(str(e))
+        rep = run(doc, gauge=args.gauge, ctx=ctx)
     if args.json:
         print(json.dumps(rep.to_dict(), ensure_ascii=False, indent=2, default=str))
     else:
@@ -86,6 +98,8 @@ def cmd_check(args: argparse.Namespace) -> int:
 
 def cmd_gate(args: argparse.Namespace) -> int:
     """The gate: every file of a folder; exit 2 on any hard red, 1 on soft (depending on --fail-on)."""
+    if not Path(args.dir).is_dir():
+        return _fail(f"no such directory: {args.dir}")
     cfg = _load_config(); _load_oracles(cfg)
     worst = 0
     for f in sorted(p for p in Path(args.dir).iterdir() if p.suffix.lower() in (".xlsx", ".csv", *ADAPTER_SUFFIXES)):

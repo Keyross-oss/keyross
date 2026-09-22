@@ -22,6 +22,7 @@ Where it plugs in: your CI (`keyross gate`), your agent loop (the Deep Agents / 
 pip install keyross
 keyross init                  # keyross.yaml, oracles/, badset/
 keyross check quote.xlsx      # run the core gauge on one output → green / yellow / red, exit 0 / 1 / 2
+keyross check invoice.xml     # an EN 16931 invoice (UBL / CII) → the official CEN rules — pip install "keyross[einvoice]"
 keyross test                  # does every oracle catch its bad case? (tests for the tests)
 keyross lint                  # refuse any oracle that calls a model or the network
 keyross lock                  # pin the oracles: the answer to "what verified this run?"
@@ -57,7 +58,7 @@ Aggregating every document oracle into installable instruments is the product. R
 
 ```bash
 keyross gauges                 # installed gauges vs the registry
-keyross add einvoice@1.2      # install a gauge, pin it in keyross.lock
+keyross add einvoice         # install a gauge, pin it in keyross.lock
 keyross update                # upgrade within the ranges of keyross.yaml, re-run the badsets      (0.3)
 keyross outdated              # are we on the latest rules?
 keyross audit                 # what verified what: gauges, versions, checksums, effective dates      (0.3)
@@ -126,7 +127,7 @@ Every oracle has an **id** (`gauge.subject.property`), a **version**, a **flag o
 
 ## Status and roadmap
 
-`0.1` — check, core gauge, test, lint, lock, report, static doctor, `gauges` / `add` / `outdated` / `yoke` on built-in gauges · `0.2` — the homologated `einvoice` gauge (official EN 16931 Schematron adapted) and the Deep Agents yoke · `0.3` — gauges from git, `update` / `audit`, the seal, doctor on images · `0.4` — signed gauges, doctor on a throwaway cluster (kind), CI action, boxed demo · `0.5` — the MCP yoke, the Claude Code hook and plugin · then `dora.register`, `aiact.annex4`, `governance`.
+`0.1` — check, core gauge, test, lint, lock, report, static doctor, `gauges` / `add` / `outdated` / `yoke` on built-in gauges, and the homologated [`einvoice`](src/keyross/gauges/einvoice/README.md) gauge (the official CEN EN 16931 artefacts 1.3.16, executed unmodified) · `0.2` — the Deep Agents yoke, `einvoice` delta oracles and Factur-X PDF · `0.3` — gauges from git, `update` / `audit`, the seal, doctor on images · `0.4` — signed gauges, doctor on a throwaway cluster (kind), CI action, boxed demo · `0.5` — the MCP yoke, the Claude Code hook and plugin · then `dora.register`, `aiact.annex4`, `governance`.
 
 This repository verifies itself: its CI runs `keyross test`, `keyross lint` and `keyross lock --check` on every commit.
 

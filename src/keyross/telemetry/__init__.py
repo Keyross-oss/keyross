@@ -1,4 +1,4 @@
-"""Telemetry: the events of every run — decisions, verdicts, sealed runs. JSONL locally; ClickHouse in production (the adaptiq repo)."""
+"""Telemetry: the events of every run — decisions, verdicts, sealed runs. JSONL locally; ClickHouse in production."""
 from __future__ import annotations
 
 import json

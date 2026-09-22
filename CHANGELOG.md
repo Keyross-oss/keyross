@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- cli: a missing file, an unsupported format or a missing directory is a usage error — clear message on stderr, exit 2, no report — instead of a red verdict or a traceback
+- docs: `SECURITY.md` (private reporting, scope: false greens, network or file access during a check, unpinned changes, leaks into minimal feedback); README EN/FR — `einvoice` in the five-minute tour and in 0.1, `keyross add einvoice`; registry index and CI action point to the `Keyross-oss` organization
 - **einvoice gauge 0.1.0** — the official CEN/TC 434 EN 16931 validation artefacts 1.3.16 (UBL, CII), vendored unmodified with their SHA-256 and executed offline by Saxon-HE (`pip install 'keyross[einvoice]'`); no rule rewritten
 - adapters: one registry entry per rule id, read from the executed artifacts (1,562 ids, version = the release, fatal → red, warning → yellow); category = the rule id, XPath and assertion text in evidence only; refused as a hard red when the pin does not match, when the adapter needs the network, or when the document declares a DOCTYPE
 - lock: records adapter pins (tool, version, per-artifact SHA-256) and every adapter rule; `lock --check` reports a changed release or artifact

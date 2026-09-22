@@ -65,3 +65,15 @@ def test_contract_delete_rows(good_doc, tmp_path):
     after = load(after_path)
     verdicts = run_contract("delete_rows", before, after, {"target_rows": ["rid:3"]})
     assert verdicts and verdicts[0].failed and verdicts[0].category == "contract.delete.amount_row"
+
+
+def test_cli_refuses_a_missing_file_without_a_report(tmp_path, capsys, monkeypatch):
+    from keyross.cli import main
+    monkeypatch.chdir(tmp_path)
+    assert main(["check", str(tmp_path / "missing.xml")]) == 2
+    assert "no such file" in capsys.readouterr().err
+    assert not (tmp_path / ".keyross").exists()                       # no report for a document that does not exist
+    (tmp_path / "keyross.yaml").write_text("gauges: [core]\n", encoding="utf-8")
+    (tmp_path / "notes.yaml").write_text("a: 1\n", encoding="utf-8")
+    assert main(["check", "notes.yaml"]) == 2 and "unsupported format" in capsys.readouterr().err
+    assert main(["gate", "no-such-dir"]) == 2
