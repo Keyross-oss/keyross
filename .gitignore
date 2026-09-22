@@ -1,0 +1,11 @@
+.keyross/
+__pycache__/
+*.pyc
+dist/
+build/
+*.egg-info/
+.venv/
+.env
+.env.*
+.pytest_cache/
+HANDOFF_CLAUDE_CODE.md

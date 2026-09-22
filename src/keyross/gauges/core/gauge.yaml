@@ -1,0 +1,16 @@
+name: core
+version: 0.1.0
+description: the universal invariants of priced documents — schema, totals, duplicates, unit vocabulary, numbering, conservation (sentinel); delete_rows contract
+documents: [table.xlsx, table.csv]
+owner: keyross
+license: Apache-2.0
+requires: { keyross: ">=0.1,<1" }
+oracles:
+  - { id: core.schema, severity: hard, version: 1 }
+  - { id: core.totals.match, severity: hard, version: 1 }
+  - { id: core.duplicates, severity: soft, version: 1 }
+  - { id: core.units.vocabulary, severity: soft, version: 1 }
+  - { id: core.numbering.continuous, severity: soft, version: 1 }
+  - { id: core.rows.conserved, severity: hard, version: 1, silent: true }
+  - { id: contract.delete_rows, severity: hard, version: 1 }
+regulatory: []

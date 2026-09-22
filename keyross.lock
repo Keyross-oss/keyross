@@ -1,0 +1,46 @@
+{
+  "oracles": {
+    "contract.delete_rows": {
+      "fingerprint": "a65117081026",
+      "kind": "contract",
+      "severity": "hard",
+      "version": 1
+    },
+    "core.duplicates": {
+      "fingerprint": "0e2a93789daa",
+      "kind": "invariant",
+      "severity": "soft",
+      "version": 1
+    },
+    "core.numbering.continuous": {
+      "fingerprint": "37edaf36e817",
+      "kind": "invariant",
+      "severity": "soft",
+      "version": 1
+    },
+    "core.rows.conserved": {
+      "fingerprint": "46c2dcd1108d",
+      "kind": "sentinel",
+      "severity": "hard",
+      "version": 1
+    },
+    "core.schema": {
+      "fingerprint": "60502e0f2b81",
+      "kind": "invariant",
+      "severity": "hard",
+      "version": 1
+    },
+    "core.totals.match": {
+      "fingerprint": "ac787145da21",
+      "kind": "invariant",
+      "severity": "hard",
+      "version": 1
+    },
+    "core.units.vocabulary": {
+      "fingerprint": "c2c272cb845e",
+      "kind": "invariant",
+      "severity": "soft",
+      "version": 1
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "registry": "keyross public index v0",
+  "gauges": {
+    "core": { "latest": "0.1.0", "source": "builtin:keyross.gauges.core", "license": "Apache-2.0", "owner": "keyross" },
+    "einvoice": { "latest": null, "source": "github:keyross/gauge-einvoice", "license": "Apache-2.0", "owner": "keyross", "status": "planned" },
+    "dora.register": { "latest": null, "source": "github:keyross/gauge-dora-register", "license": "Apache-2.0", "owner": "keyross", "status": "planned" },
+    "aiact.annex4": { "latest": null, "source": "github:keyross/gauge-aiact-annex4", "license": "Apache-2.0", "owner": "keyross", "status": "planned" },
+    "governance": { "latest": null, "source": "github:keyross/gauge-governance", "license": "commercial", "owner": "keyross", "status": "planned" }
+  }
+}

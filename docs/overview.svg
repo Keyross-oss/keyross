@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="660" viewBox="0 0 1600 660" font-family="Inter, Arial, Helvetica, sans-serif">
+<defs><marker id="ah" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 z" fill="#1A2C4E"/></marker></defs>
+<rect x="0" y="0" width="1600" height="660" fill="#FFFFFF"/>
+<text x="800.0" y="70" font-size="32" font-weight="700" text-anchor="middle" fill="#1A2C4E">Gauges measure. The yoke couples your agent to them. Scrutineering decides.</text>
+<rect x="60" y="120" width="380" height="300" rx="18" fill="#F7F7F7" stroke="#1A2C4E" stroke-width="4"/>
+<text x="250" y="174" font-size="36" font-weight="700" text-anchor="middle" fill="#1A2C4E">GAUGES</text>
+<text x="250" y="218" font-size="24" text-anchor="middle" fill="#1F2933">official validators, homologated</text>
+<text x="250" y="252" font-size="24" text-anchor="middle" fill="#1F2933">your own oracles</text>
+<text x="250" y="286" font-size="24" text-anchor="middle" fill="#1F2933">bad cases that test them</text>
+<text x="250" y="340" font-size="24" font-style="italic" text-anchor="middle" fill="#2C6E78">keyross add einvoice</text>
+<text x="250" y="380" font-size="22" font-style="italic" text-anchor="middle" fill="#6A7179">code — a model never reads it</text>
+<line x1="440" y1="270" x2="520" y2="270" stroke="#1A2C4E" stroke-width="5" marker-end="url(#ah)"/>
+<rect x="524" y="120" width="500" height="300" rx="18" fill="#FFF8E7" stroke="#B08A2E" stroke-width="5"/>
+<text x="774" y="174" font-size="36" font-weight="700" text-anchor="middle" fill="#1A2C4E">KEYROSS</text>
+<text x="774" y="216" font-size="26" text-anchor="middle" fill="#1F2933">compiles the agent’s output</text>
+<text x="774" y="256" font-size="24" text-anchor="middle" fill="#1F2933">deterministic · pinned in keyross.lock</text>
+<text x="774" y="310" font-size="28" font-weight="700" text-anchor="middle" fill="#1A2C4E">green · yellow · red · black</text>
+<text x="774" y="346" font-size="21" font-style="italic" text-anchor="middle" fill="#6A7179">the agent gets a flag and a category — never the evidence</text>
+<text x="774" y="388" font-size="26" font-weight="700" text-anchor="middle" fill="#2C6E78">exit 0 · 1 · 2</text>
+<rect x="1104" y="120" width="436" height="92" rx="18" fill="#E3EEF0" stroke="#2C6E78" stroke-width="3"/>
+<text x="1322" y="158" font-size="25" font-weight="700" text-anchor="middle" fill="#1A2C4E">YOKE — IN THE LOOP</text>
+<text x="1322" y="190" font-size="21" font-style="italic" text-anchor="middle" fill="#6A7179">middleware · Claude Code hook</text>
+<line x1="1024" y1="270" x2="1100" y2="166" stroke="#1A2C4E" stroke-width="3" marker-end="url(#ah)"/>
+<rect x="1104" y="224" width="436" height="92" rx="18" fill="#E3EEF0" stroke="#2C6E78" stroke-width="3"/>
+<text x="1322" y="262" font-size="25" font-weight="700" text-anchor="middle" fill="#1A2C4E">YOKE — AS A SERVICE</text>
+<text x="1322" y="294" font-size="21" font-style="italic" text-anchor="middle" fill="#6A7179">MCP · called by the platform</text>
+<line x1="1024" y1="270" x2="1100" y2="270" stroke="#1A2C4E" stroke-width="3" marker-end="url(#ah)"/>
+<rect x="1104" y="328" width="436" height="92" rx="18" fill="#E3EEF0" stroke="#2C6E78" stroke-width="3"/>
+<text x="1322" y="366" font-size="25" font-weight="700" text-anchor="middle" fill="#1A2C4E">SCRUTINEERING</text>
+<text x="1322" y="398" font-size="21" font-style="italic" text-anchor="middle" fill="#6A7179">CI · pipeline · no agent needed</text>
+<line x1="1024" y1="270" x2="1100" y2="374" stroke="#1A2C4E" stroke-width="3" marker-end="url(#ah)"/>
+<text x="800.0" y="500" font-size="26" text-anchor="middle" fill="#1F2933">Every door produces the same verdict, the same lock, the same report — sealed.</text>
+<text x="800.0" y="544" font-size="22" font-style="italic" text-anchor="middle" fill="#2C6E78">Full architecture → docs/ARCHITECTURE.md</text>
+</svg>

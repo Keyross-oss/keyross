@@ -1,0 +1,216 @@
+"""keyross — the command line. init · check · gate · test · lint · lock · doctor · gauges · add · outdated · yoke. No account, no cloud, no model."""
+from __future__ import annotations
+
+import argparse
+import importlib
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+import yaml
+
+from keyross import __version__
+from keyross.core.document import load
+from keyross.core.runner import run
+from keyross.core import lock as lockmod
+from keyross.gate import report as reportmod
+from keyross.oracles.badset import run_badset
+from keyross.oracles.lint import lint_dir
+
+DEFAULT_CONFIG = """# keyross.yaml — the configuration of your agent's compiler
+gauges: [core]            # gauges to load (modules keyross.gauges.<name>); add your own: [core, mycompany.invoices]
+adapters: []             # official validators run as oracles inside a gauge, pinned — e.g. [einvoice.schematron] (0.2)
+oracles_dir: oracles     # your own oracles (@oracle, @contract)
+badset_dir: badset       # one bad case per oracle: badset/<oracle_id>.xlsx
+context:
+  units: [u, m, m2, m3, ml, kg, t, ens, ff, h, j, l]   # unit vocabulary — adapt it
+report_dir: .keyross/reports
+"""
+
+SAMPLE_ORACLE = '''"""Your own oracles. An oracle = a pure function (document, context) -> Verdict. Deterministic or nothing."""
+from keyross import oracle, Verdict
+
+
+@oracle("mine.total.positive", severity="soft")
+def total_positive(doc):
+    """No negative amount in this kind of document."""
+    bad = [{"rid": l.rid, "amount": l.amount} for l in doc.amount_lines() if (l.amount or 0) < 0]
+    return Verdict.fail(f"{len(bad)} negative amount(s)", "amount.negative", rows=bad) if bad else Verdict.ok()
+'''
+
+
+def _load_config(path: str = "keyross.yaml") -> dict:
+    p = Path(path)
+    return yaml.safe_load(p.read_text(encoding="utf-8")) if p.exists() else yaml.safe_load(DEFAULT_CONFIG)
+
+
+def _load_oracles(cfg: dict) -> None:
+    for gauge in cfg.get("gauges", []):
+        importlib.import_module(f"keyross.gauges.{gauge}" if "." not in gauge else gauge)
+    d = Path(cfg.get("oracles_dir", "oracles"))
+    if d.exists():
+        for f in sorted(d.glob("*.py")):
+            spec = importlib.util.spec_from_file_location(f"oracles_{f.stem}", f)
+            mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)  # type: ignore[union-attr]
+
+
+def cmd_init(args: argparse.Namespace) -> int:
+    Path("keyross.yaml").write_text(DEFAULT_CONFIG, encoding="utf-8")
+    Path("oracles").mkdir(exist_ok=True); Path("badset").mkdir(exist_ok=True)
+    Path("oracles/mine.py").write_text(SAMPLE_ORACLE, encoding="utf-8")
+    print("created keyross.yaml, oracles/mine.py, badset/. Next: keyross check <file.xlsx>")
+    return 0
+
+
+def cmd_check(args: argparse.Namespace) -> int:
+    cfg = _load_config(); _load_oracles(cfg)
+    ctx = dict(cfg.get("context", {}))
+    if args.before:
+        ctx["before"] = load(args.before)
+    doc = load(args.file)
+    rep = run(doc, gauge=args.gauge, ctx=ctx)
+    if args.json:
+        print(json.dumps(rep.to_dict(), ensure_ascii=False, indent=2, default=str))
+    else:
+        print(reportmod.terminal(rep, verbose=args.verbose))
+        rd = Path(cfg.get("report_dir", ".keyross/reports")); rd.mkdir(parents=True, exist_ok=True)
+        out = rd / (Path(args.file).stem + ".md"); out.write_text(reportmod.markdown(rep), encoding="utf-8")
+        print(f"report: {out}")
+    return rep.exit_code
+
+
+def cmd_gate(args: argparse.Namespace) -> int:
+    """The gate: every file of a folder; exit 2 on any hard red, 1 on soft (depending on --fail-on)."""
+    cfg = _load_config(); _load_oracles(cfg)
+    worst = 0
+    for f in sorted(Path(args.dir).glob("*.xlsx")) + sorted(Path(args.dir).glob("*.csv")):
+        rep = run(load(f), gauge=args.gauge, ctx=dict(cfg.get("context", {})))
+        print(reportmod.terminal(rep)); worst = max(worst, rep.exit_code)
+    if args.fail_on == "hard":
+        return 2 if worst == 2 else 0
+    return worst
+
+
+def cmd_test(args: argparse.Namespace) -> int:
+    cfg = _load_config(); _load_oracles(cfg)
+    rc = 0
+    for oid, ok, msg in run_badset(cfg.get("badset_dir", "badset"), gauge=args.gauge, ctx=dict(cfg.get("context", {}))):
+        print(f"  {'✔' if ok else '✘'} {oid:<28} {msg}"); rc = rc or (0 if ok else 1)
+    return rc
+
+
+def cmd_lint(args: argparse.Namespace) -> int:
+    cfg = _load_config()
+    targets = [Path(cfg.get("oracles_dir", "oracles")), Path(__file__).parent / "gauges"]
+    problems = [p for t in targets if t.exists() for p in lint_dir(t)]
+    for p in problems:
+        print("  ✘ " + p)
+    print("  ✔ no model, no network, no non-determinism inside the oracles" if not problems else f"{len(problems)} problem(s)")
+    return 1 if problems else 0
+
+
+def cmd_lock(args: argparse.Namespace) -> int:
+    cfg = _load_config(); _load_oracles(cfg)
+    if args.check:
+        diffs = lockmod.check()
+        for d in diffs:
+            print("  ✘ " + d)
+        print("  ✔ pinning respected" if not diffs else f"{len(diffs)} difference(s) with keyross.lock")
+        return 1 if diffs else 0
+    data = lockmod.write()
+    print(f"keyross.lock written — {len(data['oracles'])} oracle(s) pinned")
+    return 0
+
+
+def _index() -> dict:
+    return json.loads((Path(__file__).parent / "gauges" / "index.json").read_text(encoding="utf-8"))["gauges"]
+
+
+def _gauge_version(name: str) -> str | None:
+    p = Path(__file__).parent / "gauges" / name / "gauge.yaml"
+    return yaml.safe_load(p.read_text(encoding="utf-8")).get("version") if p.exists() else None
+
+
+def cmd_gauges(args: argparse.Namespace) -> int:
+    """Installed gauges vs the registry index."""
+    cfg = _load_config(); idx = _index()
+    print(f"  {'gauge':<16} {'installed':<11} {'latest':<9} status")
+    for name, meta in idx.items():
+        installed = _gauge_version(name) if name in cfg.get("gauges", []) else None
+        latest = meta.get("latest") or "—"
+        status = "installed" if installed else ("available" if meta.get("latest") else meta.get("status", "planned"))
+        print(f"  {name:<16} {installed or '—':<11} {latest:<9} {status}")
+    return 0
+
+
+def cmd_add(args: argparse.Namespace) -> int:
+    """Add a gauge from the registry index to keyross.yaml (v1: built-in gauges; git sources in 0.3)."""
+    name = args.gauge.split("@")[0]; idx = _index()
+    if name not in idx:
+        print(f"unknown gauge: {name} — see `keyross gauges`"); return 1
+    src = idx[name]["source"]
+    if not src.startswith("builtin:"):
+        print(f"{name}: source {src} — installing from git arrives in 0.3; the gauge is {idx[name].get('status', 'planned')}"); return 1
+    cfg = _load_config()
+    if name in cfg.get("gauges", []):
+        print(f"{name} already in keyross.yaml"); return 0
+    cfg.setdefault("gauges", []).append(name)
+    Path("keyross.yaml").write_text(yaml.safe_dump(cfg, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    print(f"added {name}@{_gauge_version(name)} to keyross.yaml — run `keyross lock`")
+    return 0
+
+
+def cmd_outdated(args: argparse.Namespace) -> int:
+    """Are we on the latest rules? Installed gauge versions vs the registry."""
+    cfg = _load_config(); idx = _index(); rc = 0
+    for name in cfg.get("gauges", []):
+        installed, latest = _gauge_version(name), idx.get(name, {}).get("latest")
+        if latest and installed and installed != latest:
+            print(f"  ✘ {name:<16} {installed} → {latest}"); rc = 1
+        else:
+            print(f"  ✔ {name:<16} {installed or '?'} (latest)")
+    return rc
+
+
+def cmd_yoke(args: argparse.Namespace) -> int:
+    """The yoke: couple an agent to its gauges (0.2: prints the integration recipe for the chosen harness)."""
+    recipes = {
+        "deepagents": "from keyross.yoke.deepagents import KeyrossMiddleware\nagent = create_deep_agent(..., middleware=[..., KeyrossMiddleware(gauge=\"core\")])",
+        "claude-code": "# .claude/settings.json → hooks.PostToolUse: on Write|Edit run `keyross check \"$FILE\" --json`\n# code executed by the harness — not a skill the model reads",
+        "mcp": "keyross serve --mcp --mode guard   # 0.5 — called by the platform; --mode tool exposes verify with minimal feedback",
+    }
+    if args.harness not in recipes:
+        print(f"unknown harness: {args.harness} — one of {', '.join(recipes)}"); return 1
+    print(recipes[args.harness]); return 0
+
+
+def cmd_doctor(args: argparse.Namespace) -> int:
+    from keyross.doctor.checks import run_static, render
+    findings = run_static(args.path)
+    print(render(findings))
+    return 0 if all(f.ok for f in findings) else 1
+
+
+def main(argv: list[str] | None = None) -> int:
+    p = argparse.ArgumentParser(prog="keyross", description="A compiler for your agent's outputs.")
+    p.add_argument("--version", action="version", version=f"keyross {__version__}")
+    sub = p.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("init", help="create keyross.yaml, oracles/, badset/").set_defaults(fn=cmd_init)
+    c = sub.add_parser("check", help="run the oracles on one output"); c.add_argument("file"); c.add_argument("--gauge"); c.add_argument("--before", help="reference document (conservation sentinel)")
+    c.add_argument("--json", action="store_true"); c.add_argument("-v", "--verbose", action="store_true"); c.set_defaults(fn=cmd_check)
+    g = sub.add_parser("gate", help="the gate on a folder of outputs — exit code for CI"); g.add_argument("dir"); g.add_argument("--gauge"); g.add_argument("--fail-on", choices=["hard", "soft"], default="hard"); g.set_defaults(fn=cmd_gate)
+    t = sub.add_parser("test", help="does every oracle catch its bad case from the badset?"); t.add_argument("--gauge"); t.set_defaults(fn=cmd_test)
+    sub.add_parser("lint", help="refuse an oracle that calls a model or the network").set_defaults(fn=cmd_lint)
+    lk = sub.add_parser("lock", help="pin the oracles (keyross.lock)"); lk.add_argument("--check", action="store_true"); lk.set_defaults(fn=cmd_lock)
+    d = sub.add_parser("doctor", help="is the agent ready for a cluster? (v0.1: static checks)"); d.add_argument("path", nargs="?", default="."); d.set_defaults(fn=cmd_doctor)
+    sub.add_parser("gauges", help="installed gauges vs the registry index").set_defaults(fn=cmd_gauges)
+    a = sub.add_parser("add", help="add a gauge from the registry (keyross add core)"); a.add_argument("gauge"); a.set_defaults(fn=cmd_add)
+    sub.add_parser("outdated", help="are we on the latest rules? installed gauges vs registry").set_defaults(fn=cmd_outdated)
+    y = sub.add_parser("yoke", help="couple an agent to its gauges: deepagents · claude-code · mcp"); y.add_argument("harness"); y.set_defaults(fn=cmd_yoke)
+    args = p.parse_args(argv)
+    return args.fn(args)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

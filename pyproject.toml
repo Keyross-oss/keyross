@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "keyross"
+version = "0.1.0.dev0"
+description = "Keyross — a compiler and a package manager for your agent's document oracles: official validators adapted, your own added, one lock, one gate."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+authors = [{ name = "Wassim Amri" }]
+keywords = ["agents", "verification", "oracles", "deterministic", "llm", "kubernetes"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = ["openpyxl>=3.1", "pyyaml>=6.0"]
+
+[project.optional-dependencies]
+doctor = ["pyyaml>=6.0"]            # gitleaks / trivy / conftest sont appelés par sous-processus s'ils sont présents
+adapters = []                        # deepagents / langchain sont importés paresseusement, jamais requis
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+keyross = "keyross.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/keyross"]
+
+[tool.hatch.build]
+include = ["src/keyross/**/*.py", "src/keyross/**/*.json", "src/keyross/**/*.yaml", "src/keyross/**/*.md"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

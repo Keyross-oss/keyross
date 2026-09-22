@@ -1,0 +1,8 @@
+# keyross.yaml — la configuration du compilateur (celle du dépôt lui-même : il se vérifie)
+gauges: [core]
+adapters: []
+oracles_dir: oracles
+badset_dir: badset
+context:
+  units: [u, m, m2, m3, ml, kg, t, ens, ff, h, j, l]
+report_dir: .keyross/reports
