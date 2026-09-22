@@ -3,3 +3,12 @@ Copyright 2026 Wassim Amri / Keyross
 
 This product includes software developed by the Keyross contributors.
 Licensed under the Apache License, Version 2.0.
+
+Third-party material:
+- src/keyross/gauges/einvoice/rules/cen-1.3.16/ — CEN/TC 434 EN 16931 validation artefacts 1.3.16
+  (https://github.com/ConnectingEurope/eInvoicing-EN16931), redistributed unmodified under the
+  European Union Public Licence v1.2 (see LICENSE.txt in that directory).
+- tests/fixtures/einvoice/cen-*.xml — examples from the same CEN release, EUPL-1.2.
+- tests/fixtures/einvoice/facturx-*.xml and badset/einvoice.*.xml — derived from the test fixtures of
+  akretion/factur-x (https://github.com/akretion/factur-x), Copyright (c) 2016-2023 Alexis de Lattre,
+  BSD licence: redistribution permitted provided the copyright notice is retained.

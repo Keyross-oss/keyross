@@ -1,0 +1,4 @@
+# Pinned rule artifacts are verified by SHA-256 and bad cases are compared byte for byte: never convert their line endings.
+src/keyross/gauges/*/rules/** -text
+badset/** -text
+tests/fixtures/** -text

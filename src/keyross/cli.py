@@ -12,7 +12,7 @@ import yaml
 
 from keyross import __version__
 from keyross.core.document import load
-from keyross.core.runner import run
+from keyross.core.runner import run, run_adapters
 from keyross.core import lock as lockmod
 from keyross.gate import report as reportmod
 from keyross.oracles.badset import run_badset
@@ -20,13 +20,15 @@ from keyross.oracles.lint import lint_dir
 
 DEFAULT_CONFIG = """# keyross.yaml — the configuration of your agent's compiler
 gauges: [core]            # gauges to load (modules keyross.gauges.<name>); add your own: [core, mycompany.invoices]
-adapters: []             # official validators run as oracles inside a gauge, pinned — e.g. [einvoice.schematron] (0.2)
+adapters: []             # official validators to run, pinned (empty = every adapter of the loaded gauges), e.g. [einvoice.schematron]
 oracles_dir: oracles     # your own oracles (@oracle, @contract)
 badset_dir: badset       # one bad case per oracle: badset/<oracle_id>.xlsx
 context:
   units: [u, m, m2, m3, ml, kg, t, ens, ff, h, j, l]   # unit vocabulary — adapt it
 report_dir: .keyross/reports
 """
+
+ADAPTER_SUFFIXES = (".xml",)   # documents validated by adapters (official validators), not by the tabular loader
 
 SAMPLE_ORACLE = '''"""Your own oracles. An oracle = a pure function (document, context) -> Verdict. Deterministic or nothing."""
 from keyross import oracle, Verdict
@@ -66,10 +68,12 @@ def cmd_init(args: argparse.Namespace) -> int:
 def cmd_check(args: argparse.Namespace) -> int:
     cfg = _load_config(); _load_oracles(cfg)
     ctx = dict(cfg.get("context", {}))
-    if args.before:
-        ctx["before"] = load(args.before)
-    doc = load(args.file)
-    rep = run(doc, gauge=args.gauge, ctx=ctx)
+    if Path(args.file).suffix.lower() in ADAPTER_SUFFIXES:
+        rep = run_adapters(args.file, gauge=args.gauge, only=cfg.get("adapters") or None)
+    else:
+        if args.before:
+            ctx["before"] = load(args.before)
+        rep = run(load(args.file), gauge=args.gauge, ctx=ctx)
     if args.json:
         print(json.dumps(rep.to_dict(), ensure_ascii=False, indent=2, default=str))
     else:
@@ -84,8 +88,11 @@ def cmd_gate(args: argparse.Namespace) -> int:
     """The gate: every file of a folder; exit 2 on any hard red, 1 on soft (depending on --fail-on)."""
     cfg = _load_config(); _load_oracles(cfg)
     worst = 0
-    for f in sorted(Path(args.dir).glob("*.xlsx")) + sorted(Path(args.dir).glob("*.csv")):
-        rep = run(load(f), gauge=args.gauge, ctx=dict(cfg.get("context", {})))
+    for f in sorted(p for p in Path(args.dir).iterdir() if p.suffix.lower() in (".xlsx", ".csv", *ADAPTER_SUFFIXES)):
+        if f.suffix.lower() in ADAPTER_SUFFIXES:
+            rep = run_adapters(str(f), gauge=args.gauge, only=cfg.get("adapters") or None)
+        else:
+            rep = run(load(f), gauge=args.gauge, ctx=dict(cfg.get("context", {})))
         print(reportmod.terminal(rep)); worst = max(worst, rep.exit_code)
     if args.fail_on == "hard":
         return 2 if worst == 2 else 0

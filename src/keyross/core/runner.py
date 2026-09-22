@@ -86,6 +86,23 @@ def run(doc: Document, *, gauge: str | None = None, ids: list[str] | None = None
     return report
 
 
+def run_adapters(path: str, *, gauge: str | None = None, only: list[str] | None = None, ctx: dict[str, Any] | None = None) -> Report:
+    """Run the registered adapters that accept this document (an official validator, pinned, offline). No adapter = hard red."""
+    from keyross.oracles.adapter import adapters
+    t0 = time.perf_counter()
+    report = Report(document=str(path), context=ctx or {})
+    for a in sorted(adapters.values(), key=lambda a: a.id):
+        if (gauge and a.gauge != gauge) or (only and a.id not in only) or not a.accepts(path):
+            continue
+        report.verdicts.extend(a.verdicts(path))
+    if not report.verdicts:
+        v = Verdict.fail(f"no loaded gauge validates {path}", "document.unsupported")
+        v.oracle_id = "keyross.check"
+        report.verdicts.append(v)
+    report.duration_ms = round((time.perf_counter() - t0) * 1000)
+    return report
+
+
 def run_contract(action: str, before: Document, after: Document, params: dict[str, Any], ctx: dict[str, Any] | None = None) -> list[Verdict]:
     """Instantiate the contracts of an action with the task's parameters — the harness calls this, never the LLM."""
     ctx = ctx or {}

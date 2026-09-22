@@ -24,6 +24,7 @@ dependencies = ["openpyxl>=3.1", "pyyaml>=6.0"]
 [project.optional-dependencies]
 doctor = ["pyyaml>=6.0"]            # gitleaks / trivy / conftest are called as subprocesses when present
 adapters = []                        # deepagents / langchain are imported lazily, never required
+einvoice = ["saxonche>=12.5,<14"]    # Saxon-HE: runs the official CEN XSLT 2.0 artifacts offline
 dev = ["pytest>=8", "ruff>=0.6"]
 
 [project.scripts]
@@ -33,7 +34,8 @@ keyross = "keyross.cli:main"
 packages = ["src/keyross"]
 
 [tool.hatch.build]
-include = ["src/keyross/**/*.py", "src/keyross/**/*.json", "src/keyross/**/*.yaml", "src/keyross/**/*.md"]
+include = ["src/keyross/**/*.py", "src/keyross/**/*.json", "src/keyross/**/*.yaml", "src/keyross/**/*.md",
+           "src/keyross/gauges/*/rules/**"]
 
 [tool.ruff]
 line-length = 110

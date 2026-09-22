@@ -24,7 +24,7 @@ class Verdict:
     category: str = ""                      # the category of the deviation — this is ALL the agent ever receives
     evidence: dict[str, Any] = field(default_factory=dict)   # proof: rows, expected, actual — never shown to the agent
     oracle_id: str = ""
-    version: int = 0
+    version: int | str = 0
     severity: Severity = Severity.HARD
     silent: bool = False                    # sentinel: no feedback to the agent, zero weight
 

@@ -9,7 +9,8 @@ gauge-einvoice/
   gauge.yaml            # the manifest
   oracles/*.py         # invariants, contracts, sentinels (@oracle, @contract)
   adapters/*.py        # existing validators wrapped as oracles (ExternalValidatorAdapter)
-  badset/*.xlsx|xml    # one bad case per oracle
+  rules/<release>/     # the validator's artifacts, vendored unmodified, with their licence
+  badset/*.xlsx|xml    # one bad case per oracle; for an adapter, one per rule family
   CHANGELOG.md         # every version cites the revision of the standard that motivates it
   README.md            # which documents, which rules, what is delta
 ```
@@ -32,10 +33,14 @@ license: Apache-2.0                  # or a commercial license id
 requires: { keyross: ">=0.2,<1" }
 adapters:
   - id: einvoice.schematron
-    tool: akretion/factur-x
-    version: "EN16931 1.3.13"
-    artifact_sha256: "…"             # checksum of the rule artifacts executed
-    offline: true
+    tool: CEN/TC 434 EN 16931 validation artefacts
+    version: "1.3.16"                # the release; every rule registered from it carries this version
+    engine: Saxon-HE via saxonche (XSLT 2.0)
+    offline: true                    # false = refused
+    syntaxes: { cii: rules/cen-1.3.16/EN16931-CII-validation.xslt, ubl: rules/cen-1.3.16/EN16931-UBL-validation.xslt }
+    artifacts:                       # SHA-256 of each file executed, verified before every run
+      rules/cen-1.3.16/EN16931-CII-validation.xslt: "0b234dea…"
+      rules/cen-1.3.16/EN16931-UBL-validation.xslt: "39f9d282…"
 oracles:                             # declared, so the lock can pin them before they run
   - { id: einvoice.delta.order_match, severity: hard, version: 2 }
   - { id: einvoice.delta.supplier_reference, severity: soft, version: 1 }

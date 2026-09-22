@@ -6,14 +6,16 @@ from pathlib import Path
 from keyross.core.document import load
 from keyross.core.registry import registry
 from keyross.core.runner import run
+from keyross.oracles.adapter import adapters
 
 
 def run_badset(badset_dir: str | Path = "badset", gauge: str | None = None, ctx: dict | None = None) -> list[tuple[str, bool, str]]:
-    """For each oracle: look for badset/<id>.xlsx|csv; the oracle MUST fail on it. Returns (id, ok, message)."""
+    """For each oracle: look for badset/<id>.xlsx|csv; the oracle MUST fail on it. For each adapter: one bad case per rule family
+    (badset/<gauge>.<rule>[.<variant>].<ext> must raise <rule>). Returns (id, ok, message)."""
     results = []
     d = Path(badset_dir)
     for spec in registry.all(gauge=gauge):
-        if spec.kind == "contract":
+        if spec.kind in ("contract", "adapter"):
             continue
         candidates = [d / f"{spec.id}.xlsx", d / f"{spec.id}.csv"]
         f = next((c for c in candidates if c.exists()), None)
@@ -27,4 +29,7 @@ def run_badset(badset_dir: str | Path = "badset", gauge: str | None = None, ctx:
         rep = run(load(f), ids=[spec.id], ctx=c)
         v = rep.verdicts[0]
         results.append((spec.id, v.failed, "catches its bad case" if v.failed else f"DOES NOT FAIL on {f.name} — dead oracle or badly built case"))
+    for a in sorted(adapters.values(), key=lambda a: a.id):
+        if not gauge or a.gauge == gauge:
+            results.extend(a.badset(d))
     return results

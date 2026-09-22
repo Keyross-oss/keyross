@@ -1,5 +1,5 @@
 # keyross.yaml — the compiler configuration of this repository (it verifies itself)
-gauges: [core]
+gauges: [core, einvoice]
 adapters: []
 oracles_dir: oracles
 badset_dir: badset

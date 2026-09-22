@@ -15,17 +15,20 @@ OracleFn = Callable[..., Verdict]
 class OracleSpec:
     id: str
     fn: OracleFn
-    version: int = 1
+    version: int | str = 1            # an adapter rule carries the release of its artifact, e.g. "1.3.16"
     severity: Severity = Severity.HARD
     silent: bool = False              # sentinel
-    kind: str = "invariant"           # invariant | contract | sentinel
+    kind: str = "invariant"           # invariant | contract | sentinel | adapter
     action: str | None = None         # for a contract: the action it verifies
     doc: str = ""
     tags: list[str] = field(default_factory=list)
+    pinned: str = ""                  # adapter rule: "<rule id>|<tool severity>|<artifact sha256>" — the fingerprint follows the artifact
 
     @property
     def fingerprint(self) -> str:
-        """Code fingerprint: changes when the oracle changes. This is what the lock pins."""
+        """Code fingerprint: changes when the oracle changes (for an adapter rule: when its artifact changes). This is what the lock pins."""
+        if self.pinned:
+            return hashlib.sha1(self.pinned.encode()).hexdigest()[:12]
         try:
             src = inspect.getsource(self.fn)
         except OSError:

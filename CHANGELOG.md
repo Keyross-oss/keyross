@@ -1,6 +1,12 @@
 # Changelog
 
 ## Unreleased
+- **einvoice gauge 0.1.0** — the official CEN/TC 434 EN 16931 validation artefacts 1.3.16 (UBL, CII), vendored unmodified with their SHA-256 and executed offline by Saxon-HE (`pip install 'keyross[einvoice]'`); no rule rewritten
+- adapters: one registry entry per rule id, read from the executed artifacts (1,562 ids, version = the release, fatal → red, warning → yellow); category = the rule id, XPath and assertion text in evidence only; refused as a hard red when the pin does not match, when the adapter needs the network, or when the document declares a DOCTYPE
+- lock: records adapter pins (tool, version, per-artifact SHA-256) and every adapter rule; `lock --check` reports a changed release or artifact
+- core: second canonical model `Invoice` (header, lines, totals, VAT breakdown; `InvoiceLine` extends the common `Line`) with UBL and CII loaders — standard library only
+- cli: `check` and `gate` route `.xml` documents to the adapters of the loaded gauges; an XML document no gauge validates is a hard red
+- badset: adapter bad cases (`badset/<gauge>.<rule>[.<variant>].xml`), one or more per rule family — 20 corrupted public Factur-X examples cover the 19 EN 16931 families; `keyross test` fails on an uncovered family
 - fix(cli): force UTF-8 output — flags (✔ / ✘) crashed the CLI on a Windows console or pipe (cp1252)
 - docs: last traces of the old vocabulary and of French removed from public files — `new_pack.md` issue template renamed `new_gauge.md`; comments in CI workflows, `pyproject.toml`, `keyross.yaml`, tests, `action/` and `demo-k8s/` translated; README points to each gauge's `adapters/`
 
