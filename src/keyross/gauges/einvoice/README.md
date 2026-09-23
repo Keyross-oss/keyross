@@ -8,6 +8,7 @@ The official CEN/TC 434 validation artefacts for EN 16931, executed as published
 | Rules | CEN validation artefacts **1.3.16** ([release](https://github.com/ConnectingEurope/eInvoicing-EN16931/releases/tag/validation-1.3.16)) — 1,562 rule ids, 19 families |
 | Engine | Saxon-HE through `saxonche` (the artefacts are XSLT 2.0) — `pip install 'keyross[einvoice]'` |
 | Network | none: the check runs offline, and a document that declares a DOCTYPE is refused |
+| Not checked | **the XML schema** — which element, where, in which order. The CEN rules assume a schema-valid document: validate against the syntax's schema as well. The schema step is planned |
 
 ```bash
 keyross add einvoice && keyross lock
@@ -77,7 +78,7 @@ Sources: `tests/fixtures/xml/factur-x-en16931.xml` (CII) and `ubl-21-en16931.xml
 
 ## Not yet
 
-Other delta oracles (supplier master data, the `issue_invoice` contract); extracting the XML from a Factur-X PDF; the national extensions (XRechnung CIUS, the French CTC rules), each of which will be its own pinned adapter.
+The XML schema step, before the CEN rules (Saxon-HE does not validate XML schemas: it needs a second engine); other delta oracles (supplier master data, the `issue_invoice` contract); extracting the XML from a Factur-X PDF; the national extensions (XRechnung CIUS, the French CTC rules), each of which will be its own pinned adapter.
 
 ## Licences
 

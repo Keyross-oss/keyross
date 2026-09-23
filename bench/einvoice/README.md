@@ -13,6 +13,7 @@ Does the yoke change what an agent ships, and at what cost? The same Deep Agent 
   2. **schema** — the official Factur-X 1.09 EN 16931 XSD, which checks the structure the CEN rules do not;
   3. **order** — lines, VAT breakdown and totals against what the order implies. It catches an invoice made valid by bending the order.
 - **Correct** = accepted by all three. Primary endpoint: correct delivered invoice, per block — no yoke against each yoke arm, exact McNemar tests, Holm-adjusted; exact counts, Wilson intervals.
+- **What the yoke checks, and what it does not**, at every write: the official CEN rules (arms 2 and 3) and the order (arm 3). No arm's yoke checks the XML schema: a schema violation can ship in every arm, and the schema judge counts it (the table in the protocol, printed in every report).
 - In the third arm, the yoke and the order judge check the same property with separate code, so a delivered invoice matches the order almost by construction. What that arm measures is whether the agent gets there from the categories alone (`order.lines`, `order.vat`…), within its limits, and at what cost — or gives up.
 - Also reported: residual errors in what ships (including *valid but wrong*), the model's first write, not delivered, writes and pit stops, the red flags by category, token and time overhead of the yoke (paired bootstrap), estimated cost, agreement between Keyross and the independent validator and between Keyross' delta oracles and the order judge, results per scenario, and a blind human review of 21 invoices.
 

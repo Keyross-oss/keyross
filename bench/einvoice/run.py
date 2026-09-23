@@ -39,6 +39,10 @@ PRICES = {"claude-sonnet-5": (2.00, 10.00, 0.20, 2.50), "claude-opus-5": (5.00, 
 # the paired comparisons of the primary endpoint (protocol, deviation 4): H1 and H4 are tested, Holm-adjusted; the third is exploratory
 COMPARISONS = (("without", "with", "H1"), ("without", "with_order", "H4"), ("with", "with_order", "exploratory"))
 RED_FLAG = "red flag: "
+# what each arm's yoke checks at every write, one property per judge (protocol: What the yoke checks, and what it does not)
+PROPERTIES = ("content — the official CEN rules (validator)", "amounts — the invoice against its order (order judge)",
+              "structure — the XML schema (schema judge)")
+YOKE_CHECKS = {"without": ("no", "no", "no"), "with": ("yes", "no", "no"), "with_order": ("yes", "yes", "no")}
 
 
 class _Checks:
@@ -217,6 +221,12 @@ def report(path: Path) -> str:
                 "same property with its own code: a delivered invoice of that arm matches the order almost by construction. What the arm "
                 "measures is whether the agent gets there from the categories alone, within its limits, and at what cost — an invoice it "
                 "does not deliver is not correct. The validator and the schema stay independent; the blind human review checks the order judge.", ""]
+
+    out += ["## What the yoke checks at every write", "",
+            *_table(arms, [(name, lambda arm, i=i: YOKE_CHECKS[arm][i]) for i, name in enumerate(PROPERTIES)], first="property (judge)"),
+            "", "A write that fails a checked property is blocked; a property no yoke checks can ship in every arm. The einvoice gauge "
+            "runs the CEN rules, not the XML schema. No judge checks that the parties, the dates and the payment details are those "
+            "of the order; the human review reads the whole invoice.", ""]
 
     out += ["## Residual errors in what ships", "", *_table(arms, [
         ("not delivered (gave up)", share(lambda r: not r["delivered"])),

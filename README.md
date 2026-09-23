@@ -104,7 +104,7 @@ Nothing requires an account, a cloud or a cluster. Everything runs locally. Wher
 
 ## Status and roadmap
 
-`0.1` — check, gate, test, lint, lock, report, static doctor; the `core` gauge and the homologated [`einvoice`](src/keyross/gauges/einvoice/README.md) gauge (the official CEN EN 16931 artefacts 1.3.16, executed unmodified, and delta oracles: the invoice against its order); the Deep Agents / LangChain yoke and `keyross stats` · `0.2` — Factur-X PDF, more `einvoice` delta oracles (supplier master data, the `issue_invoice` contract) · `0.3` — gauges from git, `update` / `audit`, the seal · `0.4` — signed gauges, doctor on a throwaway cluster, CI action · `0.5` — the Claude Code hook and plugin, the MCP server · then `dora.register`, `aiact.annex4`, `governance`.
+`0.1` — check, gate, test, lint, lock, report, static doctor; the `core` gauge and the homologated [`einvoice`](src/keyross/gauges/einvoice/README.md) gauge (the official CEN EN 16931 artefacts 1.3.16, executed unmodified, and delta oracles: the invoice against its order); the Deep Agents / LangChain yoke and `keyross stats` · `0.2` — the XML schema step in `einvoice`, Factur-X PDF, more delta oracles (supplier master data, the `issue_invoice` contract) · `0.3` — gauges from git, `update` / `audit`, the seal · `0.4` — signed gauges, doctor on a throwaway cluster, CI action · `0.5` — the Claude Code hook and plugin, the MCP server · then `dora.register`, `aiact.annex4`, `governance`.
 
 This repository verifies itself: its CI runs `keyross test`, `keyross lint` and `keyross lock --check` on every commit.
 

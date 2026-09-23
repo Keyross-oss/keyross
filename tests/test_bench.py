@@ -69,6 +69,9 @@ def test_report_tests_h1_and_h4_with_holm_and_explores_the_third_pair(tmp_path):
     assert "| without yoke → yoke: rules + order (H4) | 2 | 0 | 7 | 1 | 0.01562 | 0.03125 |" in text
     assert "| yoke: rules → yoke: rules + order (exploratory) | 4 | 0 | 5 | 1 | 0.0625 | — |" in text
     assert "- yoke: rules + order: order.totals ×1, order.vat ×1" in text and "Same verdict — matches the order or not — on 60/60" in text
+    assert "| content — the official CEN rules (validator) | no | yes | yes |" in text                 # what each yoke checks
+    assert "| amounts — the invoice against its order (order judge) | no | no | yes |" in text
+    assert "| structure — the XML schema (schema judge) | no | no | no |" in text
     path.write_text("\n".join(json.dumps(r) for r in rows if r["arm"] == "with_order"), encoding="utf-8")
     alone = report(path)                                                            # the pilot of the third arm: one arm, no test
     assert "| correct | 9/10 (90 %" in alone and "paired comparison" not in alone and "Paired overhead" not in alone
