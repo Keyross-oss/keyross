@@ -3,8 +3,8 @@ line per run, every delivered invoice kept for review; then the report — exact
 
     python -m bench.einvoice.judges --setup                                         # once: the schema, the validator command
     python -m bench.einvoice.run --model scripted                                   # offline dry run: checks the harness, measures nothing
-    python -m bench.einvoice.run --model anthropic:claude-sonnet-5 --only order-01,order-02,order-03,order-04,order-05   # pilot
-    python -m bench.einvoice.run --model anthropic:claude-sonnet-5 --reps 2         # the full run: 50 tasks × 2 arms × 2
+    python -m bench.einvoice.run --model anthropic:claude-haiku-4-5 --only order-01,order-02,order-03,order-04,order-05   # pilot
+    python -m bench.einvoice.run --model anthropic:claude-haiku-4-5 --reps 2         # the full run: 50 tasks × 2 arms × 2
     python -m bench.einvoice.run --report bench/einvoice/results/<run>.jsonl       # the report of a finished run
 """
 from __future__ import annotations
@@ -220,7 +220,7 @@ def main() -> int:
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="replace")
     p = argparse.ArgumentParser(description="einvoice benchmark: the same agent without and with the yoke")
-    p.add_argument("--model", default="scripted", help="scripted (offline) or an init_chat_model string, e.g. anthropic:claude-sonnet-5")
+    p.add_argument("--model", default="scripted", help="scripted (offline) or an init_chat_model string, e.g. anthropic:claude-haiku-4-5")
     p.add_argument("--tasks", type=int, default=0, help="only the first N tasks (0: all 50)")
     p.add_argument("--only", default="", help="only these tasks, e.g. order-01,order-02")
     p.add_argument("--reps", type=int, default=1)

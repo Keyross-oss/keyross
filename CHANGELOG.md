@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- bench: model amended before any run — `claude-haiku-4-5` instead of `claude-sonnet-5` (cost), recorded under *Deviations* in the protocol
 - bench: protocol v2, pre-registered in `bench/einvoice/PROTOCOL.md` before any paid run — the yoke is no longer graded by its own code. Three judges independent of Keyross: easybill/en16931-validator (an independent implementation of CEN EN 16931 1.3.16, Docker, pinned by digest), the official Factur-X 1.09 EN 16931 XSD (pinned by SHA-256), and the match with the order. 50 orders (10 per scenario), 2 repetitions, 100 pairs; exact McNemar test, Wilson intervals, paired bootstrap for the token and time overhead; residual errors in what ships, including *valid but wrong*; first-write rates; yoke check time; API errors run again once; blind human review of 20 invoices (`review.py`)
 - bench: Keyross and the independent validator report the same fatal rules and warnings on 46 of 46 invoices (CEN and Factur-X examples, bad cases, references); CI runs the validator as a service and checks the agreement on every commit
 - yoke: telemetry events carry the check's duration

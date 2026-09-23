@@ -26,12 +26,12 @@ docker run -d --name keyross-bench-validator -p 127.0.0.1:8081:8080 -e JAVA_TOOL
   easybill/en16931-validator@sha256:e2f84d3d371e95d9eae2da0ccaef5a13bf01f2e58278e9080994ae763d8914dd
 
 python -m bench.einvoice.run --model scripted --tasks 10      # offline dry run: checks the harness, measures nothing
-python -m bench.einvoice.run --model anthropic:claude-sonnet-5 --only order-01,order-02,order-03,order-04,order-05   # pilot
-python -m bench.einvoice.run --model anthropic:claude-sonnet-5 --reps 2                                            # full run: 200 runs
+python -m bench.einvoice.run --model anthropic:claude-haiku-4-5 --only order-01,order-02,order-03,order-04,order-05   # pilot
+python -m bench.einvoice.run --model anthropic:claude-haiku-4-5 --reps 2                                            # full run: 200 runs
 python -m bench.einvoice.review sample bench/einvoice/results/<run>.jsonl   # the blind review sheet; then fill review.csv
 python -m bench.einvoice.review score  bench/einvoice/results/<run>.jsonl   # agreement between the reviewer and the judges
 ```
 
-A real model needs its provider's credentials (for Anthropic: `ANTHROPIC_API_KEY`). Rough cost with `claude-sonnet-5`: a few dollars for the pilot, 30–60 USD for the full run; the pilot measures the real token use first. Each run is capped at 4 writes of the invoice and 12 model calls, in both arms.
+A real model needs its provider's credentials (for Anthropic: `ANTHROPIC_API_KEY`). The model is `claude-haiku-4-5` (see the protocol's deviations). Rough cost: 1–2 USD for the pilot, 15–30 USD for the full run; the pilot measures the real token use first. Each run is capped at 4 writes of the invoice and 12 model calls, in both arms.
 
 The offline `scripted` model is built to fail its first write and fix it after a red flag: its numbers are true by construction and say nothing about real agents.
