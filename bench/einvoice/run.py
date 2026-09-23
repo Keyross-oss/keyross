@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import statistics
 import subprocess
 import sys
@@ -230,6 +231,8 @@ def main() -> int:
     args = p.parse_args()
     if args.report:
         print(report(args.report)); return 0
+    if args.model.startswith("anthropic:") and not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN")):
+        sys.exit("ANTHROPIC_API_KEY is not set in this terminal: $env:ANTHROPIC_API_KEY = \"sk-ant-...\" (PowerShell), then run again")
     validator(b"<x/>")                                   # every judge must be up before the first run: fail now, not after paying
     orders = load_orders()[: args.tasks or None]
     if args.only:
