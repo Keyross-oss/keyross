@@ -1,14 +1,16 @@
 """The invoicing agent under test: a Deep Agent that turns a purchase order into an EN 16931 invoice (CII) at /invoice.xml.
 
 Both arms get the same model, the same prompt and the same limits; the only difference is the yoke. The limits cap the cost
-of a run: at most `max_writes` writes of the invoice and `max_model_calls` model calls."""
+of a run: at most `max_writes` writes of the invoice and `max_model_calls` model calls. The `task` tool (a Deep Agents
+subagent) is hidden in both arms: a subagent runs outside the main agent's middleware — its limits included — and the
+benchmark measures writing an invoice, not delegating it (protocol, deviation 2)."""
 from __future__ import annotations
 
 import json
 from typing import Any
 
 from deepagents import create_deep_agent
-from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
+from langchain.agents.middleware import AgentMiddleware, ModelCallLimitMiddleware, ToolCallLimitMiddleware
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
@@ -32,8 +34,22 @@ def task_message(order: dict) -> str:
     return "Invoice this order:\n```json\n" + json.dumps(data, indent=2, ensure_ascii=False) + "\n```"
 
 
+class NoSubagents(AgentMiddleware):
+    """Hides the `task` tool from the model, so every write goes through the main agent — and its limits."""
+
+    def wrap_model_call(self, request: Any, handler: Any) -> Any:
+        return handler(request.override(tools=[t for t in request.tools if _tool_name(t) != "task"]))
+
+    async def awrap_model_call(self, request: Any, handler: Any) -> Any:
+        return await handler(request.override(tools=[t for t in request.tools if _tool_name(t) != "task"]))
+
+
+def _tool_name(tool: Any) -> str:
+    return tool.get("name", "") if isinstance(tool, dict) else getattr(tool, "name", "")
+
+
 def build_agent(model: Any, *, yoke: bool, telemetry: Any = None, max_writes: int = 4, max_model_calls: int = 12) -> Any:
-    middleware: list[Any] = [ToolCallLimitMiddleware(tool_name="write_file", run_limit=max_writes),
+    middleware: list[Any] = [NoSubagents(), ToolCallLimitMiddleware(tool_name="write_file", run_limit=max_writes),
                              ModelCallLimitMiddleware(run_limit=max_model_calls, exit_behavior="end")]
     if yoke:
         middleware.append(Yoke(gauge="einvoice", telemetry=telemetry))

@@ -3,9 +3,13 @@ the model and the rules each run straight; the yoke makes them run parallel.
 
 After every writing tool (`write_file`, `edit_file`), the yoke reads the document back through the agent's own backend,
 runs the gauges on it, and on a red flag restores the previous content and returns only the categories — a pit stop.
+A delegated run (`task`, a Deep Agents subagent) is measured too: a subagent does not inherit the main agent's middleware,
+so the yoke checks every document it returns or writes, and keeps a red one out of the agent's files.
 No evidence, no rule text, no list of oracles ever reaches the model. Requires `pip install 'keyross[yoke]'`."""
 from __future__ import annotations
 
+import base64
+import dataclasses
 import tempfile
 from pathlib import Path, PurePosixPath
 from typing import Any, Awaitable, Callable
@@ -24,6 +28,7 @@ except ImportError:  # keyross never requires LangChain; the yoke needs it only 
     _Middleware, ToolMessage = object, None  # type: ignore[assignment,misc]
 
 WRITE_TOOLS = ("write_file", "edit_file")
+DELEGATE_TOOLS = ("task",)          # Deep Agents' subagents: they do not inherit the main agent's middleware
 
 
 def _normalize(path: str) -> str | None:
@@ -52,17 +57,20 @@ class Yoke(_Middleware):  # type: ignore[misc,valid-type]
                  for a plain LangChain agent whose tools write to disk: LocalFiles(root)
     write_tools  the tools that write documents; a custom tool is measured too if it takes `path_arg`, and its
                  action contracts (`@contract("<tool name>")`) run on the before / after documents
+    delegate_tools  the tools that hand work to a subagent (`task`): what the subagent wrote is measured when it returns
     ctx          the gauges' context (unit vocabulary, reference data)
     telemetry    an object with `.event(**fields)` (e.g. JsonlTelemetry) — where the first-pass rate is computed from
     """
 
     def __init__(self, *, gauge: str | None = None, backend: Any = None, write_tools: tuple[str, ...] = WRITE_TOOLS,
-                 path_arg: str = "file_path", ctx: dict[str, Any] | None = None, telemetry: Any = None) -> None:
+                 path_arg: str = "file_path", ctx: dict[str, Any] | None = None, telemetry: Any = None,
+                 delegate_tools: tuple[str, ...] = DELEGATE_TOOLS) -> None:
         if _Middleware is not object:
             super().__init__()
         if gauge:
             load_gauge(gauge)
         self.gauge, self.write_tools, self.path_arg = gauge, tuple(write_tools), path_arg
+        self.delegate_tools = tuple(delegate_tools)
         self._backend = backend
         self.ctx, self.telemetry = dict(ctx or {}), telemetry
         self._attempts: dict[tuple[str, str], int] = {}
@@ -77,6 +85,10 @@ class Yoke(_Middleware):  # type: ignore[misc,valid-type]
     # -- the loop -------------------------------------------------------------------------------------------------
 
     def wrap_tool_call(self, request: Any, handler: Callable[[Any], Any]) -> Any:
+        if request.tool_call.get("name") in self.delegate_tools:
+            before = self._snapshot()
+            result = handler(request)
+            return self._after_delegation(request, before, result, self._snapshot())
         path = self._target(request)
         if path is None:
             return handler(request)
@@ -91,6 +103,10 @@ class Yoke(_Middleware):  # type: ignore[misc,valid-type]
         return result
 
     async def awrap_tool_call(self, request: Any, handler: Callable[[Any], Awaitable[Any]]) -> Any:
+        if request.tool_call.get("name") in self.delegate_tools:
+            before = self._snapshot()
+            result = await handler(request)
+            return self._after_delegation(request, before, result, self._snapshot())
         path = self._target(request)
         if path is None:
             return await handler(request)
@@ -148,9 +164,53 @@ class Yoke(_Middleware):  # type: ignore[misc,valid-type]
         self._record(request, path, report)
         return report
 
-    def _pit_stop(self, request: Any, report: Report) -> Any:
+    def _after_delegation(self, request: Any, before: dict[str, bytes], result: Any, after: dict[str, bytes]) -> Any:
+        """What a delegated run wrote: the files it returns in its Command (a Deep Agents subagent works on its own copy of
+        the state, merged back after the tool) and the files it wrote straight to a shared backend (a disk). A red document
+        is kept out of the agent's files — as if it had not been written — and the agent gets the red flag."""
+        reds, measured = [], set()
+        update = getattr(result, "update", None)
+        files = update.get("files") if isinstance(update, dict) else None
+        if isinstance(files, dict):
+            kept = dict(files)
+            for path, data in files.items():
+                if data is None or not isinstance(path, str) or not self._covers(path):
+                    continue
+                content = _file_bytes(data)
+                if content is None or content == before.get(path):
+                    continue
+                measured.add(path)
+                report = self._measure(request, path, before.get(path), content)
+                if report.hard_failures:
+                    del kept[path]                              # never merged: the agent's files keep what they had
+                    reds.append(report)
+            update = {**update, "files": kept}
+        for path, content in after.items():                     # a shared disk: the subagent already wrote there
+            if path in measured or content == before.get(path):
+                continue
+            report = self._measure(request, path, before.get(path), content)
+            if report.hard_failures:
+                self._restore(path, before.get(path))
+                reds.append(report)
+        if not reds:
+            return result
+        message = self._pit_stop(request, *reds)
+        if isinstance(getattr(result, "update", None), dict):
+            return dataclasses.replace(result, update={**update, "messages": [message]})
+        return message
+
+    def _snapshot(self) -> dict[str, bytes]:
+        """The documents a loaded gauge covers, as the agent's backend holds them now."""
+        glob = getattr(self.backend, "glob", None)
+        if not callable(glob):
+            return {}
+        found = getattr(glob("*", "/"), "matches", None) or []             # a bare pattern matches at any depth
+        paths = sorted({m["path"] for m in found if isinstance(m, dict) and isinstance(m.get("path"), str) and self._covers(m["path"])})
+        return {r.path: r.content for r in self.backend.download_files(paths) if r.content is not None} if paths else {}
+
+    def _pit_stop(self, request: Any, *reports: Report) -> Any:
         """Minimal feedback: the flag and the categories of the red verdicts — nothing else reaches the model."""
-        categories = list(dict.fromkeys(v.category for v in report.hard_failures))
+        categories = list(dict.fromkeys(v.category for report in reports for v in report.hard_failures))
         call = request.tool_call
         return ToolMessage(content=f"red flag: {', '.join(categories)} — the write was reverted; fix and retry",
                            tool_call_id=call["id"], name=call["name"], status="error")
@@ -197,6 +257,16 @@ class Yoke(_Middleware):  # type: ignore[misc,valid-type]
         return {"documents": documents, "first_pass": sum(self._first.values()),
                 "first_pass_rate": round(sum(self._first.values()) / documents, 3) if documents else None,
                 "writes": sum(self._attempts.values())}
+
+
+def _file_bytes(data: Any) -> bytes | None:
+    """The bytes of a Deep Agents file entry (text, or base64 for a binary file)."""
+    try:
+        from deepagents.backends.utils import file_data_to_string
+    except ImportError:
+        return None
+    text = file_data_to_string(data)
+    return text.encode("utf-8") if data.get("encoding", "utf-8") == "utf-8" else base64.standard_b64decode(text)
 
 
 def _tool_failed(result: Any) -> bool:

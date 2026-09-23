@@ -166,3 +166,26 @@ def test_local_files_refuses_paths_outside_its_root(tmp_path):
         assert outside is None                                                   # a drive path elsewhere is refused
     else:
         assert files.path(str(tmp_path / "elsewhere.csv")).is_relative_to(files.root)   # "/…" stays under root
+
+
+def delegate(n):
+    return AIMessage(content="", tool_calls=[{"name": "task", "id": f"t{n}", "args": {"description": "write /quote.csv", "subagent_type": "general-purpose"}}])
+
+
+def test_a_subagent_write_is_yoked_too():
+    """Deep Agents' subagents do not inherit the main agent's middleware: the yoke measures what `task` brings back."""
+    out = run([delegate(1), write("/quote.csv", BAD, 2), AIMessage(content="written")], Yoke(gauge="core"))
+    red = next(m for m in tool_messages(out) if m.name == "task")
+    assert red.status == "error" and red.content == "red flag: totals.mismatch — the write was reverted; fix and retry"
+    assert "/quote.csv" not in files(out)                                    # never merged into the agent's files
+
+
+def test_a_subagent_right_write_passes():
+    out = run([delegate(1), write("/quote.csv", GOOD, 2), AIMessage(content="written")], Yoke(gauge="core"))
+    assert next(m for m in tool_messages(out) if m.name == "task").content == "written" and files(out)["/quote.csv"] == GOOD
+
+
+def test_a_subagent_writing_to_disk_is_reverted(tmp_path):
+    backend = FilesystemBackend(root_dir=tmp_path, virtual_mode=True)
+    out = run([delegate(1), write("/quote.csv", BAD, 2), AIMessage(content="written")], Yoke(gauge="core", backend=backend), backend=backend)
+    assert next(m for m in tool_messages(out) if m.name == "task").status == "error" and not (tmp_path / "quote.csv").exists()

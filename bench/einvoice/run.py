@@ -22,6 +22,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from langchain_core.callbacks import UsageMetadataCallbackHandler
 from langchain_core.messages import AIMessage, ToolMessage
 
 from bench.einvoice.agent import INVOICE_PATH, ScriptedInvoiceModel, build_agent, task_message
@@ -53,17 +54,16 @@ def _model(spec: str, order: dict) -> Any:
     return init_chat_model(spec, max_tokens=32000, streaming=True)
 
 
-def _usage(messages: list[Any]) -> dict[str, int]:
-    u = {"input_tokens": 0, "output_tokens": 0, "cache_read": 0, "cache_write": 0, "model_calls": 0}
-    for m in messages:
-        if isinstance(m, AIMessage):
-            u["model_calls"] += 1
-            meta = m.usage_metadata or {}
-            details = meta.get("input_token_details") or {}
-            u["input_tokens"] += meta.get("input_tokens", 0)
-            u["output_tokens"] += meta.get("output_tokens", 0)
-            u["cache_read"] += details.get("cache_read", 0) or 0
-            u["cache_write"] += details.get("cache_creation", 0) or 0
+def _usage(messages: list[Any], counted: UsageMetadataCallbackHandler) -> dict[str, int]:
+    """Tokens over every model call of the run — a callback sees the calls no message of the main thread records."""
+    u = {"input_tokens": 0, "output_tokens": 0, "cache_read": 0, "cache_write": 0,
+         "model_calls": sum(1 for m in messages if isinstance(m, AIMessage))}
+    for meta in counted.usage_metadata.values():
+        details = meta.get("input_token_details") or {}
+        u["input_tokens"] += meta.get("input_tokens", 0)
+        u["output_tokens"] += meta.get("output_tokens", 0)
+        u["cache_read"] += details.get("cache_read", 0) or 0
+        u["cache_write"] += details.get("cache_creation", 0) or 0
     return u
 
 
@@ -91,12 +91,13 @@ def _commit() -> str:
 
 def run_one(spec: str, order: dict, arm: str, rep: int, keep: Path | None, commit: str = "") -> dict[str, Any]:
     record: dict[str, Any] = {"model": spec, "arm": arm, "rep": rep, "task": order["id"], "scenario": order["scenario"], "commit": commit}
-    checks = _Checks()
+    checks, counted = _Checks(), UsageMetadataCallbackHandler()
     t0 = time.perf_counter()
     try:
         agent = build_agent(_model(spec, order), yoke=(arm == "with"), telemetry=checks)
         out = agent.invoke({"messages": [{"role": "user", "content": task_message(order)}]},
-                           config={"configurable": {"thread_id": f"{order['id']}-{arm}-{rep}"}, "recursion_limit": 60})
+                           config={"configurable": {"thread_id": f"{order['id']}-{arm}-{rep}"}, "recursion_limit": 60,
+                                   "callbacks": [counted]})
     except Exception as e:  # noqa: BLE001 — an API error is recorded, the benchmark goes on
         return {**record, "error": f"{type(e).__name__}: {str(e)[:300]}", "seconds": round(time.perf_counter() - t0, 1)}
     seconds = round(time.perf_counter() - t0, 1)
@@ -105,13 +106,16 @@ def run_one(spec: str, order: dict, arm: str, rep: int, keep: Path | None, commi
     xml = data.get("content") if isinstance(data, dict) else data
     xml = "\n".join(xml) if isinstance(xml, list) else xml
     attempts = _written(messages)
-    usage = _usage(messages)
+    usage = _usage(messages, counted)
+    executed = [m for m in messages if isinstance(m, ToolMessage) and m.name == "write_file"
+                and not str(m.content).startswith("Tool call limit exceeded")]
     record.update(grade(order, xml))
     first = grade(order, attempts[0]) if attempts else grade(order, None)
     record.update({
         "first_correct": first["correct"], "first_valid": first["valid"], "first_schema_valid": first["schema_valid"],
         "first_right": first["right"], "first_agree": first["agree"],
-        "writes": len(attempts),
+        "writes": len(executed), "write_attempts": len(attempts),
+        "task_calls": sum(1 for m in messages if isinstance(m, AIMessage) for c in (m.tool_calls or []) if c["name"] == "task"),
         "pit_stops": sum(1 for m in messages if isinstance(m, ToolMessage) and "red flag" in str(m.content)),
         "yoke_checks": len(checks.events), "yoke_check_ms": sum(e.get("duration_ms", 0) for e in checks.events),
         **usage, "tokens": usage["input_tokens"] + usage["output_tokens"], "cost_usd": _cost(spec, usage), "seconds": seconds,
@@ -157,6 +161,9 @@ def report(path: Path) -> str:
            "Factur-X 1.09 EN 16931 schema, order match", ""]
     if not pairs:
         return "\n".join(out + ["No complete pair: nothing to compare."]) + "\n"
+    delegated = sum(r.get("task_calls", 0) for r in ok)
+    if delegated:
+        out += [f"**Warning: {delegated} call(s) to the `task` tool — subagents write outside the harness; this run is not valid.**", ""]
     a = [p[0] for p in pairs]
     b = [p[1] for p in pairs]
 
@@ -192,7 +199,8 @@ def report(path: Path) -> str:
     s_mean, s_lo, s_hi = paired_bootstrap(sec)
     base_tok = statistics.fmean([x["tokens"] for x in a]) or 1
     out += ["", "## Cost of the yoke", "", "| per run | without yoke | with yoke |", "|---|---|---|",
-            f"| writes | {_mean([r['writes'] for r in a])} | {_mean([r['writes'] for r in b])} |",
+            f"| writes (executed) | {_mean([r['writes'] for r in a])} | {_mean([r['writes'] for r in b])} |",
+            f"| write attempts (including those the limit blocked) | {_mean([r.get('write_attempts', r['writes']) for r in a])} | {_mean([r.get('write_attempts', r['writes']) for r in b])} |",
             f"| pit stops (red flags returned) | {_mean([r['pit_stops'] for r in a])} | {_mean([r['pit_stops'] for r in b])} |",
             f"| tokens | {_mean([r['tokens'] for r in a])} | {_mean([r['tokens'] for r in b])} |",
             f"| seconds | {_mean([r['seconds'] for r in a])} | {_mean([r['seconds'] for r in b])} |",
