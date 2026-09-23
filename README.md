@@ -42,6 +42,16 @@ def total_matches(doc):
     return Verdict.ok()
 ```
 
+## An example: one e-invoice
+
+EN 16931 is the European standard for electronic invoices, the base of the mandates rolling out across the EU (France since September 2026). Its rules are public: CEN publishes them as official validation artefacts — 1,562 rule ids, for example **BR-CO-10** *the sum of the invoice lines equals the line total* or **BR-E-10** *an exempt line states its exemption reason*. The `einvoice` gauge runs those artefacts unmodified; Keyross rewrites none of them.
+
+![An agent writes an invoice whose lines sum to 150.70 instead of 149.70; the yoke runs the official CEN rules, BR-CO-10 and BR-CO-13 fail, the write is reverted, the agent gets the rule ids only and writes 149.70: green flag, the invoice ships](docs/einvoice_example.png)
+
+An agent receives an order — 3 office chairs at 49.90 net, VAT 20 % — and writes the invoice. It gets the sum of the lines wrong: 150.70 instead of 149.70. With the yoke, the write is measured at once: BR-CO-10 and BR-CO-13 fail, the file is restored, and the agent receives one line — `red flag: BR-CO-10, BR-CO-13 — the write was reverted; fix and retry` — then writes the invoice again, right. The model never sees the rule text, the evidence or the list of rules: the official rules decide, not the model. Without the yoke, nothing measures the invoice: it ships.
+
+Run it offline: `python examples/deepagents/invoice_agent.py` — a scripted agent makes this kind of mistake, without and with the yoke. Measure it on a real model: [bench/einvoice](bench/einvoice/README.md) — 20 orders, two graders outside the agent.
+
 ## What it is, in three words
 
 | Word | Definition | Analogy with code |

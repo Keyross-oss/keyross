@@ -42,6 +42,16 @@ def total_matches(doc):
     return Verdict.ok()
 ```
 
+## Un exemple : une facture électronique
+
+EN 16931 est la norme européenne de la facture électronique, la base des obligations qui se déploient dans l'UE (en France depuis septembre 2026). Ses règles sont publiques : le CEN les publie sous forme d'artefacts de validation officiels — 1 562 identifiants de règles, par exemple **BR-CO-10** *la somme des lignes de la facture égale le total des lignes* ou **BR-E-10** *une ligne exonérée indique le motif de son exonération*. Le gauge `einvoice` exécute ces artefacts sans modification ; Keyross n'en réécrit aucune.
+
+![Un agent écrit une facture dont les lignes totalisent 150,70 au lieu de 149,70 ; le yoke exécute les règles officielles du CEN, BR-CO-10 et BR-CO-13 tombent, l'écriture est annulée, l'agent ne reçoit que les identifiants des règles et écrit 149,70 : flag vert, la facture part](docs/einvoice_example.png)
+
+Un agent reçoit une commande — 3 chaises de bureau à 49,90 HT, TVA 20 % — et écrit la facture. Il se trompe sur la somme des lignes : 150,70 au lieu de 149,70. Avec le yoke, l'écriture est mesurée aussitôt : BR-CO-10 et BR-CO-13 tombent, le fichier est restauré, et l'agent reçoit une seule ligne — `red flag: BR-CO-10, BR-CO-13 — the write was reverted; fix and retry` — puis réécrit la facture, juste. Le modèle ne voit jamais le texte des règles, les preuves ni la liste des règles : ce sont les règles officielles qui décident, pas le modèle. Sans yoke, rien ne mesure la facture : elle part.
+
+À essayer hors ligne : `python examples/deepagents/invoice_agent.py` — un agent scripté fait ce genre d'erreur, sans puis avec le yoke. La mesure sur un vrai modèle : [bench/einvoice](bench/einvoice/README.md) — 20 commandes, deux juges hors de l'agent.
+
 ## Ce que c'est, en trois mots
 
 | Mot | Définition | Analogie avec le code |
