@@ -2,7 +2,7 @@
 
 Does the yoke change what an agent ships, and at what cost? The same Deep Agent turns a purchase order into an EN 16931 invoice (UN/CEFACT CII, the XML of Factur-X), in three arms: without the yoke; with `Yoke(gauge="einvoice")`, the official rules; and with the official rules and the order, `Yoke(gauge="einvoice", ctx={"order": order})`, whose delta oracles catch an invoice that is valid but bills the wrong amount. Same model, prompt and limits in every arm. **None of the judges is Keyross**, so the yoke is never graded by its own code.
 
-**Status: pre-registered; two pilots run, excluded from the analysis; the full run not yet made.** The protocol — design, endpoints, analysis, human review — is fixed in [PROTOCOL.md](PROTOCOL.md) before the first paid run, and every change since is recorded there with its date and reason (model, harness, worked example, third arm). Every result will be published, favourable or not.
+**Status: the full run was made on 23 September 2026. The results are in [RESULTS.md](RESULTS.md); the blind human review is pending.** In short: correct invoices 50 % without the yoke, 64 % with the official rules, 60 % with the rules and the order (both gains significant after Holm's correction). Invoices shipped wrong without anyone being told: 50 %, 22 %, 11 %. Invoices not delivered: 0 %, 14 %, 29 %. The protocol (design, endpoints, analysis, human review) was fixed in [PROTOCOL.md](PROTOCOL.md) before the first paid run. Every change since is recorded there with its date and reason: model, harness, worked example, third arm, a clarification, interim looks. Every result is published, favourable or not.
 
 ## Design, in short
 
@@ -34,6 +34,6 @@ python -m bench.einvoice.review sample bench/einvoice/results/<run>.jsonl   # th
 python -m bench.einvoice.review score  bench/einvoice/results/<run>.jsonl   # agreement between the reviewer and the judges
 ```
 
-A real model needs its provider's credentials (for Anthropic: `ANTHROPIC_API_KEY`). The model is `claude-haiku-4-5` (see the protocol's deviations). Rough cost, from the second pilot's real token use (about 0.03 USD per run without the yoke, 0.05 with it): under 1 USD for the pilot of the third arm, 12–22 USD for the full run. Each run is capped at 4 writes of the invoice and 12 model calls, in every arm.
+A real model needs its provider's credentials (for Anthropic: `ANTHROPIC_API_KEY`). The model is `claude-haiku-4-5` (see the protocol's deviations). The full run cost 12.57 USD at list prices: 0.025 USD per run without the yoke, 0.043 with the rules, 0.057 with the rules and the order. Each run is capped at 4 writes of the invoice and 12 model calls, in every arm.
 
 The offline `scripted` model is built to fail its first write and fix it after a red flag: its numbers are true by construction and say nothing about real agents.

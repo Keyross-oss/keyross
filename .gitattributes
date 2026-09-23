@@ -4,3 +4,5 @@ badset/** -text
 tests/fixtures/** -text
 # The benchmark's worked example is part of the system prompt: the same bytes on every platform.
 bench/einvoice/example/** -text
+# A published benchmark run is kept byte for byte: the invoices as the agent delivered them.
+bench/einvoice/results/** -text
