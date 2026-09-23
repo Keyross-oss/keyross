@@ -53,6 +53,8 @@ After the run, 21 delivered invoices are drawn with `random.Random(2027)`: 7 per
 
 Before the full run: order-01 to order-05 (one per scenario), one repetition, both arms. It measures the real token use and checks the harness. It is excluded from the analysis. If it reveals a harness defect, the defect is fixed, the fix is recorded under *Deviations*, and the protocol is frozen again before the full run. Arm 3 gets its own pilot, the same five orders, one repetition, arm 3 only (deviation 4); it is excluded from the analysis too.
 
+Pilot runs, all excluded from the analysis: `20260923T141730Z` (led to deviations 2 and 3); `20260923T151115Z` (led to deviation 4); `20260923T155943Z`, arm 3 — no harness defect, 4 of 5 invoices correct at the first write, so no `order.*` flag was raised: the agent's handling of the order categories is first observed in the full run. In that pilot, one invoice (order-03) shipped with a schema violation (a delivery party out of place): the yoke runs the CEN rules, not the syntax schema — a limit of the gauge, which the schema judge measures in every arm. The protocol is frozen again for the full run by the commit that records this pilot.
+
 ## Errors
 
 A run that ends in an API error is run again once, at the end. If it fails again, its block is excluded from every comparison, and the report counts it.
