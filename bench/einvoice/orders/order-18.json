@@ -1,6 +1,6 @@
 {
   "id": "order-18",
-  "scenario": "allowances",
+  "scenario": "intra_community",
   "invoice": {
     "number": "INV-2026-1018",
     "issue_date": "2026-09-18",
@@ -20,13 +20,13 @@
     }
   },
   "buyer": {
-    "name": "Buyer 68 SAS",
-    "vat_id": "FR68000538492",
+    "name": "Buyer 68 GmbH",
+    "vat_id": "DE68000538492",
     "address": {
       "line": "68 Example Street",
-      "city": "Lille",
-      "postcode": "59000",
-      "country": "FR"
+      "city": "Cologne",
+      "postcode": "50667",
+      "country": "DE"
     }
   },
   "payment": {
@@ -37,64 +37,41 @@
     {
       "id": "1",
       "name": "Cable, 5 m",
-      "quantity": "1",
+      "quantity": "2",
       "unit_code": "C62",
-      "net_price": "19.99",
-      "vat_category": "S",
-      "vat_rate": "20.00"
+      "net_price": "49.90",
+      "vat_category": "K",
+      "vat_rate": "0.00"
     },
     {
       "id": "2",
       "name": "Training day",
-      "quantity": "0.5",
+      "quantity": "12.75",
       "unit_code": "DAY",
-      "net_price": "49.90",
-      "vat_category": "S",
-      "vat_rate": "20.00"
+      "net_price": "19.99",
+      "vat_category": "K",
+      "vat_rate": "0.00"
     },
     {
       "id": "3",
       "name": "Software licence, annual",
       "quantity": "12",
       "unit_code": "C62",
-      "net_price": "7.45",
-      "vat_category": "S",
-      "vat_rate": "20.00"
-    },
-    {
-      "id": "4",
-      "name": "Maintenance visit",
-      "quantity": "2",
-      "unit_code": "C62",
-      "net_price": "49.90",
-      "vat_category": "S",
-      "vat_rate": "20.00"
-    },
-    {
-      "id": "5",
-      "name": "Diesel",
-      "quantity": "12.75",
-      "unit_code": "LTR",
-      "net_price": "19.99",
-      "vat_category": "S",
-      "vat_rate": "20.00"
+      "net_price": "0.89",
+      "vat_category": "K",
+      "vat_rate": "0.00"
     }
   ],
-  "allowances": [
-    {
-      "amount": "15.00",
-      "reason": "Loyalty discount",
-      "vat_category": "S",
-      "vat_rate": "20.00"
+  "allowances": [],
+  "charges": [],
+  "delivery": {
+    "date": "2026-08-29",
+    "country": "DE"
+  },
+  "vat_exemptions": {
+    "K": {
+      "reason": "Intra-community supply",
+      "code": "VATEX-EU-IC"
     }
-  ],
-  "charges": [
-    {
-      "amount": "9.90",
-      "reason": "Shipping",
-      "vat_category": "S",
-      "vat_rate": "20.00"
-    }
-  ],
-  "vat_exemptions": {}
+  }
 }

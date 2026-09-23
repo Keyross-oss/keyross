@@ -26,6 +26,7 @@ doctor = ["pyyaml>=6.0"]            # gitleaks / trivy / conftest are called as 
 adapters = []                        # deepagents / langchain are imported lazily, never required
 einvoice = ["saxonche>=12.5,<14"]    # Saxon-HE: runs the official CEN XSLT 2.0 artifacts offline
 yoke = ["deepagents>=0.7,<0.8"]      # the Deep Agents / LangChain 1.x yoke
+bench = ["lxml>=5"]                  # bench/einvoice: the schema judge (the validator judge runs in Docker)
 dev = ["pytest>=8", "ruff>=0.6"]
 
 [project.scripts]

@@ -1,0 +1,68 @@
+{
+  "id": "order-28",
+  "scenario": "intra_community",
+  "invoice": {
+    "number": "INV-2026-1028",
+    "issue_date": "2026-09-28",
+    "due_date": "2026-10-28",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4728"
+  },
+  "seller": {
+    "name": "Seller 28 SAS",
+    "vat_id": "FR28000221732",
+    "address": {
+      "line": "28 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 78 GmbH",
+    "vat_id": "DE78000617682",
+    "address": {
+      "line": "78 Example Street",
+      "city": "Cologne",
+      "postcode": "50667",
+      "country": "DE"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "Consulting, senior",
+      "quantity": "2.25",
+      "unit_code": "HUR",
+      "net_price": "120.00",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "2",
+      "name": "Consulting, junior",
+      "quantity": "0.5",
+      "unit_code": "HUR",
+      "net_price": "0.89",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    }
+  ],
+  "allowances": [],
+  "charges": [],
+  "delivery": {
+    "date": "2026-09-08",
+    "country": "DE"
+  },
+  "vat_exemptions": {
+    "K": {
+      "reason": "Intra-community supply",
+      "code": "VATEX-EU-IC"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "id": "order-10",
-  "scenario": "exempt",
+  "scenario": "allowances",
   "invoice": {
     "number": "INV-2026-1010",
     "issue_date": "2026-09-10",
@@ -39,44 +39,53 @@
       "name": "Cable, 5 m",
       "quantity": "5",
       "unit_code": "C62",
-      "net_price": "89.95",
-      "vat_category": "E",
-      "vat_rate": "0.00"
+      "net_price": "120.00",
+      "vat_category": "S",
+      "vat_rate": "20.00"
     },
     {
       "id": "2",
       "name": "Training day",
-      "quantity": "12.75",
+      "quantity": "0.5",
       "unit_code": "DAY",
-      "net_price": "19.99",
+      "net_price": "7.45",
       "vat_category": "S",
       "vat_rate": "10.00"
     },
     {
       "id": "3",
       "name": "Software licence, annual",
-      "quantity": "12",
+      "quantity": "1",
       "unit_code": "C62",
-      "net_price": "7.45",
+      "net_price": "89.95",
       "vat_category": "S",
       "vat_rate": "20.00"
     },
     {
       "id": "4",
       "name": "Maintenance visit",
-      "quantity": "2",
+      "quantity": "5",
       "unit_code": "C62",
-      "net_price": "19.99",
+      "net_price": "0.89",
       "vat_category": "S",
       "vat_rate": "10.00"
     }
   ],
-  "allowances": [],
-  "charges": [],
-  "vat_exemptions": {
-    "E": {
-      "reason": "Exempt: medical care",
-      "code": "VATEX-EU-132-1C"
+  "allowances": [
+    {
+      "amount": "15.00",
+      "reason": "Loyalty discount",
+      "vat_category": "S",
+      "vat_rate": "20.00"
     }
-  }
+  ],
+  "charges": [
+    {
+      "amount": "9.90",
+      "reason": "Shipping",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    }
+  ],
+  "vat_exemptions": {}
 }

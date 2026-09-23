@@ -1,45 +1,37 @@
 # Benchmark — an invoicing agent, without and with the yoke
 
-Does the yoke change what an agent ships? The same Deep Agent turns a purchase order into an EN 16931 invoice (UN/CEFACT CII, the XML of Factur-X), twice per task: once without the yoke, once with `Yoke(gauge="einvoice")`. Same model, same prompt, same limits. Two graders, both outside the agent, decide.
+Does the yoke change what an agent ships, and at what cost? The same Deep Agent turns a purchase order into an EN 16931 invoice (UN/CEFACT CII, the XML of Factur-X), with and without `Yoke(gauge="einvoice")`. Same model, prompt and limits. **None of the judges is Keyross**, so the yoke is never graded by its own code.
 
-**Status: harness ready, not yet run on a real model.** No result below is a measurement until a run with a real model is published here.
+**Status: pre-registered, not yet run on a real model.** The protocol — design, endpoints, analysis, human review — is fixed in [PROTOCOL.md](PROTOCOL.md) before the first paid run. Every result will be published, favourable or not.
 
-## Tasks
+## Design, in short
 
-20 purchase orders (`orders/*.json`), fictitious and deterministic (`python -m bench.einvoice.orders` regenerates them), with rising difficulty:
+- **50 purchase orders** (`orders/`, fictitious, seeded), 10 per scenario: domestic, exempt (an exemption reason is due), intra-community supply, reverse charge, document-level allowances and charges. Every task is solvable: the 50 reference invoices pass the three judges.
+- **Paired**: each order runs twice in each arm — 100 pairs.
+- **Three judges, independent of Keyross:**
+  1. **validator** — easybill/en16931-validator (MIT, Docker, pinned by digest): an independent implementation of the official CEN EN 16931 rules, release 1.3.16. There is one official rule set; this is another implementation of it, not other rules;
+  2. **schema** — the official Factur-X 1.09 EN 16931 XSD, which checks the structure the CEN rules do not;
+  3. **order** — lines, VAT breakdown and totals against what the order implies. It catches an invoice made valid by bending the order.
+- **Correct** = accepted by all three. Primary endpoint: correct delivered invoice, per pair — exact McNemar test, exact counts, Wilson intervals.
+- Also reported: residual errors in what ships (including *valid but wrong*), the model's first write, not delivered, writes and pit stops, token and time overhead of the yoke (paired bootstrap), estimated cost, agreement between Keyross and the independent validator, results per scenario, and a blind human review of 20 invoices.
 
-| scenario | orders | what makes it hard |
-|---|---|---|
-| domestic | 1–8 | one to three VAT rates, 1–5 lines, quantity × price that needs rounding |
-| exempt | 9–11 | an exempt line: the VAT breakdown needs an exemption reason and code |
-| intra_community | 12–14 | intra-community supply: seller and buyer VAT identifiers, delivery date and country, exemption reason |
-| reverse_charge | 15–16 | reverse charge: both VAT identifiers, exemption reason, 0 % rate |
-| allowances | 17–20 | document-level allowances and charges, which move the VAT basis |
-
-Every task is solvable: `reference.py` writes a reference invoice for each order, and all 20 are valid for the official rules and match their order (`python -m bench.einvoice.grade`; also a test).
-
-## Grading
-
-- **valid** — the official CEN EN 16931 validation artefacts (1.3.16) find no fatal rule in the delivered invoice;
-- **right** — the delivered invoice matches the order: lines (quantity, price, net amount, VAT category and rate), VAT breakdown per category and rate, totals;
-- **correct** — valid **and** right. The second grader matters: an agent can make an invoice valid by bending the order (changing a price so the totals add up). The yoke only runs the first grader, so "right" is measured by something the yoke never sees.
-
-Also recorded: first write valid (the model's own first attempt), writes and pit stops per run, tokens, estimated cost at list prices, time.
-
-## Limits (both arms)
-
-At most 4 writes of the invoice and 12 model calls per run (`ToolCallLimitMiddleware`, `ModelCallLimitMiddleware`) — they bound the cost of a run that would loop.
+A first measurement of the adapter, before any agent run: on 46 invoices (the CEN and Factur-X examples, the 20 bad cases, 20 references), **Keyross and the independent validator report the same fatal rules and warnings on 46 of 46**. CI checks this on every commit.
 
 ## Run
 
 ```bash
-pip install -e ".[einvoice,yoke]"
-python -m bench.einvoice.run --model scripted                                   # offline dry run: checks the harness, measures nothing
-python -m bench.einvoice.run --model anthropic:claude-sonnet-5 --only order-02,order-10,order-13,order-15,order-18   # pilot: one task per scenario
-python -m bench.einvoice.run --model anthropic:claude-sonnet-5 --reps 3         # full run: 20 tasks × 2 arms × 3
-python -m bench.einvoice.run --report bench/einvoice/results/<run>.jsonl       # report of a finished run
+pip install -e ".[einvoice,yoke,bench]"
+python -m bench.einvoice.judges --setup          # the schema (pinned); prints the command that starts the validator
+docker run -d --name keyross-bench-validator -p 127.0.0.1:8081:8080 -e JAVA_TOOL_OPTIONS=-Xmx512m \
+  easybill/en16931-validator@sha256:e2f84d3d371e95d9eae2da0ccaef5a13bf01f2e58278e9080994ae763d8914dd
+
+python -m bench.einvoice.run --model scripted --tasks 10      # offline dry run: checks the harness, measures nothing
+python -m bench.einvoice.run --model anthropic:claude-sonnet-5 --only order-01,order-02,order-03,order-04,order-05   # pilot
+python -m bench.einvoice.run --model anthropic:claude-sonnet-5 --reps 2                                            # full run: 200 runs
+python -m bench.einvoice.review sample bench/einvoice/results/<run>.jsonl   # the blind review sheet; then fill review.csv
+python -m bench.einvoice.review score  bench/einvoice/results/<run>.jsonl   # agreement between the reviewer and the judges
 ```
 
-A real model needs its provider's credentials (for Anthropic: `ANTHROPIC_API_KEY`, or a profile from `ant auth login`). Rough cost with `claude-sonnet-5`: a few dollars for the pilot, 15–35 USD for the full run — the pilot measures the real token use first.
+A real model needs its provider's credentials (for Anthropic: `ANTHROPIC_API_KEY`). Rough cost with `claude-sonnet-5`: a few dollars for the pilot, 30–60 USD for the full run; the pilot measures the real token use first. Each run is capped at 4 writes of the invoice and 12 model calls, in both arms.
 
-The offline `scripted` model is built to fail its first write and fix it after a red flag: its numbers (0 % correct without the yoke, 100 % with) are true by construction and say nothing about real agents.
+The offline `scripted` model is built to fail its first write and fix it after a red flag: its numbers are true by construction and say nothing about real agents.

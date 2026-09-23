@@ -1,0 +1,59 @@
+{
+  "id": "order-21",
+  "scenario": "domestic",
+  "invoice": {
+    "number": "INV-2026-1021",
+    "issue_date": "2026-09-21",
+    "due_date": "2026-10-21",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4721"
+  },
+  "seller": {
+    "name": "Seller 21 SAS",
+    "vat_id": "FR21000166299",
+    "address": {
+      "line": "21 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 71 SAS",
+    "vat_id": "FR71000562249",
+    "address": {
+      "line": "71 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "USB-C dock",
+      "quantity": "12",
+      "unit_code": "C62",
+      "net_price": "0.89",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    },
+    {
+      "id": "2",
+      "name": "Office chair",
+      "quantity": "12",
+      "unit_code": "C62",
+      "net_price": "33.33",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    }
+  ],
+  "allowances": [],
+  "charges": [],
+  "vat_exemptions": {}
+}

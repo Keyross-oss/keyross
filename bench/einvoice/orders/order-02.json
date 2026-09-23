@@ -1,6 +1,6 @@
 {
   "id": "order-02",
-  "scenario": "domestic",
+  "scenario": "exempt",
   "invoice": {
     "number": "INV-2026-1002",
     "issue_date": "2026-09-02",
@@ -37,11 +37,11 @@
     {
       "id": "1",
       "name": "Cable, 5 m",
-      "quantity": "2",
+      "quantity": "12",
       "unit_code": "C62",
-      "net_price": "33.33",
-      "vat_category": "S",
-      "vat_rate": "20.00"
+      "net_price": "89.95",
+      "vat_category": "E",
+      "vat_rate": "0.00"
     },
     {
       "id": "2",
@@ -55,14 +55,37 @@
     {
       "id": "3",
       "name": "Software licence, annual",
-      "quantity": "12",
+      "quantity": "2",
       "unit_code": "C62",
-      "net_price": "89.95",
+      "net_price": "19.99",
       "vat_category": "S",
       "vat_rate": "5.50"
+    },
+    {
+      "id": "4",
+      "name": "Maintenance visit",
+      "quantity": "12",
+      "unit_code": "C62",
+      "net_price": "49.90",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    },
+    {
+      "id": "5",
+      "name": "Diesel",
+      "quantity": "1.5",
+      "unit_code": "LTR",
+      "net_price": "0.89",
+      "vat_category": "S",
+      "vat_rate": "10.00"
     }
   ],
   "allowances": [],
   "charges": [],
-  "vat_exemptions": {}
+  "vat_exemptions": {
+    "E": {
+      "reason": "Exempt: medical care",
+      "code": "VATEX-EU-132-1C"
+    }
+  }
 }

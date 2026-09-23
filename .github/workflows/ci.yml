@@ -5,11 +5,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix: { python: ["3.11", "3.12"] }
+    services:
+      validator:                   # the benchmark's independent EN 16931 validator (easybill 0.7.0, CEN 1.3.16), pinned by digest
+        image: easybill/en16931-validator@sha256:e2f84d3d371e95d9eae2da0ccaef5a13bf01f2e58278e9080994ae763d8914dd
+        ports: ["8081:8080"]
+        env: { JAVA_TOOL_OPTIONS: "-Xmx512m" }
+        options: >-
+          --health-cmd "wget -q -O /dev/null http://localhost:8080/health || exit 1"
+          --health-interval 5s --health-timeout 5s --health-retries 24
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "${{ matrix.python }}" }
-      - run: pip install -e ".[dev,einvoice,yoke]"
+      - run: pip install -e ".[dev,einvoice,yoke,bench]"
+      - run: python -m bench.einvoice.judges --setup   # the Factur-X EN 16931 schema, pinned by SHA-256
       - run: pytest -q
       - run: keyross test          # the tests of the tests
       - run: keyross lint          # no model inside an oracle

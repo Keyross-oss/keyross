@@ -1,0 +1,95 @@
+{
+  "id": "order-38",
+  "scenario": "intra_community",
+  "invoice": {
+    "number": "INV-2026-1038",
+    "issue_date": "2026-10-08",
+    "due_date": "2026-11-07",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4738"
+  },
+  "seller": {
+    "name": "Seller 38 SAS",
+    "vat_id": "FR38000300922",
+    "address": {
+      "line": "38 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 88 GmbH",
+    "vat_id": "DE88000696872",
+    "address": {
+      "line": "88 Example Street",
+      "city": "Cologne",
+      "postcode": "50667",
+      "country": "DE"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "Cable, 5 m",
+      "quantity": "3",
+      "unit_code": "C62",
+      "net_price": "1250.00",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "2",
+      "name": "Training day",
+      "quantity": "2.25",
+      "unit_code": "DAY",
+      "net_price": "0.89",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "3",
+      "name": "Software licence, annual",
+      "quantity": "3",
+      "unit_code": "C62",
+      "net_price": "49.90",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "4",
+      "name": "Maintenance visit",
+      "quantity": "1",
+      "unit_code": "C62",
+      "net_price": "33.33",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "5",
+      "name": "Diesel",
+      "quantity": "7",
+      "unit_code": "LTR",
+      "net_price": "33.33",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    }
+  ],
+  "allowances": [],
+  "charges": [],
+  "delivery": {
+    "date": "2026-09-18",
+    "country": "DE"
+  },
+  "vat_exemptions": {
+    "K": {
+      "reason": "Intra-community supply",
+      "code": "VATEX-EU-IC"
+    }
+  }
+}

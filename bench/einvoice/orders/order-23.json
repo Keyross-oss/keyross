@@ -1,0 +1,104 @@
+{
+  "id": "order-23",
+  "scenario": "intra_community",
+  "invoice": {
+    "number": "INV-2026-1023",
+    "issue_date": "2026-09-23",
+    "due_date": "2026-10-23",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4723"
+  },
+  "seller": {
+    "name": "Seller 23 SAS",
+    "vat_id": "FR23000182137",
+    "address": {
+      "line": "23 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 73 GmbH",
+    "vat_id": "DE73000578087",
+    "address": {
+      "line": "73 Example Street",
+      "city": "Cologne",
+      "postcode": "50667",
+      "country": "DE"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "Maintenance visit",
+      "quantity": "1",
+      "unit_code": "C62",
+      "net_price": "19.99",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "2",
+      "name": "Diesel",
+      "quantity": "7",
+      "unit_code": "LTR",
+      "net_price": "1250.00",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "3",
+      "name": "Coffee beans",
+      "quantity": "1.5",
+      "unit_code": "KGM",
+      "net_price": "19.99",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "4",
+      "name": "Consulting, senior",
+      "quantity": "12.75",
+      "unit_code": "HUR",
+      "net_price": "89.95",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "5",
+      "name": "Consulting, junior",
+      "quantity": "7",
+      "unit_code": "HUR",
+      "net_price": "0.89",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "6",
+      "name": "Laptop stand",
+      "quantity": "5",
+      "unit_code": "C62",
+      "net_price": "1250.00",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    }
+  ],
+  "allowances": [],
+  "charges": [],
+  "delivery": {
+    "date": "2026-09-03",
+    "country": "DE"
+  },
+  "vat_exemptions": {
+    "K": {
+      "reason": "Intra-community supply",
+      "code": "VATEX-EU-IC"
+    }
+  }
+}

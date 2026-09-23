@@ -101,7 +101,7 @@ Rien n'exige de compte, de cloud ni de cluster. Tout tourne en local. Où se tro
 
 - [docs/CONCEPTS.md](docs/CONCEPTS.md) — invariants, contrats et sentinelles ; les flags, dont le noir ; les règles imposées par l'outil ; écrire un oracle
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — où tournent les gauges, ce qui sort de chaque porte
-- [bench/einvoice](bench/einvoice/README.md) — le même agent sans puis avec le yoke, jugé hors de l'agent
+- [bench/einvoice](bench/einvoice/README.md) — le même agent sans puis avec le yoke, jugé par des juges qui ne sont pas Keyross ; protocole pré-enregistré
 - [GAUGES.md](GAUGES.md) · [CONTRIBUTING.md](CONTRIBUTING.md) · [GOVERNANCE.md](GOVERNANCE.md) · [SECURITY.md](SECURITY.md)
 
 ## État et feuille de route

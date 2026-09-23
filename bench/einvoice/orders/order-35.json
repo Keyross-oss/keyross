@@ -1,0 +1,102 @@
+{
+  "id": "order-35",
+  "scenario": "allowances",
+  "invoice": {
+    "number": "INV-2026-1035",
+    "issue_date": "2026-10-05",
+    "due_date": "2026-11-04",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4735"
+  },
+  "seller": {
+    "name": "Seller 35 SAS",
+    "vat_id": "FR35000277165",
+    "address": {
+      "line": "35 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 85 SAS",
+    "vat_id": "FR85000673115",
+    "address": {
+      "line": "85 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "Maintenance visit",
+      "quantity": "12",
+      "unit_code": "C62",
+      "net_price": "0.89",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    },
+    {
+      "id": "2",
+      "name": "Diesel",
+      "quantity": "12.75",
+      "unit_code": "LTR",
+      "net_price": "0.89",
+      "vat_category": "S",
+      "vat_rate": "10.00"
+    },
+    {
+      "id": "3",
+      "name": "Coffee beans",
+      "quantity": "12.75",
+      "unit_code": "KGM",
+      "net_price": "120.00",
+      "vat_category": "S",
+      "vat_rate": "5.50"
+    },
+    {
+      "id": "4",
+      "name": "Consulting, senior",
+      "quantity": "1.5",
+      "unit_code": "HUR",
+      "net_price": "0.89",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    },
+    {
+      "id": "5",
+      "name": "Consulting, junior",
+      "quantity": "1.5",
+      "unit_code": "HUR",
+      "net_price": "33.33",
+      "vat_category": "S",
+      "vat_rate": "10.00"
+    },
+    {
+      "id": "6",
+      "name": "Laptop stand",
+      "quantity": "2",
+      "unit_code": "C62",
+      "net_price": "49.90",
+      "vat_category": "S",
+      "vat_rate": "5.50"
+    }
+  ],
+  "allowances": [
+    {
+      "amount": "15.00",
+      "reason": "Loyalty discount",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    }
+  ],
+  "charges": [],
+  "vat_exemptions": {}
+}

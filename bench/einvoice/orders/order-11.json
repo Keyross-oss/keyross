@@ -1,6 +1,6 @@
 {
   "id": "order-11",
-  "scenario": "exempt",
+  "scenario": "domestic",
   "invoice": {
     "number": "INV-2026-1011",
     "issue_date": "2026-09-11",
@@ -39,16 +39,16 @@
       "name": "Maintenance visit",
       "quantity": "12",
       "unit_code": "C62",
-      "net_price": "49.90",
-      "vat_category": "E",
-      "vat_rate": "0.00"
+      "net_price": "33.33",
+      "vat_category": "S",
+      "vat_rate": "20.00"
     },
     {
       "id": "2",
       "name": "Diesel",
-      "quantity": "12.75",
+      "quantity": "7",
       "unit_code": "LTR",
-      "net_price": "33.33",
+      "net_price": "89.95",
       "vat_category": "S",
       "vat_rate": "10.00"
     },
@@ -57,35 +57,39 @@
       "name": "Coffee beans",
       "quantity": "0.5",
       "unit_code": "KGM",
-      "net_price": "120.00",
+      "net_price": "33.33",
       "vat_category": "S",
       "vat_rate": "5.50"
     },
     {
       "id": "4",
       "name": "Consulting, senior",
-      "quantity": "0.5",
+      "quantity": "2.25",
       "unit_code": "HUR",
-      "net_price": "7.45",
+      "net_price": "0.89",
       "vat_category": "S",
       "vat_rate": "20.00"
     },
     {
       "id": "5",
       "name": "Consulting, junior",
-      "quantity": "1.5",
+      "quantity": "7",
       "unit_code": "HUR",
-      "net_price": "89.95",
+      "net_price": "19.99",
       "vat_category": "S",
       "vat_rate": "10.00"
+    },
+    {
+      "id": "6",
+      "name": "Laptop stand",
+      "quantity": "1",
+      "unit_code": "C62",
+      "net_price": "120.00",
+      "vat_category": "S",
+      "vat_rate": "5.50"
     }
   ],
   "allowances": [],
   "charges": [],
-  "vat_exemptions": {
-    "E": {
-      "reason": "Exempt: medical care",
-      "code": "VATEX-EU-132-1C"
-    }
-  }
+  "vat_exemptions": {}
 }

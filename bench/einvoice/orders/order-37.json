@@ -1,0 +1,73 @@
+{
+  "id": "order-37",
+  "scenario": "exempt",
+  "invoice": {
+    "number": "INV-2026-1037",
+    "issue_date": "2026-10-07",
+    "due_date": "2026-11-06",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4737"
+  },
+  "seller": {
+    "name": "Seller 37 SAS",
+    "vat_id": "FR37000293003",
+    "address": {
+      "line": "37 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 87 SAS",
+    "vat_id": "FR87000688953",
+    "address": {
+      "line": "87 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "USB-C dock",
+      "quantity": "2",
+      "unit_code": "C62",
+      "net_price": "49.90",
+      "vat_category": "E",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "2",
+      "name": "Office chair",
+      "quantity": "12",
+      "unit_code": "C62",
+      "net_price": "1250.00",
+      "vat_category": "S",
+      "vat_rate": "10.00"
+    },
+    {
+      "id": "3",
+      "name": "Printer paper A4",
+      "quantity": "3",
+      "unit_code": "C62",
+      "net_price": "49.90",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    }
+  ],
+  "allowances": [],
+  "charges": [],
+  "vat_exemptions": {
+    "E": {
+      "reason": "Exempt: medical care",
+      "code": "VATEX-EU-132-1C"
+    }
+  }
+}

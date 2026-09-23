@@ -1,6 +1,6 @@
 {
   "id": "order-03",
-  "scenario": "domestic",
+  "scenario": "intra_community",
   "invoice": {
     "number": "INV-2026-1003",
     "issue_date": "2026-09-03",
@@ -20,13 +20,13 @@
     }
   },
   "buyer": {
-    "name": "Buyer 53 SAS",
-    "vat_id": "FR53000419707",
+    "name": "Buyer 53 GmbH",
+    "vat_id": "DE53000419707",
     "address": {
       "line": "53 Example Street",
-      "city": "Lille",
-      "postcode": "59000",
-      "country": "FR"
+      "city": "Cologne",
+      "postcode": "50667",
+      "country": "DE"
     }
   },
   "payment": {
@@ -37,41 +37,50 @@
     {
       "id": "1",
       "name": "Maintenance visit",
-      "quantity": "2",
+      "quantity": "1",
       "unit_code": "C62",
-      "net_price": "19.99",
-      "vat_category": "S",
-      "vat_rate": "20.00"
+      "net_price": "89.95",
+      "vat_category": "K",
+      "vat_rate": "0.00"
     },
     {
       "id": "2",
       "name": "Diesel",
-      "quantity": "12.75",
+      "quantity": "1.5",
       "unit_code": "LTR",
-      "net_price": "49.90",
-      "vat_category": "S",
-      "vat_rate": "20.00"
+      "net_price": "89.95",
+      "vat_category": "K",
+      "vat_rate": "0.00"
     },
     {
       "id": "3",
       "name": "Coffee beans",
-      "quantity": "1.5",
+      "quantity": "7",
       "unit_code": "KGM",
-      "net_price": "0.89",
-      "vat_category": "S",
-      "vat_rate": "20.00"
+      "net_price": "7.45",
+      "vat_category": "K",
+      "vat_rate": "0.00"
     },
     {
       "id": "4",
       "name": "Consulting, senior",
-      "quantity": "1.5",
+      "quantity": "0.5",
       "unit_code": "HUR",
-      "net_price": "89.95",
-      "vat_category": "S",
-      "vat_rate": "20.00"
+      "net_price": "0.89",
+      "vat_category": "K",
+      "vat_rate": "0.00"
     }
   ],
   "allowances": [],
   "charges": [],
-  "vat_exemptions": {}
+  "delivery": {
+    "date": "2026-08-14",
+    "country": "DE"
+  },
+  "vat_exemptions": {
+    "K": {
+      "reason": "Intra-community supply",
+      "code": "VATEX-EU-IC"
+    }
+  }
 }

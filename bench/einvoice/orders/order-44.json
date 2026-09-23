@@ -1,0 +1,73 @@
+{
+  "id": "order-44",
+  "scenario": "reverse_charge",
+  "invoice": {
+    "number": "INV-2026-1044",
+    "issue_date": "2026-10-14",
+    "due_date": "2026-11-13",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4744"
+  },
+  "seller": {
+    "name": "Seller 44 SAS",
+    "vat_id": "FR44000348436",
+    "address": {
+      "line": "44 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 94 GmbH",
+    "vat_id": "DE94000744386",
+    "address": {
+      "line": "94 Example Street",
+      "city": "Cologne",
+      "postcode": "50667",
+      "country": "DE"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "Consulting, senior",
+      "quantity": "7",
+      "unit_code": "HUR",
+      "net_price": "19.99",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "2",
+      "name": "Consulting, junior",
+      "quantity": "12.75",
+      "unit_code": "HUR",
+      "net_price": "1250.00",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "3",
+      "name": "Laptop stand",
+      "quantity": "2",
+      "unit_code": "C62",
+      "net_price": "19.99",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
+    }
+  ],
+  "allowances": [],
+  "charges": [],
+  "vat_exemptions": {
+    "AE": {
+      "reason": "Reverse charge",
+      "code": "VATEX-EU-AE"
+    }
+  }
+}

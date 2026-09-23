@@ -37,7 +37,7 @@
     {
       "id": "1",
       "name": "Cable, 5 m",
-      "quantity": "3",
+      "quantity": "1",
       "unit_code": "C62",
       "net_price": "1250.00",
       "vat_category": "S",
@@ -46,16 +46,16 @@
     {
       "id": "2",
       "name": "Training day",
-      "quantity": "0.5",
+      "quantity": "7",
       "unit_code": "DAY",
-      "net_price": "49.90",
+      "net_price": "89.95",
       "vat_category": "S",
       "vat_rate": "20.00"
     },
     {
       "id": "3",
       "name": "Software licence, annual",
-      "quantity": "3",
+      "quantity": "5",
       "unit_code": "C62",
       "net_price": "49.90",
       "vat_category": "S",

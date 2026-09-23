@@ -1,6 +1,6 @@
 {
   "id": "order-04",
-  "scenario": "domestic",
+  "scenario": "reverse_charge",
   "invoice": {
     "number": "INV-2026-1004",
     "issue_date": "2026-09-04",
@@ -20,13 +20,13 @@
     }
   },
   "buyer": {
-    "name": "Buyer 54 SAS",
-    "vat_id": "FR54000427626",
+    "name": "Buyer 54 GmbH",
+    "vat_id": "DE54000427626",
     "address": {
       "line": "54 Example Street",
-      "city": "Lille",
-      "postcode": "59000",
-      "country": "FR"
+      "city": "Cologne",
+      "postcode": "50667",
+      "country": "DE"
     }
   },
   "payment": {
@@ -37,14 +37,28 @@
     {
       "id": "1",
       "name": "Consulting, senior",
-      "quantity": "1.5",
+      "quantity": "7",
       "unit_code": "HUR",
-      "net_price": "89.95",
-      "vat_category": "S",
-      "vat_rate": "20.00"
+      "net_price": "1250.00",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "2",
+      "name": "Consulting, junior",
+      "quantity": "0.5",
+      "unit_code": "HUR",
+      "net_price": "49.90",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
     }
   ],
   "allowances": [],
   "charges": [],
-  "vat_exemptions": {}
+  "vat_exemptions": {
+    "AE": {
+      "reason": "Reverse charge",
+      "code": "VATEX-EU-AE"
+    }
+  }
 }

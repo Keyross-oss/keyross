@@ -51,6 +51,15 @@
       "net_price": "49.90",
       "vat_category": "S",
       "vat_rate": "10.00"
+    },
+    {
+      "id": "3",
+      "name": "Printer paper A4",
+      "quantity": "2",
+      "unit_code": "C62",
+      "net_price": "33.33",
+      "vat_category": "S",
+      "vat_rate": "20.00"
     }
   ],
   "allowances": [],

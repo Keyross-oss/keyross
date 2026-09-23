@@ -1,6 +1,6 @@
 {
   "id": "order-19",
-  "scenario": "allowances",
+  "scenario": "reverse_charge",
   "invoice": {
     "number": "INV-2026-1019",
     "issue_date": "2026-09-19",
@@ -20,13 +20,13 @@
     }
   },
   "buyer": {
-    "name": "Buyer 69 SAS",
-    "vat_id": "FR69000546411",
+    "name": "Buyer 69 GmbH",
+    "vat_id": "DE69000546411",
     "address": {
       "line": "69 Example Street",
-      "city": "Lille",
-      "postcode": "59000",
-      "country": "FR"
+      "city": "Cologne",
+      "postcode": "50667",
+      "country": "DE"
     }
   },
   "payment": {
@@ -37,66 +37,55 @@
     {
       "id": "1",
       "name": "Maintenance visit",
-      "quantity": "12",
+      "quantity": "3",
       "unit_code": "C62",
-      "net_price": "0.89",
-      "vat_category": "S",
-      "vat_rate": "20.00"
+      "net_price": "120.00",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
     },
     {
       "id": "2",
       "name": "Diesel",
-      "quantity": "7",
+      "quantity": "1.5",
       "unit_code": "LTR",
-      "net_price": "120.00",
-      "vat_category": "S",
-      "vat_rate": "10.00"
+      "net_price": "1250.00",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
     },
     {
       "id": "3",
       "name": "Coffee beans",
-      "quantity": "1.5",
+      "quantity": "12.75",
       "unit_code": "KGM",
-      "net_price": "1250.00",
-      "vat_category": "S",
-      "vat_rate": "20.00"
+      "net_price": "89.95",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
     },
     {
       "id": "4",
       "name": "Consulting, senior",
-      "quantity": "12.75",
+      "quantity": "2.25",
       "unit_code": "HUR",
-      "net_price": "89.95",
-      "vat_category": "S",
-      "vat_rate": "10.00"
+      "net_price": "7.45",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
     },
     {
       "id": "5",
       "name": "Consulting, junior",
-      "quantity": "2.25",
+      "quantity": "0.5",
       "unit_code": "HUR",
-      "net_price": "7.45",
-      "vat_category": "S",
-      "vat_rate": "20.00"
-    },
-    {
-      "id": "6",
-      "name": "Laptop stand",
-      "quantity": "5",
-      "unit_code": "C62",
       "net_price": "120.00",
-      "vat_category": "S",
-      "vat_rate": "10.00"
+      "vat_category": "AE",
+      "vat_rate": "0.00"
     }
   ],
-  "allowances": [
-    {
-      "amount": "15.00",
-      "reason": "Loyalty discount",
-      "vat_category": "S",
-      "vat_rate": "20.00"
-    }
-  ],
+  "allowances": [],
   "charges": [],
-  "vat_exemptions": {}
+  "vat_exemptions": {
+    "AE": {
+      "reason": "Reverse charge",
+      "code": "VATEX-EU-AE"
+    }
+  }
 }

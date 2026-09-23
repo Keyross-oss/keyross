@@ -1,0 +1,68 @@
+{
+  "id": "order-33",
+  "scenario": "intra_community",
+  "invoice": {
+    "number": "INV-2026-1033",
+    "issue_date": "2026-10-03",
+    "due_date": "2026-11-02",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4733"
+  },
+  "seller": {
+    "name": "Seller 33 SAS",
+    "vat_id": "FR33000261327",
+    "address": {
+      "line": "33 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 83 GmbH",
+    "vat_id": "DE83000657277",
+    "address": {
+      "line": "83 Example Street",
+      "city": "Cologne",
+      "postcode": "50667",
+      "country": "DE"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "USB-C dock",
+      "quantity": "12",
+      "unit_code": "C62",
+      "net_price": "120.00",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "2",
+      "name": "Office chair",
+      "quantity": "1",
+      "unit_code": "C62",
+      "net_price": "1250.00",
+      "vat_category": "K",
+      "vat_rate": "0.00"
+    }
+  ],
+  "allowances": [],
+  "charges": [],
+  "delivery": {
+    "date": "2026-09-13",
+    "country": "DE"
+  },
+  "vat_exemptions": {
+    "K": {
+      "reason": "Intra-community supply",
+      "code": "VATEX-EU-IC"
+    }
+  }
+}

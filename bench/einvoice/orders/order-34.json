@@ -1,0 +1,82 @@
+{
+  "id": "order-34",
+  "scenario": "reverse_charge",
+  "invoice": {
+    "number": "INV-2026-1034",
+    "issue_date": "2026-10-04",
+    "due_date": "2026-11-03",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4734"
+  },
+  "seller": {
+    "name": "Seller 34 SAS",
+    "vat_id": "FR34000269246",
+    "address": {
+      "line": "34 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 84 GmbH",
+    "vat_id": "DE84000665196",
+    "address": {
+      "line": "84 Example Street",
+      "city": "Cologne",
+      "postcode": "50667",
+      "country": "DE"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "Cable, 5 m",
+      "quantity": "2",
+      "unit_code": "C62",
+      "net_price": "1250.00",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "2",
+      "name": "Training day",
+      "quantity": "12.75",
+      "unit_code": "DAY",
+      "net_price": "7.45",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "3",
+      "name": "Software licence, annual",
+      "quantity": "1",
+      "unit_code": "C62",
+      "net_price": "0.89",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "4",
+      "name": "Maintenance visit",
+      "quantity": "12",
+      "unit_code": "C62",
+      "net_price": "7.45",
+      "vat_category": "AE",
+      "vat_rate": "0.00"
+    }
+  ],
+  "allowances": [],
+  "charges": [],
+  "vat_exemptions": {
+    "AE": {
+      "reason": "Reverse charge",
+      "code": "VATEX-EU-AE"
+    }
+  }
+}

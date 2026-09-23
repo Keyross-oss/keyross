@@ -1,6 +1,6 @@
-"""The benchmark's tasks: 20 purchase orders to invoice, and the amounts an invoice for each must carry.
+"""The benchmark's tasks: 50 purchase orders to invoice (10 per scenario), and the amounts an invoice for each must carry.
 
-The orders are fictitious and deterministic (seeded), with rising difficulty: several VAT rates, exempt lines that need an
+The orders are fictitious and deterministic (seeded), across five scenarios: several VAT rates, exempt lines that need an
 exemption reason, intra-community supplies and reverse charge (extra identifiers and delivery data), document-level
 allowances and charges, quantities and prices whose product needs rounding. `python -m bench.einvoice.orders` rewrites
 bench/einvoice/orders/*.json; the committed files are the benchmark."""
@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import random
+from datetime import date, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
@@ -19,6 +20,8 @@ ITEMS = [("Consulting, senior", "HUR"), ("Consulting, junior", "HUR"), ("Laptop 
          ("Office chair", "C62"), ("Printer paper A4", "C62"), ("Cable, 5 m", "C62"), ("Training day", "DAY"),
          ("Software licence, annual", "C62"), ("Maintenance visit", "C62"), ("Diesel", "LTR"), ("Coffee beans", "KGM")]
 STANDARD_RATES = ["20.00", "10.00", "5.50"]
+SCENARIOS = ["domestic", "exempt", "intra_community", "reverse_charge", "allowances"]
+FIRST_ISSUE = date(2026, 9, 1)
 EXEMPTIONS = {
     "E": ("Exempt: medical care", "VATEX-EU-132-1C"),
     "K": ("Intra-community supply", "VATEX-EU-IC"),
@@ -38,11 +41,11 @@ def _party(n: int, country: str, prefix: str) -> dict:
 
 
 def make_order(i: int, rng: random.Random) -> dict:
-    """Order i (1-based). Features switch on with i, so later orders are harder."""
-    scenario = ("domestic" if i <= 8 else "exempt" if i <= 11 else "intra_community" if i <= 14
-                else "reverse_charge" if i <= 16 else "allowances")
+    """Order i (1-based): scenarios in turn, 1 to 6 lines, one to three VAT rates."""
+    scenario = SCENARIOS[(i - 1) % len(SCENARIOS)]
     buyer_country = "DE" if scenario in ("intra_community", "reverse_charge") else "FR"
-    n_lines = 1 + (i % 4) + (i // 7)
+    n_lines = 1 + (i % 4) + (i % 3)
+    issued = FIRST_ISSUE + timedelta(days=i - 1)
     rates = STANDARD_RATES[: 1 + (i % 3)] if scenario in ("domestic", "exempt", "allowances") else []
     lines = []
     for k in range(n_lines):
@@ -61,14 +64,14 @@ def make_order(i: int, rng: random.Random) -> dict:
                       "vat_category": category, "vat_rate": rate})
     order = {
         "id": f"order-{i:02d}", "scenario": scenario,
-        "invoice": {"number": f"INV-2026-{1000 + i}", "issue_date": f"2026-09-{i:02d}", "due_date": f"2026-10-{i:02d}",
+        "invoice": {"number": f"INV-2026-{1000 + i}", "issue_date": issued.isoformat(), "due_date": (issued + timedelta(days=30)).isoformat(),
                     "type_code": "380", "currency": "EUR", "buyer_reference": f"PO-{4700 + i}"},
         "seller": _party(i, "FR", "Seller"), "buyer": _party(50 + i, buyer_country, "Buyer"),
         "payment": {"means_code": "58", "iban": "FR7630006000011234567890189"},
         "lines": lines, "allowances": [], "charges": [],
     }
     if scenario == "intra_community":
-        order["delivery"] = {"date": f"2026-08-{i:02d}", "country": "DE"}
+        order["delivery"] = {"date": (issued - timedelta(days=20)).isoformat(), "country": "DE"}
     if scenario == "allowances":
         first = lines[0]
         order["allowances"].append({"amount": "15.00", "reason": "Loyalty discount", "vat_category": first["vat_category"], "vat_rate": first["vat_rate"]})
@@ -106,7 +109,7 @@ def load_orders() -> list[dict]:
     return [json.loads(p.read_text(encoding="utf-8")) for p in sorted(ORDERS_DIR.glob("order-*.json"))]
 
 
-def write_orders(n: int = 20, seed: int = 2026) -> None:
+def write_orders(n: int = 50, seed: int = 2026) -> None:
     rng = random.Random(seed)
     ORDERS_DIR.mkdir(exist_ok=True)
     for i in range(1, n + 1):

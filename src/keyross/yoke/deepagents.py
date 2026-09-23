@@ -188,7 +188,7 @@ class Yoke(_Middleware):  # type: ignore[misc,valid-type]
             self.telemetry.event(
                 event_type="verification", decision_id=call.get("id", ""), tool=call.get("name", ""), thread_id=thread,
                 document=path, gauge=self.gauge or "*", attempt=attempt, flag=report.flag, aligned=report.aligned,
-                reverted=bool(report.hard_failures),
+                reverted=bool(report.hard_failures), duration_ms=report.duration_ms,
                 verdicts=[v.to_dict() for v in report.verdicts if v.status == Status.FAIL])
 
     def stats(self) -> dict[str, Any]:

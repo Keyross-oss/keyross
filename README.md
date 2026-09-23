@@ -99,7 +99,7 @@ Nothing requires an account, a cloud or a cluster. Everything runs locally. Wher
 
 - [docs/CONCEPTS.md](docs/CONCEPTS.md) — invariants, contracts and sentinels; the flags, including black; the rules the tool enforces; writing an oracle
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — where the gauges run, what comes out of every door
-- [bench/einvoice](bench/einvoice/README.md) — the same agent without and with the yoke, graded outside the agent
+- [bench/einvoice](bench/einvoice/README.md) — the same agent without and with the yoke, graded by judges that are not Keyross; pre-registered protocol
 - [GAUGES.md](GAUGES.md) · [CONTRIBUTING.md](CONTRIBUTING.md) · [GOVERNANCE.md](GOVERNANCE.md) · [SECURITY.md](SECURITY.md)
 
 ## Status and roadmap

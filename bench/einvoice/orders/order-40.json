@@ -1,0 +1,73 @@
+{
+  "id": "order-40",
+  "scenario": "allowances",
+  "invoice": {
+    "number": "INV-2026-1040",
+    "issue_date": "2026-10-10",
+    "due_date": "2026-11-09",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4740"
+  },
+  "seller": {
+    "name": "Seller 40 SAS",
+    "vat_id": "FR40000316760",
+    "address": {
+      "line": "40 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 90 SAS",
+    "vat_id": "FR90000712710",
+    "address": {
+      "line": "90 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "Consulting, senior",
+      "quantity": "12.75",
+      "unit_code": "HUR",
+      "net_price": "1250.00",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    },
+    {
+      "id": "2",
+      "name": "Consulting, junior",
+      "quantity": "7",
+      "unit_code": "HUR",
+      "net_price": "89.95",
+      "vat_category": "S",
+      "vat_rate": "10.00"
+    }
+  ],
+  "allowances": [
+    {
+      "amount": "15.00",
+      "reason": "Loyalty discount",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    }
+  ],
+  "charges": [
+    {
+      "amount": "9.90",
+      "reason": "Shipping",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    }
+  ],
+  "vat_exemptions": {}
+}

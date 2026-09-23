@@ -1,7 +1,8 @@
-"""Grading, outside the agent: is the delivered invoice valid (the official CEN rules, no fatal finding) and is it right
-(its lines, VAT breakdown and totals match the order)? The second check catches an invoice made valid by bending the order.
+"""Grading, outside the agent and outside Keyross: an invoice is **correct** when the independent validator finds no fatal
+rule, the official schema accepts it, and it matches the order (lines, VAT breakdown, totals). The order check catches an
+invoice made valid by bending the order. Keyross' own verdict is recorded only to measure its agreement with the validator.
 
-`python -m bench.einvoice.grade` checks that the 20 reference invoices are valid and right: every task is solvable."""
+`python -m bench.einvoice.grade` checks that every reference invoice is correct: every task is solvable."""
 from __future__ import annotations
 
 import tempfile
@@ -13,6 +14,7 @@ from keyross.core.invoice import load_invoice
 from keyross.core.runner import check_file
 from keyross.gauges import load_gauge
 
+from bench.einvoice.judges import schema_errors, validator
 from bench.einvoice.orders import expected, load_orders
 
 TOL = Decimal("0.005")
@@ -59,22 +61,26 @@ def order_mismatches(order: dict, path: Path) -> list[str]:
 
 
 def grade(order: dict, xml: str | None) -> dict[str, Any]:
-    """The verdict on one delivered invoice (`xml` None: nothing was delivered)."""
+    """The verdict of the three independent judges on one invoice (`xml` None: nothing was delivered)."""
     if xml is None:
-        return {"delivered": False, "valid": False, "right": False, "correct": False, "fatal": [], "mismatches": ["not delivered"]}
+        return {"delivered": False, "valid": False, "schema_valid": False, "right": False, "correct": False,
+                "fatal": [], "schema": [], "mismatches": ["not delivered"], "keyross_fatal": [], "agree": None}
+    data = xml.encode("utf-8")
+    independent = validator(data)
+    schema = schema_errors(data)
     load_gauge("einvoice")
     with tempfile.TemporaryDirectory(prefix="keyross-bench-", ignore_cleanup_errors=True) as tmp:
         f = Path(tmp) / "invoice.xml"
-        f.write_text(xml, encoding="utf-8")
-        report = check_file(f, gauge="einvoice")
-        fatal = sorted({v.category for v in report.hard_failures})
+        f.write_bytes(data)
+        keyross_fatal = sorted({v.category for v in check_file(f, gauge="einvoice").hard_failures})
         try:
             mismatches = order_mismatches(order, f)
         except Exception as e:  # noqa: BLE001 — an unreadable invoice is not right
             mismatches = [f"unreadable: {type(e).__name__}"]
-    valid, right = not fatal, not mismatches
-    return {"delivered": True, "valid": valid, "right": right, "correct": valid and right, "fatal": fatal,
-            "warnings": len(report.soft_failures), "mismatches": mismatches}
+    valid, schema_valid, right = not independent["fatal"], not schema, not mismatches
+    return {"delivered": True, "valid": valid, "schema_valid": schema_valid, "right": right,
+            "correct": valid and schema_valid and right, "fatal": independent["fatal"], "warnings": len(independent["warnings"]),
+            "schema": schema, "mismatches": mismatches, "keyross_fatal": keyross_fatal, "agree": keyross_fatal == independent["fatal"]}
 
 
 def check_references() -> list[tuple[str, dict]]:
@@ -86,7 +92,7 @@ if __name__ == "__main__":
     import sys
     results = check_references()
     for oid, g in results:
-        print(f"  {'OK ' if g['correct'] else 'XX '} {oid}  fatal={g['fatal']}  warnings={g['warnings']}  mismatches={g['mismatches']}")
+        print(f"  {'OK ' if g['correct'] else 'XX '} {oid}  fatal={g['fatal']}  schema={g['schema'][:1]}  mismatches={g['mismatches']}")
     bad = [oid for oid, g in results if not g["correct"]]
-    print(f"{len(results) - len(bad)}/{len(results)} reference invoices valid and right")
+    print(f"{len(results) - len(bad)}/{len(results)} reference invoices correct for the three independent judges")
     sys.exit(1 if bad else 0)

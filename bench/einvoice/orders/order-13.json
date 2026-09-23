@@ -37,7 +37,7 @@
     {
       "id": "1",
       "name": "USB-C dock",
-      "quantity": "3",
+      "quantity": "12",
       "unit_code": "C62",
       "net_price": "89.95",
       "vat_category": "K",
@@ -46,18 +46,18 @@
     {
       "id": "2",
       "name": "Office chair",
-      "quantity": "5",
+      "quantity": "3",
       "unit_code": "C62",
-      "net_price": "33.33",
+      "net_price": "7.45",
       "vat_category": "K",
       "vat_rate": "0.00"
     },
     {
       "id": "3",
       "name": "Printer paper A4",
-      "quantity": "2",
+      "quantity": "3",
       "unit_code": "C62",
-      "net_price": "0.89",
+      "net_price": "89.95",
       "vat_category": "K",
       "vat_rate": "0.00"
     }
@@ -65,7 +65,7 @@
   "allowances": [],
   "charges": [],
   "delivery": {
-    "date": "2026-08-13",
+    "date": "2026-08-24",
     "country": "DE"
   },
   "vat_exemptions": {

@@ -1,6 +1,6 @@
 {
   "id": "order-14",
-  "scenario": "intra_community",
+  "scenario": "reverse_charge",
   "invoice": {
     "number": "INV-2026-1014",
     "issue_date": "2026-09-14",
@@ -37,59 +37,55 @@
     {
       "id": "1",
       "name": "Cable, 5 m",
-      "quantity": "3",
+      "quantity": "5",
       "unit_code": "C62",
-      "net_price": "19.99",
-      "vat_category": "K",
+      "net_price": "89.95",
+      "vat_category": "AE",
       "vat_rate": "0.00"
     },
     {
       "id": "2",
       "name": "Training day",
-      "quantity": "1.5",
+      "quantity": "0.5",
       "unit_code": "DAY",
-      "net_price": "120.00",
-      "vat_category": "K",
+      "net_price": "19.99",
+      "vat_category": "AE",
       "vat_rate": "0.00"
     },
     {
       "id": "3",
       "name": "Software licence, annual",
-      "quantity": "12",
+      "quantity": "3",
       "unit_code": "C62",
-      "net_price": "89.95",
-      "vat_category": "K",
+      "net_price": "1250.00",
+      "vat_category": "AE",
       "vat_rate": "0.00"
     },
     {
       "id": "4",
       "name": "Maintenance visit",
-      "quantity": "12",
+      "quantity": "5",
       "unit_code": "C62",
-      "net_price": "89.95",
-      "vat_category": "K",
+      "net_price": "49.90",
+      "vat_category": "AE",
       "vat_rate": "0.00"
     },
     {
       "id": "5",
       "name": "Diesel",
-      "quantity": "7",
+      "quantity": "0.5",
       "unit_code": "LTR",
-      "net_price": "7.45",
-      "vat_category": "K",
+      "net_price": "0.89",
+      "vat_category": "AE",
       "vat_rate": "0.00"
     }
   ],
   "allowances": [],
   "charges": [],
-  "delivery": {
-    "date": "2026-08-14",
-    "country": "DE"
-  },
   "vat_exemptions": {
-    "K": {
-      "reason": "Intra-community supply",
-      "code": "VATEX-EU-IC"
+    "AE": {
+      "reason": "Reverse charge",
+      "code": "VATEX-EU-AE"
     }
   }
 }

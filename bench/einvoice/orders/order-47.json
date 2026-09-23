@@ -1,0 +1,100 @@
+{
+  "id": "order-47",
+  "scenario": "exempt",
+  "invoice": {
+    "number": "INV-2026-1047",
+    "issue_date": "2026-10-17",
+    "due_date": "2026-11-16",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4747"
+  },
+  "seller": {
+    "name": "Seller 47 SAS",
+    "vat_id": "FR47000372193",
+    "address": {
+      "line": "47 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 97 SAS",
+    "vat_id": "FR97000768143",
+    "address": {
+      "line": "97 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "Maintenance visit",
+      "quantity": "12",
+      "unit_code": "C62",
+      "net_price": "120.00",
+      "vat_category": "E",
+      "vat_rate": "0.00"
+    },
+    {
+      "id": "2",
+      "name": "Diesel",
+      "quantity": "7",
+      "unit_code": "LTR",
+      "net_price": "33.33",
+      "vat_category": "S",
+      "vat_rate": "10.00"
+    },
+    {
+      "id": "3",
+      "name": "Coffee beans",
+      "quantity": "0.5",
+      "unit_code": "KGM",
+      "net_price": "33.33",
+      "vat_category": "S",
+      "vat_rate": "5.50"
+    },
+    {
+      "id": "4",
+      "name": "Consulting, senior",
+      "quantity": "2.25",
+      "unit_code": "HUR",
+      "net_price": "33.33",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    },
+    {
+      "id": "5",
+      "name": "Consulting, junior",
+      "quantity": "2.25",
+      "unit_code": "HUR",
+      "net_price": "120.00",
+      "vat_category": "S",
+      "vat_rate": "10.00"
+    },
+    {
+      "id": "6",
+      "name": "Laptop stand",
+      "quantity": "2",
+      "unit_code": "C62",
+      "net_price": "19.99",
+      "vat_category": "S",
+      "vat_rate": "5.50"
+    }
+  ],
+  "allowances": [],
+  "charges": [],
+  "vat_exemptions": {
+    "E": {
+      "reason": "Exempt: medical care",
+      "code": "VATEX-EU-132-1C"
+    }
+  }
+}
