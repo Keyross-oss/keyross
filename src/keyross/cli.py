@@ -1,8 +1,7 @@
-"""keyross — the command line. init · check · gate · test · lint · lock · doctor · gauges · add · outdated · yoke. No account, no cloud, no model."""
+"""keyross — the command line. init · check · gate · test · lint · lock · doctor · gauges · add · outdated · yoke · stats. No account, no cloud, no model."""
 from __future__ import annotations
 
 import argparse
-import importlib
 import importlib.util
 import json
 import sys
@@ -11,12 +10,12 @@ from pathlib import Path
 import yaml
 
 from keyross import __version__
-from keyross.core.document import load
-from keyross.core.runner import run, run_adapters
+from keyross.core.runner import ADAPTER_SUFFIXES, TABULAR_SUFFIXES, check_file, unreadable
 from keyross.core import lock as lockmod
 from keyross.gate import report as reportmod
 from keyross.oracles.badset import run_badset
 from keyross.oracles.lint import lint_dir
+from keyross.gauges import load_gauge
 
 DEFAULT_CONFIG = """# keyross.yaml — the configuration of your agent's compiler
 gauges: [core]            # gauges to load (modules keyross.gauges.<name>); add your own: [core, mycompany.invoices]
@@ -27,8 +26,6 @@ context:
   units: [u, m, m2, m3, ml, kg, t, ens, ff, h, j, l]   # unit vocabulary — adapt it
 report_dir: .keyross/reports
 """
-
-ADAPTER_SUFFIXES = (".xml",)   # documents validated by adapters (official validators), not by the tabular loader
 
 SAMPLE_ORACLE = '''"""Your own oracles. An oracle = a pure function (document, context) -> Verdict. Deterministic or nothing."""
 from keyross import oracle, Verdict
@@ -49,7 +46,7 @@ def _load_config(path: str = "keyross.yaml") -> dict:
 
 def _load_oracles(cfg: dict) -> None:
     for gauge in cfg.get("gauges", []):
-        importlib.import_module(f"keyross.gauges.{gauge}" if "." not in gauge else gauge)
+        load_gauge(gauge)
     d = Path(cfg.get("oracles_dir", "oracles"))
     if d.exists():
         for f in sorted(d.glob("*.py")):
@@ -75,17 +72,11 @@ def cmd_check(args: argparse.Namespace) -> int:
     if not Path(args.file).is_file():
         return _fail(f"no such file: {args.file}")
     cfg = _load_config(); _load_oracles(cfg)
-    ctx = dict(cfg.get("context", {}))
-    if Path(args.file).suffix.lower() in ADAPTER_SUFFIXES:
-        rep = run_adapters(args.file, gauge=args.gauge, only=cfg.get("adapters") or None)
-    else:
-        try:
-            if args.before:
-                ctx["before"] = load(args.before)
-            doc = load(args.file)
-        except (ValueError, OSError) as e:
-            return _fail(str(e))
-        rep = run(doc, gauge=args.gauge, ctx=ctx)
+    try:
+        rep = check_file(args.file, gauge=args.gauge, ctx=dict(cfg.get("context", {})), only=cfg.get("adapters") or None,
+                         before=args.before)
+    except (ValueError, OSError) as e:
+        return _fail(str(e))
     if args.json:
         print(json.dumps(rep.to_dict(), ensure_ascii=False, indent=2, default=str))
     else:
@@ -102,11 +93,11 @@ def cmd_gate(args: argparse.Namespace) -> int:
         return _fail(f"no such directory: {args.dir}")
     cfg = _load_config(); _load_oracles(cfg)
     worst = 0
-    for f in sorted(p for p in Path(args.dir).iterdir() if p.suffix.lower() in (".xlsx", ".csv", *ADAPTER_SUFFIXES)):
-        if f.suffix.lower() in ADAPTER_SUFFIXES:
-            rep = run_adapters(str(f), gauge=args.gauge, only=cfg.get("adapters") or None)
-        else:
-            rep = run(load(f), gauge=args.gauge, ctx=dict(cfg.get("context", {})))
+    for f in sorted(p for p in Path(args.dir).iterdir() if p.suffix.lower() in (*TABULAR_SUFFIXES, *ADAPTER_SUFFIXES)):
+        try:
+            rep = check_file(f, gauge=args.gauge, ctx=dict(cfg.get("context", {})), only=cfg.get("adapters") or None)
+        except (ValueError, OSError) as e:        # an output nothing can read is a red, not a skip
+            rep = unreadable(str(f), str(e))
         print(reportmod.terminal(rep)); worst = max(worst, rep.exit_code)
     if args.fail_on == "hard":
         return 2 if worst == 2 else 0
@@ -197,13 +188,31 @@ def cmd_outdated(args: argparse.Namespace) -> int:
 def cmd_yoke(args: argparse.Namespace) -> int:
     """The yoke: couple an agent to its gauges (0.2: prints the integration recipe for the chosen harness)."""
     recipes = {
-        "deepagents": "from keyross.yoke import Yoke\nagent = create_deep_agent(..., middleware=[..., Yoke(gauge=\"core\")])",
+        "deepagents": ("# pip install 'keyross[yoke]'\nfrom keyross.yoke import Yoke\nfrom keyross.telemetry import JsonlTelemetry\n"
+                       "agent = create_deep_agent(..., middleware=[Yoke(gauge=\"einvoice\", telemetry=JsonlTelemetry())])\n"
+                       "# another backend than the default StateBackend? pass the same one: Yoke(..., backend=backend)\n"
+                       "# then: keyross stats   (first-pass rate)"),
         "claude-code": "# .claude/settings.json → hooks.PostToolUse: on Write|Edit run `keyross check \"$FILE\" --json`\n# code executed by the harness — not a skill the model reads",
         "mcp": "keyross serve --mcp --mode guard   # 0.5 — called by the platform; --mode tool exposes verify with minimal feedback",
     }
     if args.harness not in recipes:
         print(f"unknown harness: {args.harness} — one of {', '.join(recipes)}"); return 1
     print(recipes[args.harness]); return 0
+
+
+def cmd_stats(args: argparse.Namespace) -> int:
+    """The first-pass rate of the yokes, from the telemetry: green on the first write, no retry."""
+    from keyross.telemetry import first_pass, read_events
+    stats = first_pass(read_events(args.telemetry))
+    if args.json:
+        print(json.dumps(stats, indent=2)); return 0
+    if not stats:
+        print(f"no verification event in {args.telemetry} — give the yoke a telemetry: Yoke(..., telemetry=JsonlTelemetry())"); return 0
+    print(f"  {'gauge':<12} {'documents':>9} {'first pass':>10} {'rate':>6} {'writes':>7} {'pit stops':>9}")
+    for gauge, s in stats.items():
+        rate = "—" if s["first_pass_rate"] is None else f"{s['first_pass_rate']:.0%}"
+        print(f"  {gauge:<12} {s['documents']:>9} {s['first_pass']:>10} {rate:>6} {s['writes']:>7} {s['pit_stops']:>9}")
+    return 0
 
 
 def cmd_doctor(args: argparse.Namespace) -> int:
@@ -229,6 +238,8 @@ def main(argv: list[str] | None = None) -> int:
     a = sub.add_parser("add", help="add a gauge from the registry (keyross add core)"); a.add_argument("gauge"); a.set_defaults(fn=cmd_add)
     sub.add_parser("outdated", help="are we on the latest rules? installed gauges vs registry").set_defaults(fn=cmd_outdated)
     y = sub.add_parser("yoke", help="couple an agent to its gauges: deepagents · claude-code · mcp"); y.add_argument("harness"); y.set_defaults(fn=cmd_yoke)
+    st = sub.add_parser("stats", help="first-pass rate of the yokes, from the telemetry"); st.add_argument("--telemetry", default=".keyross/events.jsonl")
+    st.add_argument("--json", action="store_true"); st.set_defaults(fn=cmd_stats)
     args = p.parse_args(argv)
     _utf8_output()
     return args.fn(args)

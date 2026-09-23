@@ -1,6 +1,12 @@
 # Changelog
 
 ## Unreleased
+- **yoke: the Deep Agents yoke is real** (LangChain 1.x `AgentMiddleware`, `wrap_tool_call` and `awrap_tool_call`; `pip install 'keyross[yoke]'`): after `write_file` / `edit_file` (and custom tools with action contracts), reads the document back through the agent's backend, runs the gauges on a temporary copy, restores the previous content on red and answers with the categories only; yellow and sentinels never block; paths normalized as Deep Agents writes them; any backend (`StateBackend` by default, `FilesystemBackend`…)
+- stats: `keyross stats` — first-pass rate per gauge from the yoke's `verification` telemetry events; `Yoke.stats()` for one process
+- core: `check_file()` — one routing (tabular → invariants, XML → adapters) shared by `check`, scrutineering and the yoke; `unreadable()` — an output nothing can read is a red; `load_gauge()`; xlsx workbooks closed after reading
+- einvoice: Saxon-HE confined to one dedicated thread — saxonche objects created on an agent's worker thread and freed on the main thread crashed the process at exit
+- examples: `examples/deepagents/invoice_agent.py` — an offline Deep Agent writing an EN 16931 invoice without and with the yoke
+- docs: the yoke README gets the wheel-alignment sentence and the `Yoke` table that the previous commit announced but did not include
 - yoke: `Yoke` class (`KeyrossMiddleware` alias), `Report.aligned` (first-pass rate), README section "The yoke" with the drift animation (docs/yoke.gif)
 - cli: a missing file, an unsupported format or a missing directory is a usage error — clear message on stderr, exit 2, no report — instead of a red verdict or a traceback
 - docs: `SECURITY.md` (private reporting, scope: false greens, network or file access during a check, unpinned changes, leaks into minimal feedback); README EN/FR — `einvoice` in the five-minute tour and in 0.1, `keyross add einvoice`; registry index and CI action point to the `Keyross-oss` organization

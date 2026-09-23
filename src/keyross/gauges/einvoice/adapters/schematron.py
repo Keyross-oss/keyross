@@ -6,9 +6,13 @@ the rule list the registry pins is read from the same artifacts. A verdict that 
 from __future__ import annotations
 
 import hashlib
+import importlib.util
+import queue
+import threading
 import xml.etree.ElementTree as ET
+from concurrent.futures import Future
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 
 import yaml
 
@@ -19,19 +23,52 @@ GAUGE_DIR = Path(__file__).resolve().parent.parent
 XSL = "{http://www.w3.org/1999/XSL/Transform}"
 SVRL = "{http://purl.oclc.org/dsdl/svrl}"
 
-_processor: Any = None
+class _SaxonThread:
+    """Saxon-HE lives in one dedicated thread. saxonche's native objects must be created, used and freed on the same thread:
+    created on an agent's worker thread and freed on the main thread at exit, they crash the whole process. This daemon
+    thread owns the processor and the compiled stylesheets until the process ends; every other thread only sends it jobs."""
 
+    def __init__(self) -> None:
+        self._jobs: "queue.Queue[tuple[Callable[..., Any], tuple[Any, ...], Future]]" = queue.Queue()
+        self._thread: threading.Thread | None = None
+        self._lock = threading.Lock()
 
-def _saxon() -> Any:
-    """One Saxon-HE processor per process (creating several is slow and unsupported by saxonche)."""
-    global _processor
-    if _processor is None:
+    def call(self, fn: Callable[..., Any], *args: Any) -> Any:
+        if importlib.util.find_spec("saxonche") is None:
+            raise AdapterError("saxonche is not installed — pip install 'keyross[einvoice]'", "adapter.unavailable")
+        with self._lock:
+            if self._thread is None:
+                self._thread = threading.Thread(target=self._loop, name="keyross-saxon", daemon=True)
+                self._thread.start()
+        done: Future = Future()
+        self._jobs.put((fn, args, done))
+        return done.result()
+
+    def _loop(self) -> None:
         try:
             from saxonche import PySaxonProcessor
-        except ImportError as e:
-            raise AdapterError("saxonche is not installed — pip install 'keyross[einvoice]'", "adapter.unavailable") from e
-        _processor = PySaxonProcessor(license=False)
-    return _processor
+            processor, compiled, failure = PySaxonProcessor(license=False), {}, None
+        except Exception as e:  # noqa: BLE001 — reported to every caller, never swallowed
+            processor, compiled, failure = None, {}, e
+        while True:
+            fn, args, done = self._jobs.get()
+            if failure is not None:
+                done.set_exception(AdapterError(f"Saxon-HE could not start: {failure}", "adapter.unavailable"))
+                continue
+            try:
+                done.set_result(fn(processor, compiled, *args))
+            except BaseException as e:  # noqa: BLE001 — the caller turns it into a hard red
+                done.set_exception(e)
+
+
+_saxon = _SaxonThread()
+
+
+def _transform(processor: Any, compiled: dict[str, Any], stylesheet: str, source: str) -> str:
+    """Runs on the Saxon thread: compile the stylesheet once per process, transform the document to SVRL."""
+    if stylesheet not in compiled:
+        compiled[stylesheet] = processor.new_xslt30_processor().compile_stylesheet(stylesheet_file=stylesheet)
+    return compiled[stylesheet].transform_to_string(source_file=source)
 
 
 class CenSchematron(ExternalValidatorAdapter):
@@ -46,7 +83,6 @@ class CenSchematron(ExternalValidatorAdapter):
         self._pin = AdapterPin(tool=m["tool"], version=str(m["version"]), artifacts=artifacts,
                                artifact_sha256=AdapterPin.digest(artifacts), offline=bool(m.get("offline", True)))
         self._verified: dict[str, Path] = {}
-        self._compiled: dict[str, Any] = {}
 
     @classmethod
     def from_manifest(cls, path: Path = GAUGE_DIR / "gauge.yaml") -> "CenSchematron":
@@ -92,10 +128,7 @@ class CenSchematron(ExternalValidatorAdapter):
         syntax = syntax_of(root)
         if syntax not in self.syntaxes:
             raise AdapterError(f"{path.name}: not a UBL or CII invoice (root {root.tag})", "einvoice.syntax.unknown")
-        if syntax not in self._compiled:
-            xslt = _saxon().new_xslt30_processor()
-            self._compiled[syntax] = xslt.compile_stylesheet(stylesheet_file=str(self._artifact(syntax)))
-        svrl = self._compiled[syntax].transform_to_string(source_file=str(path.resolve()))
+        svrl = _saxon.call(_transform, str(self._artifact(syntax)), str(path.resolve()))
         if not svrl:
             raise AdapterError(f"{path.name}: Saxon returned no SVRL report", "adapter.engine_error")
         for fa in ET.fromstring(svrl.encode("utf-8")).iter(SVRL + "failed-assert"):

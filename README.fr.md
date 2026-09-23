@@ -84,6 +84,8 @@ Pense au parallélisme des roues. Le modèle roule droit ; les règles roulent d
 
 Le yoke mesure ; il ne borne pas. Budgets, colonnes protégées, plafonds de suppression restent dans le harness (ses limiters). Trois yokes : la middleware Deep Agents / LangGraph, le hook `PostToolUse` de Claude Code, le serveur MCP (mode garde) — `keyross yoke <harness>` imprime la recette.
 
+À essayer hors ligne : `python examples/deepagents/invoice_agent.py` fait tourner le même agent sans puis avec le yoke — un total faux part, puis il est attrapé, annulé et corrigé. Avec une telemetry, `keyross stats` affiche le first-pass rate.
+
 ## Où tournent les gauges
 
 ![Un run : l'agent écrit, le compilateur exécute les gauges, drapeau rouge → pit stop, vert → le scrutineering livre](docs/loop.gif)
@@ -114,7 +116,7 @@ Chaque verdict porte un flag : **green** (ok), **yellow** (échec souple — sig
 | Niveau | Comment | Temps |
 |---|---|---|
 | 0 — le scrutineering en CI | `keyross gate outputs/ --fail-on hard` — exit code, comme pytest | 10 min |
-| 1 — le yoke, dans la boucle | `Yoke(gauge="core")` pour Deep Agents / LangChain : vérifie après chaque outil d'écriture, revert si rouge, retour minimal *(esquisse v0.2)* | 1 h |
+| 1 — le yoke, dans la boucle | `Yoke(gauge="core")` pour Deep Agents / LangChain : vérifie après chaque outil d'écriture, revert si rouge, retour minimal — `pip install 'keyross[yoke]'` | 1 h |
 | 2 — le yoke, en service | `keyross serve --mcp` : l'outil `verify` en mode garde, appelé par le harness *(v0.5)* | 1 h |
 | 3 — l'audit | `keyross audit` : le rapport en neuf sections et le gauge governance sur la telemetry *(0.3)* | 1 jour |
 
@@ -128,7 +130,7 @@ Chaque oracle a un **identifiant** (`gauge.sujet.propriete`), une **version**, u
 
 ## État et feuille de route
 
-`0.1` — check, gauge core, test, lint, lock, rapport, doctor statique, `gauges` / `add` / `outdated` / `yoke`, et le gauge homologué [`einvoice`](src/keyross/gauges/einvoice/README.md) (les artefacts officiels du CEN EN 16931 1.3.16, exécutés sans modification) · `0.2` — le yoke Deep Agents, les oracles delta `einvoice` et le PDF Factur-X · `0.3` — gauges depuis git, `update` / `audit`, le seal, doctor sur images · `0.4` — gauges signés, doctor sur cluster jetable (kind), action CI, démo en boîte · `0.5` — le yoke MCP, le hook et le plugin Claude Code · puis `dora.register`, `aiact.annex4`, `governance`.
+`0.1` — check, gauge core, test, lint, lock, rapport, doctor statique, `gauges` / `add` / `outdated` / `yoke`, et le gauge homologué [`einvoice`](src/keyross/gauges/einvoice/README.md) (les artefacts officiels du CEN EN 16931 1.3.16, exécutés sans modification), le yoke Deep Agents et `keyross stats` (first-pass rate) · `0.2` — les oracles delta `einvoice` et le PDF Factur-X · `0.3` — gauges depuis git, `update` / `audit`, le seal, doctor sur images · `0.4` — gauges signés, doctor sur cluster jetable (kind), action CI, démo en boîte · `0.5` — le yoke MCP, le hook et le plugin Claude Code · puis `dora.register`, `aiact.annex4`, `governance`.
 
 Ce dépôt se vérifie lui-même : sa CI lance `keyross test`, `keyross lint` et `keyross lock --check` à chaque commit.
 

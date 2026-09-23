@@ -3,13 +3,16 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
-from keyross.core.document import Document
+from keyross.core.document import Document, load
 from keyross.core.registry import registry, OracleSpec
 from keyross.core.verdict import Verdict, Status, Severity
 
 EXIT_OK, EXIT_SOFT, EXIT_HARD = 0, 1, 2
+TABULAR_SUFFIXES = (".xlsx", ".xlsm", ".csv")   # read by the tabular loader, checked by invariants and sentinels
+ADAPTER_SUFFIXES = (".xml",)                     # checked by adapters (official validators)
 
 
 @dataclass
@@ -107,6 +110,26 @@ def run_adapters(path: str, *, gauge: str | None = None, only: list[str] | None 
         report.verdicts.append(v)
     report.duration_ms = round((time.perf_counter() - t0) * 1000)
     return report
+
+
+def check_file(path: str | Path, *, gauge: str | None = None, ctx: dict[str, Any] | None = None, only: list[str] | None = None,
+               before: str | Path | Document | None = None) -> Report:
+    """One document through the loaded gauges — the same verdicts whether the CLI, scrutineering or a yoke asks.
+    Tabular documents go to the invariants and sentinels (`before` is the reference of a conservation sentinel), XML to the
+    adapters. Raises ValueError when the tabular loader cannot read the document."""
+    if Path(path).suffix.lower() in ADAPTER_SUFFIXES:
+        return run_adapters(str(path), gauge=gauge, only=only, ctx=ctx)
+    c = dict(ctx or {})
+    if before is not None:
+        c["before"] = before if isinstance(before, Document) else load(before)
+    return run(load(path), gauge=gauge, ctx=c)
+
+
+def unreadable(document: str, error: str) -> Report:
+    """A document nothing can verify is a hard red, never a pass: the report of an output the loader could not read."""
+    v = Verdict.fail(f"unreadable document: {error}", "document.unreadable")
+    v.oracle_id = "keyross.check"
+    return Report(document=document, verdicts=[v])
 
 
 def run_contract(action: str, before: Document, after: Document, params: dict[str, Any], ctx: dict[str, Any] | None = None) -> list[Verdict]:

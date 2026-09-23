@@ -98,6 +98,8 @@ Think of a wheel alignment. The model runs straight; the rules run straight; wit
 
 The yoke measures; it does not bound. Budgets, protected columns and deletion caps stay in your harness (its limiters). Three yokes exist or are planned: the Deep Agents / LangGraph middleware, the Claude Code `PostToolUse` hook, the MCP server (guard mode) — `keyross yoke <harness>` prints the recipe.
 
+Try it offline: `python examples/deepagents/invoice_agent.py` runs the same agent without and with the yoke — a wrong total ships, then is caught, reverted and fixed. With a telemetry, `keyross stats` prints the first-pass rate.
+
 ## Where the gauges run
 
 ![One run: the agent writes, the compiler runs the gauges, red flag → pit stop, green → scrutineering ships](docs/loop.gif)
@@ -128,7 +130,7 @@ Every verdict carries a flag: **green** (ok), **yellow** (soft failure — signa
 | Level | How | Time |
 |---|---|---|
 | 0 — scrutineering in CI | `keyross gate outputs/ --fail-on hard` — every gauge replayed outside the agent, an exit code, like pytest | 10 min |
-| 1 — the yoke, in the loop | `Yoke(gauge="core")` for Deep Agents / LangChain: measures after every writing tool, pit stop on red, minimal feedback *(sketch, v0.2)*. For Claude Code, a **hook** (`PostToolUse`) runs `keyross check` on files the agent writes — code executed by the harness, not a skill the model reads. `keyross yoke <harness>` prints the recipe | 1 h |
+| 1 — the yoke, in the loop | `Yoke(gauge="core")` for Deep Agents / LangChain: measures after every writing tool, pit stop on red, minimal feedback — `pip install 'keyross[yoke]'`. For Claude Code, a **hook** (`PostToolUse`) runs `keyross check` on files the agent writes — code executed by the harness, not a skill the model reads. `keyross yoke <harness>` prints the recipe | 1 h |
 | 2 — the yoke, as a service | `keyross serve --mcp`: guard mode, called by the platform and invisible to the model; or tool mode with minimal feedback *(v0.5)* | 1 h |
 | 3 — the audit | `keyross audit`: the nine-section report and the governance gauge on the telemetry *(0.3)* | 1 day |
 
@@ -142,7 +144,7 @@ Every oracle has an **id** (`gauge.subject.property`), a **version**, a **flag o
 
 ## Status and roadmap
 
-`0.1` — check, core gauge, test, lint, lock, report, static doctor, `gauges` / `add` / `outdated` / `yoke` on built-in gauges, and the homologated [`einvoice`](src/keyross/gauges/einvoice/README.md) gauge (the official CEN EN 16931 artefacts 1.3.16, executed unmodified) · `0.2` — the Deep Agents yoke, `einvoice` delta oracles and Factur-X PDF · `0.3` — gauges from git, `update` / `audit`, the seal, doctor on images · `0.4` — signed gauges, doctor on a throwaway cluster (kind), CI action, boxed demo · `0.5` — the MCP yoke, the Claude Code hook and plugin · then `dora.register`, `aiact.annex4`, `governance`.
+`0.1` — check, core gauge, test, lint, lock, report, static doctor, `gauges` / `add` / `outdated` / `yoke` on built-in gauges, and the homologated [`einvoice`](src/keyross/gauges/einvoice/README.md) gauge (the official CEN EN 16931 artefacts 1.3.16, executed unmodified), the Deep Agents yoke and `keyross stats` (first-pass rate) · `0.2` — `einvoice` delta oracles and Factur-X PDF · `0.3` — gauges from git, `update` / `audit`, the seal, doctor on images · `0.4` — signed gauges, doctor on a throwaway cluster (kind), CI action, boxed demo · `0.5` — the MCP yoke, the Claude Code hook and plugin · then `dora.register`, `aiact.annex4`, `governance`.
 
 This repository verifies itself: its CI runs `keyross test`, `keyross lint` and `keyross lock --check` on every commit.
 

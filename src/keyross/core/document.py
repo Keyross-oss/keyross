@@ -124,8 +124,11 @@ def load(path: str | Path, sheet: str | None = None, mapping: dict[str, list[str
     if p.suffix.lower() in (".xlsx", ".xlsm"):
         import openpyxl
         wb = openpyxl.load_workbook(p, data_only=True, read_only=True)
-        ws = wb[sheet] if sheet else wb.worksheets[0]
-        rows = [list(r) for r in ws.iter_rows(values_only=True)]
+        try:
+            ws = wb[sheet] if sheet else wb.worksheets[0]
+            rows = [list(r) for r in ws.iter_rows(values_only=True)]
+        finally:
+            wb.close()                                   # read-only workbooks keep the file open until closed
         return _rows_to_document(str(p), rows, mapping)
     if p.suffix.lower() == ".csv":
         with open(p, newline="", encoding="utf-8-sig") as f:
