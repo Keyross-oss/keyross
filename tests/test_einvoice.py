@@ -14,7 +14,7 @@ from keyross.gauges.einvoice.adapters.schematron import GAUGE_DIR, CenSchematron
 
 ROOT = Path(__file__).resolve().parent.parent
 FIXTURES = ROOT / "tests" / "fixtures" / "einvoice"
-BADSET = sorted((ROOT / "badset").glob("einvoice.*.xml"))
+BADSET = sorted(p for p in (ROOT / "badset").glob("einvoice.*.xml") if not p.name.startswith("einvoice.delta."))   # the CEN rules' cases
 CLEAN = sorted(FIXTURES.glob("*.xml"))
 
 saxon = pytest.mark.skipif(__import__("importlib").util.find_spec("saxonche") is None, reason="pip install 'keyross[einvoice]'")
@@ -134,3 +134,36 @@ def test_xml_without_a_gauge_is_refused(tmp_path):
     finally:
         adapter_mod.adapters.update(saved)
     assert rep.exit_code == 2 and rep.verdicts[0].category == "document.unsupported"
+
+
+def _delta_order():
+    import json
+    return json.loads((FIXTURES / "delta-order.json").read_text(encoding="utf-8"))
+
+
+def _delta_report(xml_path, order):
+    from keyross.core.runner import check_file
+    return check_file(xml_path, gauge="einvoice", ctx={"order": order} if order else None)
+
+
+@saxon
+def test_delta_oracles_pass_on_the_right_invoice():
+    rep = _delta_report(FIXTURES / "delta-order.cii.xml", _delta_order())
+    assert rep.exit_code == 0 and {v.oracle_id for v in rep.verdicts} >= {
+        "einvoice.delta.order.header", "einvoice.delta.order.lines", "einvoice.delta.order.vat", "einvoice.delta.order.totals"}
+
+
+@saxon
+def test_delta_oracles_skip_without_an_order():
+    rep = _delta_report(FIXTURES / "delta-order.cii.xml", None)
+    assert all(v.status.value == "skip" for v in rep.verdicts if v.oracle_id.startswith("einvoice.delta."))
+
+
+@saxon
+def test_delta_oracles_catch_an_invoice_valid_for_the_official_rules():
+    """One cent of VAT, carried into every total: coherent, inside BR-CO-17's tolerance — only the order sees it."""
+    rep = _delta_report(ROOT / "badset" / "einvoice.delta.order.vat.xml", _delta_order())
+    red = sorted(v.category for v in rep.hard_failures)
+    assert red == ["order.totals", "order.vat"]                                   # no official rule fails
+    v = next(v for v in rep.hard_failures if v.category == "order.vat")
+    assert v.minimal() == {"status": "fail", "flag": "red", "category": "order.vat"} and v.evidence["deviations"][0]["expected"]

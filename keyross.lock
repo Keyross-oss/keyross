@@ -4890,6 +4890,30 @@
       "severity": "hard",
       "version": "1.3.16"
     },
+    "einvoice.delta.order.header": {
+      "fingerprint": "873a91b0bba6",
+      "kind": "invariant",
+      "severity": "hard",
+      "version": 1
+    },
+    "einvoice.delta.order.lines": {
+      "fingerprint": "8ed2c3b266c7",
+      "kind": "invariant",
+      "severity": "hard",
+      "version": 1
+    },
+    "einvoice.delta.order.totals": {
+      "fingerprint": "48c6b170b43a",
+      "kind": "invariant",
+      "severity": "hard",
+      "version": 1
+    },
+    "einvoice.delta.order.vat": {
+      "fingerprint": "74ac54dede39",
+      "kind": "invariant",
+      "severity": "hard",
+      "version": 1
+    },
     "einvoice.ubl-cr-001": {
       "fingerprint": "4d3ba9d0dfb4",
       "kind": "adapter",

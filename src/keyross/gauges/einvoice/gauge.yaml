@@ -1,6 +1,6 @@
 name: einvoice
-version: 0.1.0
-description: EN 16931 e-invoices (UBL 2.1, UN/CEFACT CII D16B) — the official CEN Schematron, executed as published; no rule rewritten
+version: 0.2.0
+description: EN 16931 e-invoices (UBL 2.1, UN/CEFACT CII D16B) — the official CEN Schematron, executed as published, no rule rewritten; and delta oracles, the invoice against its order
 documents: [invoice.ubl, invoice.cii]
 owner: keyross
 license: Apache-2.0                    # the vendored CEN artifacts keep their own licence: EUPL-1.2 (rules/cen-1.3.16/LICENSE.txt)
@@ -18,6 +18,10 @@ adapters:
     artifacts:                         # SHA-256 of the files executed, verified before every run
       rules/cen-1.3.16/EN16931-CII-validation.xslt: 0b234dea2bbfee739b7761e607a992c17fab88773014ef56355b6158cfb1cc53
       rules/cen-1.3.16/EN16931-UBL-validation.xslt: 39f9d282867f1a49e7708d9e29a53da89643e1ee56f10cec1ebcf1277595fcbd
-oracles: []                            # the rules are registered from the artifacts (one entry per rule id) and pinned in keyross.lock
+oracles:                               # the delta oracles (the CEN rules are registered from the artifacts, one entry per rule id)
+  - { id: einvoice.delta.order.header, severity: hard, version: 1 }
+  - { id: einvoice.delta.order.lines, severity: hard, version: 1 }
+  - { id: einvoice.delta.order.vat, severity: hard, version: 1 }
+  - { id: einvoice.delta.order.totals, severity: hard, version: 1 }
 regulatory:
   - { standard: "EN 16931-1:2017+A1:2019", revision: "CEN validation artefacts 1.3.16", scope: "EU public procurement (Directive 2014/55/EU); national B2B mandates built on EN 16931" }

@@ -158,8 +158,9 @@ class ExternalValidatorAdapter:
         """`badset/<gauge>.<rule>[.<variant>].<ext>` must raise <rule>; every rule family must have at least one bad case."""
         d, results, covered = Path(badset_dir), [], set()
         known = self.rule_ids()
+        own = [s.id for s in registry.all(gauge=self.gauge) if s.kind != "adapter"]   # the gauge's other oracles have bad cases too
         for f in sorted(d.glob(f"{self.gauge}.*")):
-            if not self.accepts(f):
+            if not self.accepts(f) or any(f.name.startswith(oid + ".") for oid in own):
                 continue
             oid = f"{self.gauge}.{f.name[len(self.gauge) + 1:].split('.')[0]}"
             if oid not in known:

@@ -189,3 +189,18 @@ def test_a_subagent_writing_to_disk_is_reverted(tmp_path):
     backend = FilesystemBackend(root_dir=tmp_path, virtual_mode=True)
     out = run([delegate(1), write("/quote.csv", BAD, 2), AIMessage(content="written")], Yoke(gauge="core", backend=backend), backend=backend)
     assert next(m for m in tool_messages(out) if m.name == "task").status == "error" and not (tmp_path / "quote.csv").exists()
+
+
+@saxon
+def test_the_yoke_with_the_order_catches_what_the_official_rules_cannot():
+    import json
+    fixtures = ROOT / "tests" / "fixtures" / "einvoice"
+    order = json.loads((fixtures / "delta-order.json").read_text(encoding="utf-8"))
+    wrong = (ROOT / "badset" / "einvoice.delta.order.vat.xml").read_text(encoding="utf-8")    # valid for the CEN rules
+    right = (fixtures / "delta-order.cii.xml").read_text(encoding="utf-8")
+    rules_only = run([write("/invoice.xml", wrong, 1)], Yoke(gauge="einvoice"))
+    assert tool_messages(rules_only)[0].status == "success"                                   # the official rules let it through
+    out = run([write("/invoice.xml", wrong, 1), write("/invoice.xml", right, 2)], Yoke(gauge="einvoice", ctx={"order": order}))
+    red, green = tool_messages(out)
+    assert red.content == "red flag: order.totals, order.vat — the write was reverted; fix and retry"
+    assert green.status == "success" and files(out)["/invoice.xml"] == right

@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- **einvoice 0.2.0 — delta oracles**: the invoice against the order it is issued for (`ctx["order"]`) — `einvoice.delta.order.header`, `.lines`, `.vat`, `.totals`, EN 16931 arithmetic half-up to the cent. They catch what the official rules cannot see: an invoice coherent with itself that bills the wrong amounts (the benchmark's pilot saw a wrong multiplication carried into every total, and a 1-cent VAT error inside BR-CO-17's tolerance). With the order in its context, the yoke turns those errors into red flags; the agent gets `order.lines`, `order.vat`… never the expected amounts
+- core: oracles tagged `invoice` run on the canonical `Invoice` after the adapters, in `check_file`; their bad cases are an invoice and its order (`badset/<id>.xml` + `<id>.order.json`)
 - fix(yoke): Deep Agents subagents escaped the yoke — the `task` tool runs a subagent that does not inherit the main agent's middleware, and its files were merged back unmeasured (found by the benchmark's pilot: 2 of 5 runs with the yoke shipped an invoice written this way). The yoke now measures what a delegated run returns in its Command and what it wrote on a shared disk, keeps a red document out of the agent's files, and returns the red flag to the main agent
 - bench: deviation 3, after the pilot — a worked example (an order outside the 50 and its invoice, correct for the three judges) at the end of both arms' system prompt: without it Haiku 4.5 produced no correct invoice, and the primary endpoint could not discriminate
 - bench: deviation 2, after the pilot — the `task` tool hidden in both arms; tokens counted over every model call (a callback); executed writes and blocked attempts counted apart; a run with a `task` call is flagged invalid

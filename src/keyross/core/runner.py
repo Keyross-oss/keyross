@@ -7,12 +7,14 @@ from pathlib import Path
 from typing import Any
 
 from keyross.core.document import Document, load
+from keyross.core.invoice import Invoice, load_invoice
 from keyross.core.registry import registry, OracleSpec
 from keyross.core.verdict import Verdict, Status, Severity
 
 EXIT_OK, EXIT_SOFT, EXIT_HARD = 0, 1, 2
 TABULAR_SUFFIXES = (".xlsx", ".xlsm", ".csv")   # read by the tabular loader, checked by invariants and sentinels
-ADAPTER_SUFFIXES = (".xml",)                     # checked by adapters (official validators)
+ADAPTER_SUFFIXES = (".xml",)                     # checked by adapters (official validators), then by the invoice oracles
+INVOICE_TAG = "invoice"                          # an oracle with this tag reads the canonical Invoice, not a table
 
 
 @dataclass
@@ -80,10 +82,12 @@ def _wants_ctx(spec: OracleSpec) -> bool:
 
 
 def run(doc: Document, *, gauge: str | None = None, ids: list[str] | None = None, ctx: dict[str, Any] | None = None) -> Report:
-    """Run invariants and sentinels (not contracts: they need before / after / params)."""
+    """Run invariants and sentinels (not contracts: they need before / after / params) — those written for this kind of
+    document: an Invoice gets the oracles tagged "invoice", a table the others."""
     ctx = ctx or {}
     t0 = time.perf_counter()
-    specs = [s for s in registry.all() if s.kind in ("invariant", "sentinel")]
+    on_invoice = isinstance(doc, Invoice)
+    specs = [s for s in registry.all() if s.kind in ("invariant", "sentinel") and (INVOICE_TAG in s.tags) == on_invoice]
     if gauge:
         specs = [s for s in specs if s.id.startswith(gauge + ".")]
     if ids:
@@ -118,7 +122,16 @@ def check_file(path: str | Path, *, gauge: str | None = None, ctx: dict[str, Any
     Tabular documents go to the invariants and sentinels (`before` is the reference of a conservation sentinel), XML to the
     adapters. Raises ValueError when the tabular loader cannot read the document."""
     if Path(path).suffix.lower() in ADAPTER_SUFFIXES:
-        return run_adapters(str(path), gauge=gauge, only=only, ctx=ctx)
+        report = run_adapters(str(path), gauge=gauge, only=only, ctx=ctx)
+        if any(INVOICE_TAG in s.tags and s.kind in ("invariant", "sentinel") for s in registry.all(gauge=gauge)):
+            try:
+                invoice = load_invoice(path)
+            except (ValueError, OSError, SyntaxError):  # unreadable or not an invoice: the adapters' verdict already says so
+                return report
+            extra = run(invoice, gauge=gauge, ctx=ctx)
+            report.verdicts += extra.verdicts
+            report.duration_ms += extra.duration_ms
+        return report
     c = dict(ctx or {})
     if before is not None:
         c["before"] = before if isinstance(before, Document) else load(before)

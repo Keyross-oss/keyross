@@ -22,6 +22,30 @@ keyross check invoice.xml          # exit 0 green · 1 yellow (a CEN warning) ·
 - **Minimal feedback**: the category is the rule id (`BR-CO-10`). The XPath location, the assertion test and the assertion text go into `evidence` for the report. They never go into `minimal()`.
 - `keyross.core.invoice` loads the same files into the canonical `Invoice` model (header, lines, totals, VAT breakdown) for delta oracles. The official rules never depend on it.
 
+## Delta oracles — the invoice against its order
+
+The official rules check that an invoice is coherent with itself. It can be coherent and still bill the wrong quantity, price or amount: the benchmark's pilot saw `12.75 × 89.95` written `1146.81` and carried into every total, and a VAT amount one cent off — inside the tolerance of BR-CO-17. Four delta oracles compare the invoice with the order it is issued for:
+
+| Oracle | Category | Checks |
+|---|---|---|
+| `einvoice.delta.order.header` | `order.header` | invoice number and currency |
+| `einvoice.delta.order.lines` | `order.lines` | every order line invoiced once: quantity, net price, VAT category and rate, net amount = quantity × net price |
+| `einvoice.delta.order.vat` | `order.vat` | one breakdown per VAT category and rate: taxable amount (lines − allowances + charges), VAT amount (taxable × rate) |
+| `einvoice.delta.order.totals` | `order.totals` | lines, allowances, charges, without VAT, VAT, with VAT, amount due |
+
+Amounts follow EN 16931 arithmetic, rounded half-up to the cent. The order comes from the context — the harness gives it, not the model: `Yoke(gauge="einvoice", ctx={"order": order})`, or `check_file(path, gauge="einvoice", ctx={"order": order})`. Without an order, the delta oracles skip. The agent only ever gets the categories, never the expected amounts.
+
+The order format:
+
+```json
+{
+  "invoice": {"number": "INV-2026-0901", "currency": "EUR"},
+  "lines": [{"id": "1", "quantity": "3", "net_price": "49.90", "vat_category": "S", "vat_rate": "20.00"}],
+  "allowances": [{"amount": "10.00", "vat_category": "S", "vat_rate": "20.00"}],
+  "charges": []
+}
+```
+
 ## Bad set
 
 At least one bad case per rule family. Each case is a public Factur-X example with one deliberate corruption. `keyross test` fails if a family has no case, or if a case does not raise its rule.
@@ -53,7 +77,7 @@ Sources: `tests/fixtures/xml/factur-x-en16931.xml` (CII) and `ubl-21-en16931.xml
 
 ## Not yet
 
-Delta oracles (invoice vs purchase order, supplier master data, the `issue_invoice` contract); extracting the XML from a Factur-X PDF; the national extensions (XRechnung CIUS, the French CTC rules), each of which will be its own pinned adapter.
+Other delta oracles (supplier master data, the `issue_invoice` contract); extracting the XML from a Factur-X PDF; the national extensions (XRechnung CIUS, the French CTC rules), each of which will be its own pinned adapter.
 
 ## Licences
 

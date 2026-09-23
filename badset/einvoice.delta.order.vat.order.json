@@ -1,0 +1,57 @@
+{
+  "invoice": {
+    "number": "INV-2026-0901",
+    "issue_date": "2026-09-01",
+    "due_date": "2026-10-01",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4600"
+  },
+  "seller": {
+    "name": "Seller 90 SAS",
+    "vat_id": "FR90000712710",
+    "address": {
+      "line": "90 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 91 SAS",
+    "vat_id": "FR91000720629",
+    "address": {
+      "line": "91 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "Office chair",
+      "quantity": "3",
+      "unit_code": "C62",
+      "net_price": "49.90",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    },
+    {
+      "id": "2",
+      "name": "Training day",
+      "quantity": "2.5",
+      "unit_code": "DAY",
+      "net_price": "33.33",
+      "vat_category": "S",
+      "vat_rate": "10.00"
+    }
+  ],
+  "allowances": [],
+  "charges": [],
+  "vat_exemptions": {}
+}
