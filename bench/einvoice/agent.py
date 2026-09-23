@@ -7,6 +7,7 @@ benchmark measures writing an invoice, not delegating it (protocol, deviation 2)
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 from deepagents import create_deep_agent
@@ -20,12 +21,18 @@ from keyross.yoke import Yoke
 from bench.einvoice.reference import to_cii
 
 INVOICE_PATH = "/invoice.xml"
-SYSTEM_PROMPT = (
+EXAMPLE_DIR = Path(__file__).resolve().parent / "example"
+INSTRUCTIONS = (
     "You are the invoicing agent of a company. You receive a purchase order as JSON. Issue its invoice as an EN 16931 "
     "electronic invoice in UN/CEFACT Cross Industry Invoice syntax (CII D16B — the XML of Factur-X, profile EN 16931) and "
     f"save it with write_file to {INVOICE_PATH}. Compute every amount from the order: line net amounts, document-level "
     "allowances and charges, the VAT breakdown per category and rate, and the totals. When a tool answers with a red flag, "
     "the listed EN 16931 rules failed: correct them and write the file again. When the invoice is saved, answer DONE.")
+# a company's template: an order outside the 50 tasks and the invoice issued for it (protocol, deviation 3)
+EXAMPLE = ("\n\nAn invoice your company issued for another order — follow its format.\n\nThe order:\n```json\n"
+           + (EXAMPLE_DIR / "example-order.json").read_text(encoding="utf-8").strip() + "\n```\n\nThe invoice:\n```xml\n"
+           + (EXAMPLE_DIR / "example-invoice.xml").read_text(encoding="utf-8").strip() + "\n```")
+SYSTEM_PROMPT = INSTRUCTIONS + EXAMPLE
 
 
 def task_message(order: dict) -> str:

@@ -7,7 +7,7 @@ Does the yoke change what an agent ships, and at what cost? The same Deep Agent 
 ## Design, in short
 
 - **50 purchase orders** (`orders/`, fictitious, seeded), 10 per scenario: domestic, exempt (an exemption reason is due), intra-community supply, reverse charge, document-level allowances and charges. Every task is solvable: the 50 reference invoices pass the three judges.
-- **Paired**: each order runs twice in each arm — 100 pairs.
+- **Paired**: each order runs twice in each arm — 100 pairs. Both arms get the same prompt, which ends with a worked example: an order outside the 50 and the invoice issued for it (`example/`), as a company gives a template.
 - **Three judges, independent of Keyross:**
   1. **validator** — easybill/en16931-validator (MIT, Docker, pinned by digest): an independent implementation of the official CEN EN 16931 rules, release 1.3.16. There is one official rule set; this is another implementation of it, not other rules;
   2. **schema** — the official Factur-X 1.09 EN 16931 XSD, which checks the structure the CEN rules do not;

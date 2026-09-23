@@ -81,3 +81,14 @@ def test_harness_runs_both_arms_offline():
     assert without["delivered"] and not without["correct"] and without["pit_stops"] == 0 and without["yoke_checks"] == 0
     assert with_yoke["correct"] and with_yoke["writes"] == 2 and with_yoke["pit_stops"] == 1 and not with_yoke["first_correct"]
     assert with_yoke["yoke_checks"] == 2 and with_yoke["agree"] and with_yoke["first_agree"]
+
+
+@judges
+def test_the_worked_example_is_correct_and_not_a_task(tmp_path):
+    """The system prompt's example (deviation 3) passes the three judges and gives away none of the 50 tasks."""
+    import json
+    from bench.einvoice.agent import EXAMPLE_DIR, SYSTEM_PROMPT
+    from bench.einvoice.grade import grade
+    order = {"id": "example", "scenario": "example", **json.loads((EXAMPLE_DIR / "example-order.json").read_text(encoding="utf-8"))}
+    assert grade(order, (EXAMPLE_DIR / "example-invoice.xml").read_text(encoding="utf-8"))["correct"]
+    assert order["invoice"]["number"] not in {o["invoice"]["number"] for o in load_orders()} and order["invoice"]["number"] in SYSTEM_PROMPT
