@@ -135,16 +135,18 @@ def test_plain_langchain_agent_with_its_own_disk_tool(tmp_path):
     from langchain_core.tools import tool
     from keyross.yoke import LocalFiles
 
+    files = LocalFiles(tmp_path)
+
     @tool
     def save_quote(file_path: str, content: str) -> str:
         """Save a quote as CSV."""
-        (tmp_path / file_path).write_text(content, encoding="utf-8")
+        files.path(file_path).write_text(content, encoding="utf-8")        # the tool and the yoke agree on the file
         return f"saved {file_path}"
 
     def call(content, n):
         return AIMessage(content="", tool_calls=[{"name": "save_quote", "args": {"file_path": "quote.csv", "content": content}, "id": f"s{n}"}])
 
-    yoke = Yoke(gauge="core", backend=LocalFiles(tmp_path), write_tools=("save_quote",))
+    yoke = Yoke(gauge="core", backend=files, write_tools=("save_quote",))
     agent = create_agent(model=Scripted(responses=[call(BAD, 1), call(GOOD, 2), AIMessage(content="done")]), tools=[save_quote], middleware=[yoke])
     out = agent.invoke({"messages": [{"role": "user", "content": "go"}]})
     assert [m.status for m in tool_messages(out)] == ["error", "success"]
@@ -153,7 +155,14 @@ def test_plain_langchain_agent_with_its_own_disk_tool(tmp_path):
 
 def test_local_files_refuses_paths_outside_its_root(tmp_path):
     from keyross.yoke import LocalFiles
+    import os
     files = LocalFiles(tmp_path / "out")
     assert files.normalize("invoice.xml") == files.normalize("/invoice.xml") == "/invoice.xml"
-    assert files.normalize("../secret.csv") is None and files.normalize(str(tmp_path / "elsewhere.csv")) is None
-    assert files.normalize(str(tmp_path / "out" / "sub" / "a.csv")) == "/sub/a.csv"
+    assert files.normalize("../secret.csv") is None and files.normalize("/sub/../../x.csv") is None
+    assert files.normalize(str(tmp_path / "out" / "sub" / "a.csv")) == "/sub/a.csv"       # a real path inside root
+    assert files.path("/sub/a.csv") == (tmp_path / "out" / "sub" / "a.csv").resolve()
+    outside = files.normalize(str(tmp_path / "elsewhere.csv"))
+    if os.name == "nt":
+        assert outside is None                                                   # a drive path elsewhere is refused
+    else:
+        assert files.path(str(tmp_path / "elsewhere.csv")).is_relative_to(files.root)   # "/…" stays under root
