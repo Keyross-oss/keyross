@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- docs: README rewritten shorter (2,340 → about 1,500 words, 15 → 11 sections, 6 → 4 visuals) around the three words — gauge, yoke, flags — and one story, the e-invoice; reference material moved to the new `docs/CONCEPTS.md` (oracle families, flags including black, enforced rules, writing an oracle, skills vs gauges); `loop.gif` moved to `docs/ARCHITECTURE.md`; planned doors (Claude Code hook, MCP server) and planned features (update, audit, signatures, seal) marked as such; French README follows, with the flag names kept in English
+- docs: new `docs/demo.gif` (real `keyross check` output on the agent's invoice: red, then green) and a simpler `docs/overview.png` (gauges → yoke → flags, where it runs)
 - docs: README EN/FR — "An example: one e-invoice": the order, the agent's mistake, the official CEN rules at the write, the pit stop, the fix, in one diagram (`docs/einvoice_example.png` / `.svg`; every number checked against the CEN artefacts); the demo README explains its output and how it differs from the benchmark
 - yoke: `LocalFiles` — the yoke in a plain LangChain agent (`create_agent`) whose own tools write to disk, no Deep Agents needed; paths confined to one folder
 - bench: `bench/einvoice` — the same Deep Agent turns 20 purchase orders into EN 16931 invoices, without and with the yoke; graded outside the agent by the official CEN rules (valid) and against the order (right); reference invoices prove every task solvable; per-run limits on writes and model calls; token and cost accounting; offline dry run with a scripted model (harness only — no result yet)
