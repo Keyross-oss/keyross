@@ -1,5 +1,6 @@
 """The statistics of the benchmark, in the standard library so anyone can check them: exact McNemar test on paired outcomes,
-Wilson intervals for proportions, a seeded paired bootstrap for differences of means."""
+Holm's correction when several comparisons are tested, Wilson intervals for proportions, a seeded paired bootstrap for
+differences of means."""
 from __future__ import annotations
 
 import math
@@ -16,6 +17,16 @@ def mcnemar_exact(b: int, c: int) -> float:
         return 1.0
     tail = sum(math.comb(n, k) for k in range(min(b, c) + 1)) / 2 ** n
     return min(1.0, 2 * tail)
+
+
+def holm(ps: Sequence[float]) -> list[float]:
+    """Holm-adjusted p-values (step-down; controls the family-wise error rate), in the order given."""
+    m, running = len(ps), 0.0
+    adjusted = [1.0] * m
+    for rank, i in enumerate(sorted(range(m), key=lambda i: ps[i])):
+        running = max(running, min(1.0, (m - rank) * ps[i]))
+        adjusted[i] = running
+    return adjusted
 
 
 def wilson(k: int, n: int) -> tuple[float, float]:

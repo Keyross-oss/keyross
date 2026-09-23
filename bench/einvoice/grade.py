@@ -1,6 +1,7 @@
 """Grading, outside the agent and outside Keyross: an invoice is **correct** when the independent validator finds no fatal
 rule, the official schema accepts it, and it matches the order (lines, VAT breakdown, totals). The order check catches an
-invoice made valid by bending the order. Keyross' own verdict is recorded only to measure its agreement with the validator.
+invoice made valid by bending the order. Keyross' own verdict, with the order in its context, is recorded only to measure
+agreement: its official rules against the validator, its delta oracles (`order.*`) against the order judge.
 
 `python -m bench.einvoice.grade` checks that every reference invoice is correct: every task is solvable."""
 from __future__ import annotations
@@ -18,6 +19,7 @@ from bench.einvoice.judges import schema_errors, validator
 from bench.einvoice.orders import expected, load_orders
 
 TOL = Decimal("0.005")
+DELTA = "einvoice.delta."            # Keyross' delta oracles: the invoice against its order
 
 
 def _same(a: Any, b: Any) -> bool:
@@ -64,7 +66,8 @@ def grade(order: dict, xml: str | None) -> dict[str, Any]:
     """The verdict of the three independent judges on one invoice (`xml` None: nothing was delivered)."""
     if xml is None:
         return {"delivered": False, "valid": False, "schema_valid": False, "right": False, "correct": False,
-                "fatal": [], "schema": [], "mismatches": ["not delivered"], "keyross_fatal": [], "agree": None}
+                "fatal": [], "schema": [], "mismatches": ["not delivered"], "keyross_fatal": [], "agree": None,
+                "keyross_order": [], "order_agree": None}
     data = xml.encode("utf-8")
     independent = validator(data)
     schema = schema_errors(data)
@@ -72,15 +75,20 @@ def grade(order: dict, xml: str | None) -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix="keyross-bench-", ignore_cleanup_errors=True) as tmp:
         f = Path(tmp) / "invoice.xml"
         f.write_bytes(data)
-        keyross_fatal = sorted({v.category for v in check_file(f, gauge="einvoice").hard_failures})
+        report = check_file(f, gauge="einvoice", ctx={"order": order})
         try:
             mismatches = order_mismatches(order, f)
         except Exception as e:  # noqa: BLE001 — an unreadable invoice is not right
             mismatches = [f"unreadable: {type(e).__name__}"]
     valid, schema_valid, right = not independent["fatal"], not schema, not mismatches
+    fails = report.hard_failures
+    keyross_fatal = sorted({v.category for v in fails if not v.oracle_id.startswith(DELTA)})    # the official rules
+    keyross_order = sorted({v.category for v in fails if v.oracle_id.startswith(DELTA)})        # the delta oracles
+    delta_ran = any(v.oracle_id.startswith(DELTA) for v in report.verdicts)                     # not on an unreadable XML
     return {"delivered": True, "valid": valid, "schema_valid": schema_valid, "right": right,
             "correct": valid and schema_valid and right, "fatal": independent["fatal"], "warnings": len(independent["warnings"]),
-            "schema": schema, "mismatches": mismatches, "keyross_fatal": keyross_fatal, "agree": keyross_fatal == independent["fatal"]}
+            "schema": schema, "mismatches": mismatches, "keyross_fatal": keyross_fatal, "agree": keyross_fatal == independent["fatal"],
+            "keyross_order": keyross_order, "order_agree": (not keyross_order) == right if delta_ran else None}
 
 
 def check_references() -> list[tuple[str, dict]]:
@@ -92,7 +100,8 @@ if __name__ == "__main__":
     import sys
     results = check_references()
     for oid, g in results:
-        print(f"  {'OK ' if g['correct'] else 'XX '} {oid}  fatal={g['fatal']}  schema={g['schema'][:1]}  mismatches={g['mismatches']}")
-    bad = [oid for oid, g in results if not g["correct"]]
-    print(f"{len(results) - len(bad)}/{len(results)} reference invoices correct for the three independent judges")
+        print(f"  {'OK ' if g['correct'] else 'XX '} {oid}  fatal={g['fatal']}  schema={g['schema'][:1]}  mismatches={g['mismatches']}"
+              f"  keyross={g['keyross_fatal'] + g['keyross_order']}")
+    bad = [oid for oid, g in results if not g["correct"] or g["keyross_fatal"] or g["keyross_order"]]
+    print(f"{len(results) - len(bad)}/{len(results)} reference invoices correct for the three independent judges, and green for Keyross")
     sys.exit(1 if bad else 0)

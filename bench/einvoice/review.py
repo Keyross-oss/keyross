@@ -1,5 +1,6 @@
-"""The human review (PROTOCOL.md): 20 delivered invoices, 10 per arm, drawn with random.Random(2027) and renamed so the arm
-is hidden. The sheet shows the order and what the invoice says — never the expected amounts nor any judge's verdict.
+"""The human review (PROTOCOL.md): at least 20 delivered invoices, the same number per arm — 7 per arm for three arms (21),
+10 per arm for two — drawn with random.Random(2027) and renamed so the arm is hidden. The sheet shows the order and what the
+invoice says — never the expected amounts nor any judge's verdict.
 
     python -m bench.einvoice.review sample bench/einvoice/results/<run>.jsonl    # writes results/<run>-review/
     python -m bench.einvoice.review score  bench/einvoice/results/<run>.jsonl    # after review.csv is filled in
@@ -8,16 +9,17 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import random
 import sys
 from pathlib import Path
 
 from keyross.core.invoice import load_invoice
 
-from bench.einvoice.agent import task_message
+from bench.einvoice.agent import ARMS, task_message
 from bench.einvoice.orders import load_orders
 
-SEED, PER_ARM = 2027, 10
+SEED, REVIEWED = 2027, 20            # at least 20 invoices, the same number per arm (protocol, deviation 4)
 
 
 def _rows(results: Path) -> list[dict]:
@@ -47,10 +49,12 @@ def _render(xml: Path) -> str:
 def sample(results: Path) -> Path:
     rows = [r for r in _rows(results) if r.get("delivered")]
     rng = random.Random(SEED)
+    arms = [arm for arm in ARMS if any(r["arm"] == arm for r in rows)]
+    per_arm = math.ceil(REVIEWED / len(arms)) if arms else 0
     picked = []
-    for arm in ("without", "with"):
+    for arm in arms:
         pool = [r for r in rows if r["arm"] == arm]
-        picked += rng.sample(pool, min(PER_ARM, len(pool)))
+        picked += rng.sample(pool, min(per_arm, len(pool)))
     rng.shuffle(picked)
     invoices = results.parent / results.stem
     folder = results.parent / f"{results.stem}-review"
@@ -84,11 +88,14 @@ def score(results: Path) -> str:
         human = {row["invoice"]: row for row in csv.DictReader(f)}
     done = {n: h for n, h in human.items() if h["verdict"].strip().lower() in ("correct", "incorrect")}
     agree = [n for n, h in done.items() if (h["verdict"].strip().lower() == "correct") == key[n]["correct"]]
+    per_arm = [f"{ARMS[arm]} {sum(1 for n in agree if key[n]['arm'] == arm)}/{sum(1 for n in done if key[n]['arm'] == arm)}"
+               for arm in ARMS if any(key[n]["arm"] == arm for n in done)]
     lines = ["# Human review — agreement with the automated judges", "",
-             f"{len(done)}/{len(key)} invoices reviewed · the human verdict agrees with the three judges on {len(agree)}/{len(done)}.", ""]
+             f"{len(done)}/{len(key)} invoices reviewed · the human verdict agrees with the three judges on {len(agree)}/{len(done)}"
+             + (f" ({', '.join(per_arm)})" if per_arm else "") + ".", ""]
     for n in sorted(set(done) - set(agree)):
         k, h = key[n], done[n]
-        lines.append(f"- {n} ({k['task']}, {k['arm']} the yoke, rep {k['rep']}): judges say {'correct' if k['correct'] else 'incorrect'}, "
+        lines.append(f"- {n} ({k['task']}, {ARMS[k['arm']]}, rep {k['rep']}): judges say {'correct' if k['correct'] else 'incorrect'}, "
                      f"the reviewer says {h['verdict'].strip()} — {h['what is wrong'].strip()}")
     text = "\n".join(lines) + "\n"
     (folder / "SCORE.md").write_text(text, encoding="utf-8")

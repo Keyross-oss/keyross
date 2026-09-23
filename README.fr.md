@@ -101,12 +101,12 @@ Rien n'exige de compte, de cloud ni de cluster. Tout tourne en local. Où se tro
 
 - [docs/CONCEPTS.md](docs/CONCEPTS.md) — invariants, contrats et sentinelles ; les flags, dont le noir ; les règles imposées par l'outil ; écrire un oracle
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — où tournent les gauges, ce qui sort de chaque porte
-- [bench/einvoice](bench/einvoice/README.md) — le même agent sans puis avec le yoke, jugé par des juges qui ne sont pas Keyross ; protocole pré-enregistré
+- [bench/einvoice](bench/einvoice/README.md) — le même agent sans yoke, avec les règles officielles, puis avec les règles et la commande, jugé par des juges qui ne sont pas Keyross ; protocole pré-enregistré
 - [GAUGES.md](GAUGES.md) · [CONTRIBUTING.md](CONTRIBUTING.md) · [GOVERNANCE.md](GOVERNANCE.md) · [SECURITY.md](SECURITY.md)
 
 ## État et feuille de route
 
-`0.1` — check, gate, test, lint, lock, rapport, doctor statique ; le gauge `core` et le gauge homologué [`einvoice`](src/keyross/gauges/einvoice/README.md) (les artefacts officiels du CEN EN 16931 1.3.16, exécutés sans modification) ; le yoke Deep Agents / LangChain et `keyross stats` · `0.2` — les oracles delta `einvoice` (facture vs commande) et le PDF Factur-X · `0.3` — gauges depuis git, `update` / `audit`, le seal · `0.4` — gauges signés, doctor sur cluster jetable, action CI · `0.5` — le hook et le plugin Claude Code, le serveur MCP · puis `dora.register`, `aiact.annex4`, `governance`.
+`0.1` — check, gate, test, lint, lock, rapport, doctor statique ; le gauge `core` et le gauge homologué [`einvoice`](src/keyross/gauges/einvoice/README.md) (les artefacts officiels du CEN EN 16931 1.3.16, exécutés sans modification, et des oracles delta : la facture contre sa commande) ; le yoke Deep Agents / LangChain et `keyross stats` · `0.2` — le PDF Factur-X, d'autres oracles delta `einvoice` (données fournisseur, le contrat `issue_invoice`) · `0.3` — gauges depuis git, `update` / `audit`, le seal · `0.4` — gauges signés, doctor sur cluster jetable, action CI · `0.5` — le hook et le plugin Claude Code, le serveur MCP · puis `dora.register`, `aiact.annex4`, `governance`.
 
 Ce dépôt se vérifie lui-même : sa CI lance `keyross test`, `keyross lint` et `keyross lock --check` à chaque commit.
 

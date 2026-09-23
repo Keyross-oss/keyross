@@ -1,8 +1,10 @@
 """The invoicing agent under test: a Deep Agent that turns a purchase order into an EN 16931 invoice (CII) at /invoice.xml.
 
-Both arms get the same model, the same prompt and the same limits; the only difference is the yoke. The limits cap the cost
-of a run: at most `max_writes` writes of the invoice and `max_model_calls` model calls. The `task` tool (a Deep Agents
-subagent) is hidden in both arms: a subagent runs outside the main agent's middleware — its limits included — and the
+Three arms (protocol, deviation 4): without the yoke; the yoke with the official rules; the yoke with the official rules
+and the order — its delta oracles check the invoice against the order, which the harness gives, not the model. Every arm
+gets the same model, the same prompt and the same limits; the only difference is the yoke. The limits cap the cost of a
+run: at most `max_writes` writes of the invoice and `max_model_calls` model calls. The `task` tool (a Deep Agents
+subagent) is hidden in every arm: a subagent runs outside the main agent's middleware — its limits included — and the
 benchmark measures writing an invoice, not delegating it (protocol, deviation 2)."""
 from __future__ import annotations
 
@@ -21,6 +23,7 @@ from keyross.yoke import Yoke
 from bench.einvoice.reference import to_cii
 
 INVOICE_PATH = "/invoice.xml"
+ARMS = {"without": "without yoke", "with": "yoke: rules", "with_order": "yoke: rules + order"}
 EXAMPLE_DIR = Path(__file__).resolve().parent / "example"
 INSTRUCTIONS = (
     "You are the invoicing agent of a company. You receive a purchase order as JSON. Issue its invoice as an EN 16931 "
@@ -55,11 +58,17 @@ def _tool_name(tool: Any) -> str:
     return tool.get("name", "") if isinstance(tool, dict) else getattr(tool, "name", "")
 
 
-def build_agent(model: Any, *, yoke: bool, telemetry: Any = None, max_writes: int = 4, max_model_calls: int = 12) -> Any:
+def build_agent(model: Any, *, arm: str, order: dict | None = None, telemetry: Any = None, max_writes: int = 4,
+                max_model_calls: int = 12) -> Any:
+    """The agent of one arm. `with_order` needs the order: the yoke's context, never the model's."""
+    if arm not in ARMS:
+        raise ValueError(f"unknown arm {arm!r}: {', '.join(ARMS)}")
+    if arm == "with_order" and not order:
+        raise ValueError("the with_order arm needs the order")
     middleware: list[Any] = [NoSubagents(), ToolCallLimitMiddleware(tool_name="write_file", run_limit=max_writes),
                              ModelCallLimitMiddleware(run_limit=max_model_calls, exit_behavior="end")]
-    if yoke:
-        middleware.append(Yoke(gauge="einvoice", telemetry=telemetry))
+    if arm != "without":
+        middleware.append(Yoke(gauge="einvoice", telemetry=telemetry, ctx={"order": order} if arm == "with_order" else None))
     return create_deep_agent(model=model, system_prompt=SYSTEM_PROMPT, middleware=middleware)
 
 

@@ -99,12 +99,12 @@ Nothing requires an account, a cloud or a cluster. Everything runs locally. Wher
 
 - [docs/CONCEPTS.md](docs/CONCEPTS.md) — invariants, contracts and sentinels; the flags, including black; the rules the tool enforces; writing an oracle
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — where the gauges run, what comes out of every door
-- [bench/einvoice](bench/einvoice/README.md) — the same agent without and with the yoke, graded by judges that are not Keyross; pre-registered protocol
+- [bench/einvoice](bench/einvoice/README.md) — the same agent without the yoke, with the official rules, and with the rules and the order, graded by judges that are not Keyross; pre-registered protocol
 - [GAUGES.md](GAUGES.md) · [CONTRIBUTING.md](CONTRIBUTING.md) · [GOVERNANCE.md](GOVERNANCE.md) · [SECURITY.md](SECURITY.md)
 
 ## Status and roadmap
 
-`0.1` — check, gate, test, lint, lock, report, static doctor; the `core` gauge and the homologated [`einvoice`](src/keyross/gauges/einvoice/README.md) gauge (the official CEN EN 16931 artefacts 1.3.16, executed unmodified); the Deep Agents / LangChain yoke and `keyross stats` · `0.2` — `einvoice` delta oracles (invoice vs order) and Factur-X PDF · `0.3` — gauges from git, `update` / `audit`, the seal · `0.4` — signed gauges, doctor on a throwaway cluster, CI action · `0.5` — the Claude Code hook and plugin, the MCP server · then `dora.register`, `aiact.annex4`, `governance`.
+`0.1` — check, gate, test, lint, lock, report, static doctor; the `core` gauge and the homologated [`einvoice`](src/keyross/gauges/einvoice/README.md) gauge (the official CEN EN 16931 artefacts 1.3.16, executed unmodified, and delta oracles: the invoice against its order); the Deep Agents / LangChain yoke and `keyross stats` · `0.2` — Factur-X PDF, more `einvoice` delta oracles (supplier master data, the `issue_invoice` contract) · `0.3` — gauges from git, `update` / `audit`, the seal · `0.4` — signed gauges, doctor on a throwaway cluster, CI action · `0.5` — the Claude Code hook and plugin, the MCP server · then `dora.register`, `aiact.annex4`, `governance`.
 
 This repository verifies itself: its CI runs `keyross test`, `keyross lint` and `keyross lock --check` on every commit.
 
