@@ -48,7 +48,8 @@ class Yoke(_Middleware):  # type: ignore[misc,valid-type]
     """`create_deep_agent(..., middleware=[Yoke(gauge="einvoice")])`.
 
     gauge        the gauge to measure with (`None`: every loaded gauge); it is loaded if needed
-    backend      the agent's backend — pass the one given to create_deep_agent (default: StateBackend, as Deep Agents)
+    backend      the agent's backend — pass the one given to create_deep_agent (default: StateBackend, as Deep Agents);
+                 for a plain LangChain agent whose tools write to disk: LocalFiles(root)
     write_tools  the tools that write documents; a custom tool is measured too if it takes `path_arg`, and its
                  action contracts (`@contract("<tool name>")`) run on the before / after documents
     ctx          the gauges' context (unit vocabulary, reference data)
@@ -112,7 +113,8 @@ class Yoke(_Middleware):  # type: ignore[misc,valid-type]
         known = call.get("name") in self.write_tools or bool(registry.contracts_for(call.get("name", "")))
         if not known or not isinstance(path, str):
             return None
-        path = _normalize(path)
+        normalize = getattr(self.backend, "normalize", None)     # LocalFiles knows its own paths; Deep Agents' rule otherwise
+        path = normalize(path) if callable(normalize) else _normalize(path)
         return path if path is not None and self._covers(path) else None
 
     def _covers(self, path: str) -> bool:

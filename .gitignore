@@ -9,3 +9,6 @@ build/
 .env.*
 .pytest_cache/
 HANDOFF_CLAUDE_CODE.md
+
+# benchmark runs (a chosen run is published deliberately, not by default)
+bench/einvoice/results/

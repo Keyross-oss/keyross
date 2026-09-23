@@ -1,0 +1,82 @@
+{
+  "id": "order-20",
+  "scenario": "allowances",
+  "invoice": {
+    "number": "INV-2026-1020",
+    "issue_date": "2026-09-20",
+    "due_date": "2026-10-20",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4720"
+  },
+  "seller": {
+    "name": "Seller 20 SAS",
+    "vat_id": "FR20000158380",
+    "address": {
+      "line": "20 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 70 SAS",
+    "vat_id": "FR70000554330",
+    "address": {
+      "line": "70 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "Consulting, senior",
+      "quantity": "12.75",
+      "unit_code": "HUR",
+      "net_price": "0.89",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    },
+    {
+      "id": "2",
+      "name": "Consulting, junior",
+      "quantity": "1.5",
+      "unit_code": "HUR",
+      "net_price": "33.33",
+      "vat_category": "S",
+      "vat_rate": "10.00"
+    },
+    {
+      "id": "3",
+      "name": "Laptop stand",
+      "quantity": "2",
+      "unit_code": "C62",
+      "net_price": "120.00",
+      "vat_category": "S",
+      "vat_rate": "5.50"
+    }
+  ],
+  "allowances": [
+    {
+      "amount": "15.00",
+      "reason": "Loyalty discount",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    }
+  ],
+  "charges": [
+    {
+      "amount": "9.90",
+      "reason": "Shipping",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    }
+  ],
+  "vat_exemptions": {}
+}

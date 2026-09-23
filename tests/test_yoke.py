@@ -127,3 +127,33 @@ def test_saxon_survives_the_agent_threads():
     proc = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True, text=True, timeout=120,
                           env={**__import__("os").environ, "PYTHONPATH": str(ROOT / "src")})
     assert proc.returncode == 0, proc.stderr[-2000:]
+
+
+def test_plain_langchain_agent_with_its_own_disk_tool(tmp_path):
+    """No Deep Agents: a LangChain create_agent whose own tool writes to disk, yoked through LocalFiles."""
+    from langchain.agents import create_agent
+    from langchain_core.tools import tool
+    from keyross.yoke import LocalFiles
+
+    @tool
+    def save_quote(file_path: str, content: str) -> str:
+        """Save a quote as CSV."""
+        (tmp_path / file_path).write_text(content, encoding="utf-8")
+        return f"saved {file_path}"
+
+    def call(content, n):
+        return AIMessage(content="", tool_calls=[{"name": "save_quote", "args": {"file_path": "quote.csv", "content": content}, "id": f"s{n}"}])
+
+    yoke = Yoke(gauge="core", backend=LocalFiles(tmp_path), write_tools=("save_quote",))
+    agent = create_agent(model=Scripted(responses=[call(BAD, 1), call(GOOD, 2), AIMessage(content="done")]), tools=[save_quote], middleware=[yoke])
+    out = agent.invoke({"messages": [{"role": "user", "content": "go"}]})
+    assert [m.status for m in tool_messages(out)] == ["error", "success"]
+    assert (tmp_path / "quote.csv").read_text(encoding="utf-8") == GOOD
+
+
+def test_local_files_refuses_paths_outside_its_root(tmp_path):
+    from keyross.yoke import LocalFiles
+    files = LocalFiles(tmp_path / "out")
+    assert files.normalize("invoice.xml") == files.normalize("/invoice.xml") == "/invoice.xml"
+    assert files.normalize("../secret.csv") is None and files.normalize(str(tmp_path / "elsewhere.csv")) is None
+    assert files.normalize(str(tmp_path / "out" / "sub" / "a.csv")) == "/sub/a.csv"

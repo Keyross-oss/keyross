@@ -4,5 +4,6 @@ from keyross.yoke import Yoke
 agent = create_deep_agent(..., middleware=[Yoke(gauge="core")])
 """
 from keyross.yoke.deepagents import Yoke, KeyrossMiddleware
+from keyross.yoke.files import LocalFiles
 
-__all__ = ["Yoke", "KeyrossMiddleware"]
+__all__ = ["Yoke", "KeyrossMiddleware", "LocalFiles"]

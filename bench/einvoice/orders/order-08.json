@@ -1,0 +1,59 @@
+{
+  "id": "order-08",
+  "scenario": "domestic",
+  "invoice": {
+    "number": "INV-2026-1008",
+    "issue_date": "2026-09-08",
+    "due_date": "2026-10-08",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4708"
+  },
+  "seller": {
+    "name": "Seller 08 SAS",
+    "vat_id": "FR08000063352",
+    "address": {
+      "line": "8 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 58 SAS",
+    "vat_id": "FR58000459302",
+    "address": {
+      "line": "58 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "Consulting, senior",
+      "quantity": "0.5",
+      "unit_code": "HUR",
+      "net_price": "49.90",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    },
+    {
+      "id": "2",
+      "name": "Consulting, junior",
+      "quantity": "0.5",
+      "unit_code": "HUR",
+      "net_price": "89.95",
+      "vat_category": "S",
+      "vat_rate": "10.00"
+    }
+  ],
+  "allowances": [],
+  "charges": [],
+  "vat_exemptions": {}
+}

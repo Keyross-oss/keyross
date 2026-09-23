@@ -1,0 +1,68 @@
+{
+  "id": "order-06",
+  "scenario": "domestic",
+  "invoice": {
+    "number": "INV-2026-1006",
+    "issue_date": "2026-09-06",
+    "due_date": "2026-10-06",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4706"
+  },
+  "seller": {
+    "name": "Seller 06 SAS",
+    "vat_id": "FR06000047514",
+    "address": {
+      "line": "6 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 56 SAS",
+    "vat_id": "FR56000443464",
+    "address": {
+      "line": "56 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "Cable, 5 m",
+      "quantity": "3",
+      "unit_code": "C62",
+      "net_price": "1250.00",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    },
+    {
+      "id": "2",
+      "name": "Training day",
+      "quantity": "0.5",
+      "unit_code": "DAY",
+      "net_price": "49.90",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    },
+    {
+      "id": "3",
+      "name": "Software licence, annual",
+      "quantity": "3",
+      "unit_code": "C62",
+      "net_price": "49.90",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    }
+  ],
+  "allowances": [],
+  "charges": [],
+  "vat_exemptions": {}
+}

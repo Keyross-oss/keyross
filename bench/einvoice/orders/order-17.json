@@ -1,0 +1,84 @@
+{
+  "id": "order-17",
+  "scenario": "allowances",
+  "invoice": {
+    "number": "INV-2026-1017",
+    "issue_date": "2026-09-17",
+    "due_date": "2026-10-17",
+    "type_code": "380",
+    "currency": "EUR",
+    "buyer_reference": "PO-4717"
+  },
+  "seller": {
+    "name": "Seller 17 SAS",
+    "vat_id": "FR17000134623",
+    "address": {
+      "line": "17 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "buyer": {
+    "name": "Buyer 67 SAS",
+    "vat_id": "FR67000530573",
+    "address": {
+      "line": "67 Example Street",
+      "city": "Lille",
+      "postcode": "59000",
+      "country": "FR"
+    }
+  },
+  "payment": {
+    "means_code": "58",
+    "iban": "FR7630006000011234567890189"
+  },
+  "lines": [
+    {
+      "id": "1",
+      "name": "USB-C dock",
+      "quantity": "5",
+      "unit_code": "C62",
+      "net_price": "1250.00",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    },
+    {
+      "id": "2",
+      "name": "Office chair",
+      "quantity": "1",
+      "unit_code": "C62",
+      "net_price": "7.45",
+      "vat_category": "S",
+      "vat_rate": "10.00"
+    },
+    {
+      "id": "3",
+      "name": "Printer paper A4",
+      "quantity": "5",
+      "unit_code": "C62",
+      "net_price": "120.00",
+      "vat_category": "S",
+      "vat_rate": "5.50"
+    },
+    {
+      "id": "4",
+      "name": "Cable, 5 m",
+      "quantity": "5",
+      "unit_code": "C62",
+      "net_price": "19.99",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    }
+  ],
+  "allowances": [
+    {
+      "amount": "15.00",
+      "reason": "Loyalty discount",
+      "vat_category": "S",
+      "vat_rate": "20.00"
+    }
+  ],
+  "charges": [],
+  "vat_exemptions": {}
+}
