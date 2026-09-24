@@ -14,7 +14,9 @@ EN 16931 est la norme européenne de la facture électronique, la base des oblig
 
 Un agent reçoit une commande — 3 chaises de bureau à 49,90 HT, TVA 20 % — et écrit la facture. Il se trompe sur le total des lignes : 150,70 au lieu de 149,70. Avec le yoke, l'écriture est mesurée aussitôt : BR-CO-10 et BR-CO-13 tombent, le fichier est restauré, et l'agent reçoit une seule ligne — `red flag: BR-CO-10, BR-CO-13 — the write was reverted; fix and retry` — puis réécrit la facture, juste. Le modèle ne voit jamais le texte des règles ni les preuves : ce sont les règles officielles qui décident, pas le modèle. Sans yoke, rien ne mesure la facture : elle part.
 
-À essayer hors ligne : `python examples/deepagents/invoice_agent.py`. La mesure sur un vrai modèle : [bench/einvoice](bench/einvoice/README.md).
+À essayer hors ligne : `python examples/deepagents/invoice_agent.py`.
+
+**Mesuré.** Dans un benchmark pré-enregistré — le même agent, 300 runs, jugés par des juges qui ne sont pas Keyross — 50 factures sur 100 partaient fausses sans le yoke, sans que rien ne le signale. Avec le yoke sur les règles officielles et la commande : 11, toutes des erreurs de schéma XML, que le yoke ne vérifie pas encore. Les factures correctes passent de 50 % à 64 % avec les seules règles officielles (p = 0,005 après correction de Holm). Les résultats et les données brutes : [bench/einvoice](bench/einvoice/README.md) · la page, avec un calculateur de coûts : [keyross-oss.github.io/keyross/bench/](https://keyross-oss.github.io/keyross/bench/).
 
 ## Pourquoi ce dépôt existe
 

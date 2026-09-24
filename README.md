@@ -14,7 +14,9 @@ EN 16931 is the European standard for electronic invoices, the base of the manda
 
 An agent receives an order — 3 office chairs at 49.90 net, VAT 20 % — and writes the invoice. It gets the line total wrong: 150.70 instead of 149.70. With the yoke, the write is measured at once: BR-CO-10 and BR-CO-13 fail, the file is restored, and the agent receives one line — `red flag: BR-CO-10, BR-CO-13 — the write was reverted; fix and retry` — then writes the invoice again, right. The model never sees the rule text or the evidence: the official rules decide, not the model. Without the yoke, nothing measures the invoice: it ships.
 
-Run it offline: `python examples/deepagents/invoice_agent.py`. Measure it on a real model: [bench/einvoice](bench/einvoice/README.md).
+Run it offline: `python examples/deepagents/invoice_agent.py`.
+
+**Measured.** In a pre-registered benchmark — the same agent, 300 runs, graded by judges that are not Keyross — 50 invoices in 100 shipped wrong without the yoke, and nothing said so. With the yoke on the official rules and the order: 11, all XML schema errors, which the yoke does not check yet. Correct invoices rose from 50 % to 64 % with the official rules alone (Holm-adjusted p = 0.005). The results and the raw data: [bench/einvoice](bench/einvoice/README.md) · the page, with a cost calculator: [keyross-oss.github.io/keyross/bench/](https://keyross-oss.github.io/keyross/bench/).
 
 ## Why this repository exists
 

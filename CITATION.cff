@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use Keyross or its benchmark, please cite it as below."
+title: "Keyross"
+abstract: "A compiler for agent outputs. Gauges measure, the yoke couples your agent to them, flags decide what ships."
+type: software
+authors:
+  - family-names: Amri
+    given-names: Wassim
+version: 0.1.0
+date-released: 2026-09-24
+license: Apache-2.0
+repository-code: "https://github.com/Keyross-oss/keyross"
+url: "https://keyross-oss.github.io/keyross/bench/"
+keywords:
+  - ai-agents
+  - agent-validation
+  - e-invoicing
+  - EN 16931
+  - deep-agents
+  - langchain
+  - benchmark

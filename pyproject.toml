@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "keyross"
-version = "0.1.0.dev0"
+version = "0.1.0"
 description = "Keyross — a compiler and a package manager for your agent's document oracles: official validators adapted, your own added, one lock, one gate."
 readme = "README.md"
 license = { text = "Apache-2.0" }
