@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A pre-registered 300-run benchmark of Keyross' yoke on an AI agent writing EN 16931 e-invoices.">
+<title>Keyross E-Invoice Benchmark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Schibsted+Grotesk:wght@600;700;800&display=swap">
+<style>
+:root{
+  --ground:#F3F6F5; --surface:#FFFFFF; --surface-2:#E6EEEB; --ink:#11201E; --ink-2:#394B48; --muted:#5F7370; --rule:#D1DCD9;
+  --accent:#0C6670; --accent-soft:#D4EAE9;
+  --ok:#1D8A4D; --on-ok:#FFFFFF; --ok-soft:#D9F0E2; --ok-ink:#16703D;
+  --warn:#D9A21B; --on-warn:#281C00; --warn-soft:#F6EACB; --warn-ink:#845600;
+  --bad:#C0392B; --on-bad:#FFFFFF; --bad-soft:#F8DDD8; --bad-ink:#A12D20;
+  --display:"Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;
+  --body:"Public Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0C1312; --surface:#131C1B; --surface-2:#1C2826; --ink:#E2EBE9; --ink-2:#B4C3C0; --muted:#8B9D9A; --rule:#283735;
+    --accent:#5BC3C8; --accent-soft:#15302F;
+    --ok:#46BF7B; --on-ok:#05200E; --ok-soft:#13301E; --ok-ink:#6BD897;
+    --warn:#E2B04A; --on-warn:#231700; --warn-soft:#342712; --warn-ink:#F0C45E;
+    --bad:#EE6F5B; --on-bad:#290701; --bad-soft:#391A15; --bad-ink:#FF8E7A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0C1312; --surface:#131C1B; --surface-2:#1C2826; --ink:#E2EBE9; --ink-2:#B4C3C0; --muted:#8B9D9A; --rule:#283735;
+  --accent:#5BC3C8; --accent-soft:#15302F;
+  --ok:#46BF7B; --on-ok:#05200E; --ok-soft:#13301E; --ok-ink:#6BD897;
+  --warn:#E2B04A; --on-warn:#231700; --warn-soft:#342712; --warn-ink:#F0C45E;
+  --bad:#EE6F5B; --on-bad:#290701; --bad-soft:#391A15; --bad-ink:#FF8E7A;
+}
+
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.page{max-width:1040px;margin:0 auto;padding-inline:clamp(16px,4vw,40px);padding-block:44px 72px}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+code,.mono{font-family:var(--mono);font-size:.92em}
+.num{font-variant-numeric:tabular-nums}
+
+/* masthead */
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px}
+.eyebrow b{color:var(--accent);font-weight:600}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,5.4vw,56px);line-height:1.04;letter-spacing:-.022em;margin:18px 0 0;max-width:19ch;text-wrap:balance}
+.lede{font-size:clamp(17px,2vw,19.5px);color:var(--ink-2);max-width:64ch;margin-top:20px}
+.lede strong{color:var(--ink);font-weight:600}
+
+/* the lifted figure */
+.figure{margin-top:36px;background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:clamp(18px,3vw,30px)}
+.figure h2{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.005em;margin:0}
+.figure .sub{color:var(--muted);font-size:14.5px;margin-top:4px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:18px;font-size:14px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block;flex:none}
+.sw.ok{background:var(--ok)} .sw.warn{background:var(--warn)} .sw.bad{background:var(--bad)}
+.stack{display:grid;gap:14px;margin-top:20px}
+.stack-row{display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:center}
+.stack-label{font-weight:600;font-size:15px;line-height:1.3}
+.stack-label small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.bar{display:flex;height:46px;border-radius:8px;overflow:hidden;background:var(--surface-2)}
+.seg{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;font-size:15px;white-space:nowrap;min-width:0}
+.seg.ok{background:var(--ok);color:var(--on-ok)}
+.seg.warn{background:var(--warn);color:var(--on-warn)}
+.seg.bad{background:var(--bad);color:var(--on-bad)}
+.scale{display:grid;grid-template-columns:220px 1fr;gap:16px}
+.scale-track{position:relative;height:18px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.scale-track span{position:absolute;top:0}
+.scale-track span:nth-child(2){left:50%;transform:translateX(-50%)}
+.scale-track span:nth-child(3){right:0}
+.figure .note{margin-top:18px;font-size:14.5px;color:var(--ink-2);max-width:78ch}
+
+/* key numbers */
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:28px 32px;margin-top:40px}
+.key{border-top:2px solid var(--ink);padding-top:12px}
+.key .big{font-family:var(--display);font-weight:800;font-size:clamp(34px,4vw,42px);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.key .big small{font-size:.5em;font-weight:700;letter-spacing:0}
+.key p{margin-top:10px;font-size:14.5px;color:var(--ink-2);line-height:1.45}
+
+/* sections */
+section{margin-top:76px;border-top:1px solid var(--rule);padding-top:26px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h2.title{font-family:var(--display);font-weight:700;font-size:clamp(25px,3.2vw,34px);line-height:1.12;letter-spacing:-.015em;margin:10px 0 0;max-width:30ch;text-wrap:balance}
+.intro{margin-top:14px;max-width:68ch;color:var(--ink-2);font-size:17px}
+
+/* claim / evidence rows */
+.rows{margin-top:26px}
+.row{display:grid;grid-template-columns:minmax(200px,300px) 1fr;gap:10px 32px;padding-block:18px;border-top:1px solid var(--rule)}
+.row:last-child{border-bottom:1px solid var(--rule)}
+.claim{font-family:var(--display);font-weight:700;font-size:19px;line-height:1.25;letter-spacing:-.005em}
+.evidence{color:var(--ink-2);max-width:66ch}
+.evidence strong{color:var(--ink);font-weight:600}
+
+/* specimen: real lines from shipped invoices */
+.specimen{margin-top:28px;background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:18px 20px}
+.specimen h3{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+.specimen table{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums}
+.specimen th{font-weight:500;color:var(--muted);text-align:right;padding:6px 10px;border-bottom:1px solid var(--rule);font-size:12px}
+.specimen th:first-child,.specimen td:first-child{text-align:left}
+.specimen td{padding:7px 10px;text-align:right;border-bottom:1px dashed var(--rule)}
+.specimen tr:last-child td{border-bottom:0}
+.specimen td.wrong{color:var(--bad-ink);font-weight:600}
+.specimen p{margin-top:12px;font-family:var(--body);font-size:14.5px;color:var(--ink-2)}
+
+/* data tables */
+.table-wrap{overflow-x:auto;margin-top:22px}
+table.data{border-collapse:collapse;width:100%;min-width:560px;font-size:15px}
+table.data th,table.data td{padding:11px 12px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:middle}
+table.data thead th{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1.5px solid var(--ink)}
+table.data tbody th{font-weight:600}
+table.data td{font-variant-numeric:tabular-nums}
+.cellbar{display:grid;grid-template-columns:3.4em minmax(60px,1fr);gap:10px;align-items:center}
+.track{height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.fill{height:100%;border-radius:4px}
+.fill.ok{background:var(--ok)} .fill.warn{background:var(--warn)} .fill.bad{background:var(--bad)} .fill.acc{background:var(--accent)}
+.caption{margin-top:12px;font-size:14px;color:var(--muted);max-width:78ch}
+.yes{color:var(--ok-ink);font-weight:600} .no{color:var(--muted)}
+
+/* chips */
+.chip{display:inline-block;font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok-ink)}
+.chip.warn{background:var(--warn-soft);color:var(--warn-ink)}
+.chip.neutral{background:var(--surface-2);color:var(--ink-2)}
+
+/* calculator */
+.calc{margin-top:26px;background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:clamp(18px,3vw,28px)}
+.inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px 24px}
+.field label{display:block;font-weight:600;font-size:14.5px}
+.field .hint{display:block;font-size:13px;color:var(--muted);margin-top:2px;line-height:1.4;min-height:2.8em}
+.field .input{display:flex;align-items:center;margin-top:8px;border:1px solid var(--rule);border-radius:8px;background:var(--ground);overflow:hidden}
+.field .input span{font-family:var(--mono);color:var(--muted);padding-left:12px}
+.field input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font-family:var(--mono);font-size:18px;padding:10px 12px;font-variant-numeric:tabular-nums}
+.field .input:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.field input:focus-visible{outline:none}
+.calc table.data{min-width:640px}
+.calc tr.projected th,.calc tr.projected td{color:var(--muted);font-style:italic}
+.summary{margin-top:20px;background:var(--accent-soft);border-radius:10px;padding:16px 18px;font-size:16.5px;line-height:1.55}
+.summary strong{font-weight:700}
+.assumptions{margin-top:14px;font-size:13.5px;color:var(--muted);max-width:80ch}
+
+/* method grid */
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 36px;margin-top:22px}
+.fact{display:grid;grid-template-columns:120px 1fr;gap:12px;padding-block:12px;border-top:1px solid var(--rule);font-size:15px}
+.fact dt{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.fact dd{margin:0;color:var(--ink-2)}
+
+ul.plain{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:14px;max-width:74ch}
+ul.plain li{padding-left:22px;position:relative;color:var(--ink-2)}
+ul.plain li::before{content:"";position:absolute;left:2px;top:.62em;width:8px;height:8px;border-radius:2px;background:var(--rule)}
+ul.plain.next li::before{background:var(--accent)}
+ul.plain strong{color:var(--ink);font-weight:600}
+
+footer{margin-top:80px;padding-top:22px;border-top:1px solid var(--rule);font-size:13.5px;color:var(--muted);display:grid;gap:6px}
+footer .motto{font-family:var(--display);font-weight:700;font-size:16px;color:var(--ink)}
+
+@media (max-width:680px){
+  .stack-row,.scale{grid-template-columns:1fr;gap:6px}
+  .scale > div:first-child{display:none}
+  .row{grid-template-columns:1fr}
+  .fact{grid-template-columns:1fr;gap:2px}
+  section{margin-top:60px}
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <header>
+    <div class="eyebrow"><b>Keyross</b><span>Pre-registered benchmark</span><span>300 runs</span><span>23 September 2026</span></div>
+    <h1>Half the invoices an AI agent wrote were wrong, and nothing said so.</h1>
+    <p class="lede">Keyross' <strong>yoke</strong> checks every document an agent writes, at the moment it writes it, against the official rules and your own data. It doesn't make the agent smarter. It <strong>stops wrong invoices from leaving silently</strong>. We measured that on 300 runs, graded by three judges that are not Keyross.</p>
+  </header>
+
+  <div class="figure" role="figure" aria-labelledby="fig-title">
+    <h2 id="fig-title">What 100 invoices became, per setup</h2>
+    <p class="sub">The same agent (Claude Haiku 4.5), the same prompt, the same 50 purchase orders, twice each.</p>
+    <div class="legend" aria-hidden="true">
+      <span><i class="sw ok"></i>Correct</span>
+      <span><i class="sw warn"></i>Blocked — a person takes over</span>
+      <span><i class="sw bad"></i>Shipped wrong — nobody is told</span>
+    </div>
+    <div class="stack">
+      <div class="stack-row">
+        <div class="stack-label">Agent alone<small>no check at the write</small></div>
+        <div class="bar" role="img" aria-label="Agent alone: 50 correct, 0 blocked, 50 shipped wrong">
+          <div class="seg ok" style="width:50%">50</div><div class="seg bad" style="width:50%">50</div>
+        </div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-label">+ yoke: official rules<small>the EN 16931 rules, as published</small></div>
+        <div class="bar" role="img" aria-label="Yoke on the official rules: 64 correct, 14 blocked, 22 shipped wrong">
+          <div class="seg ok" style="width:64%">64</div><div class="seg warn" style="width:14%">14</div><div class="seg bad" style="width:22%">22</div>
+        </div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-label">+ yoke: rules and order<small>and the invoice against its order</small></div>
+        <div class="bar" role="img" aria-label="Yoke on the rules and the order: 60 correct, 29 blocked, 11 shipped wrong">
+          <div class="seg ok" style="width:60%">60</div><div class="seg warn" style="width:29%">29</div><div class="seg bad" style="width:11%">11</div>
+        </div>
+      </div>
+      <div class="scale" aria-hidden="true"><div></div><div class="scale-track"><span>0</span><span>50</span><span>100 invoices</span></div></div>
+    </div>
+    <p class="note">Correct means accepted by all three judges: an independent validator of the official CEN rules, the official Factur-X schema, and a check against the order. The 11 still shipped wrong in the last row are all XML schema violations — the one property the yoke does not check yet.</p>
+  </div>
+
+  <div class="keys">
+    <div class="key"><div class="big num">33 → 0</div><p>invoices per 100 shipped with a fatal official-rule violation, with either yoke.</p></div>
+    <div class="key"><div class="big num">50 → 64<small> %</small></div><p>correct invoices with the yoke on the official rules. Exact paired test, Holm-adjusted p = 0.005.</p></div>
+    <div class="key"><div class="big num">557/557</div><p>invoices where Keyross and an independent validator of the official rules gave the same verdict.</p></div>
+    <div class="key"><div class="big num">15<small> ms</small></div><p>per check (mean; 26 and 33 ms per run, at 1.7 and 2.1 checks a run). The real overhead is the model writing again: 2 to 3 US cents per invoice.</p></div>
+  </div>
+
+  <section aria-labelledby="s-product">
+    <div class="label">What the test says about the product</div>
+    <h2 class="title" id="s-product">It does what it claims — and the test found where it stops.</h2>
+    <div class="rows">
+      <div class="row">
+        <div class="claim">What the yoke checks does not ship.</div>
+        <p class="evidence">No invoice with a fatal CEN rule left either yoked setup: <strong>0 of 200</strong>, against 33 of 100 without. No invoice billing an amount that differs from the order left the setup that checks the order: <strong>0 of 100</strong>, against 26 of 100 without.</p>
+      </div>
+      <div class="row">
+        <div class="claim">More invoices end up correct.</div>
+        <p class="evidence">50 → <strong>64 %</strong> with the official rules (Holm-adjusted p = 0.005) and 50 → <strong>60 %</strong> with the rules and the order (p = 0.021). Paired, the yoked arm wins 17 blocks and loses 3 (rules), 13 and 3 (rules and order). Within each yoked arm, 13 and 12 runs are rescues: a write refused, then fixed by the agent knowing only which check failed. The rest of the net gain is the first write, sampled independently in each arm.</p>
+      </div>
+      <div class="row">
+        <div class="claim">It is faithful to the official rules.</div>
+        <p class="evidence">Keyross runs the CEN EN 16931 validation artefacts unmodified. On <strong>557 of 557</strong> invoices graded, it reported exactly the fatal rules that an independent implementation (easybill's validator, in Docker) reported. Its order checks agree with the benchmark's order judge on 547 of 557; the 10 differences are one half-cent tolerance case, <a href="https://github.com/Keyross-oss/keyross/issues/1">open for calibration</a>, and change no result.</p>
+      </div>
+      <div class="row">
+        <div class="claim">Cheap to run, not free.</div>
+        <p class="evidence">A check takes <strong>15 ms</strong> on average (15.2 and 15.6 ms; medians 14.9 and 14.4). The cost is the agent writing again: +80 % and +140 % tokens, +18 s and +31 s, <strong>+0.018 and +0.032 USD per invoice</strong> at list prices.</p>
+      </div>
+      <div class="row">
+        <div class="claim">Its limits, found by the test.</div>
+        <p class="evidence">The XML schema is not checked yet, so <strong>11 %</strong> of invoices still ship with a structure error — stated before the run, and next on the roadmap. And a bare category such as <code>order.lines</code> is often not enough for a small model to find its mistake: <strong>14 % and 29 %</strong> of invoices end blocked, for a person.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-need">
+    <div class="label">What the test confirms about the need</div>
+    <h2 class="title" id="s-need">Agents writing official documents need a check at the write. Instructions are not one.</h2>
+    <div class="rows">
+      <div class="row">
+        <div class="claim">A good prompt is not a control.</div>
+        <p class="evidence">With clean data and a worked example in its prompt, the agent still shipped a defective invoice <strong>50 times in 100</strong>. Its first attempt was right about half the time in every setup (50, 51, 48 %): the yoke does not make it write better, it stops what is wrong.</p>
+      </div>
+      <div class="row">
+        <div class="claim">The official rules are necessary.</div>
+        <p class="evidence">One invoice in three broke a fatal rule of the standard — a missing delivery country on an intra-EU supply, totals that don't add up, too many decimals. These rules are public and executable; nothing applied them at the write.</p>
+      </div>
+      <div class="row">
+        <div class="claim">They are not sufficient.</div>
+        <p class="evidence"><strong>One invoice in nine</strong> passed every official rule and the schema, and still billed the wrong amount. Only the company's own data — here, the order — could catch it. That is what Keyross' delta checks add to the standard.</p>
+      </div>
+      <div class="row">
+        <div class="claim">These errors are hard to see.</div>
+        <p class="evidence">A few cents on one line, carried consistently into every total; a VAT amount one cent off, inside the official tolerance; an XML element out of place. A person skimming the invoice could easily miss them; a check at the write does not.</p>
+      </div>
+      <div class="row">
+        <div class="claim">The deadline is here.</div>
+        <p class="evidence">Since <strong>1 September 2026</strong>, every VAT-registered company in France must be able to receive e-invoices, and large and mid-sized companies must issue them; small companies and micro-enterprises follow by <strong>1 September 2027</strong> at the latest (<a href="https://www.impots.gouv.fr/professionnel/je-passe-la-facturation-electronique" rel="noopener">DGFiP</a>). The invoices follow the EN 16931 standard — the rules this benchmark ran.</p>
+      </div>
+    </div>
+
+    <div class="specimen">
+      <h3>Real lines from invoices the agent shipped without the yoke</h3>
+      <div class="table-wrap" style="margin-top:0">
+        <table>
+          <thead><tr><th scope="col">Line</th><th scope="col">Should be</th><th scope="col">Written</th><th scope="col">Off by</th></tr></thead>
+          <tbody>
+            <tr><td>12.75 × 89.95</td><td>1,146.86</td><td class="wrong">1,146.81</td><td>−0.05</td></tr>
+            <tr><td>0.5 × 89.95</td><td>44.98</td><td class="wrong">45.00</td><td>+0.02</td></tr>
+            <tr><td>5 × 7.45</td><td>37.25</td><td class="wrong">37.50</td><td>+0.25</td></tr>
+            <tr><td>VAT at 20 %</td><td>263.33</td><td class="wrong">263.32</td><td>−0.01</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Each of these invoices was coherent with itself: the totals followed the wrong line, so the official validator and the schema accepted it. The first error alone shipped in 8 invoices. With the order in its context, the yoke refused every such write.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-where">
+    <div class="label">Where the agent fails</div>
+    <h2 class="title" id="s-where">Two situations hold most failures — both missing from the example it was given.</h2>
+    <p class="intro">Correct invoices out of 20 per scenario. The worked example in the prompt is a domestic invoice, with no delivery data and no shipping charge.</p>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col">Scenario</th><th scope="col">Agent alone</th><th scope="col">+ yoke: rules</th><th scope="col">+ yoke: rules and order</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Domestic</th><td><div class="cellbar"><span>14/20</span><div class="track"><div class="fill ok" style="width:70%"></div></div></div></td><td><div class="cellbar"><span>16/20</span><div class="track"><div class="fill ok" style="width:80%"></div></div></div></td><td><div class="cellbar"><span>17/20</span><div class="track"><div class="fill ok" style="width:85%"></div></div></div></td></tr>
+          <tr><th scope="row">Exempt line</th><td><div class="cellbar"><span>13/20</span><div class="track"><div class="fill ok" style="width:65%"></div></div></div></td><td><div class="cellbar"><span>16/20</span><div class="track"><div class="fill ok" style="width:80%"></div></div></div></td><td><div class="cellbar"><span>16/20</span><div class="track"><div class="fill ok" style="width:80%"></div></div></div></td></tr>
+          <tr><th scope="row">Reverse charge</th><td><div class="cellbar"><span>14/20</span><div class="track"><div class="fill ok" style="width:70%"></div></div></div></td><td><div class="cellbar"><span>18/20</span><div class="track"><div class="fill ok" style="width:90%"></div></div></div></td><td><div class="cellbar"><span>17/20</span><div class="track"><div class="fill ok" style="width:85%"></div></div></div></td></tr>
+          <tr><th scope="row">Allowances and charges</th><td><div class="cellbar"><span>9/20</span><div class="track"><div class="fill ok" style="width:45%"></div></div></div></td><td><div class="cellbar"><span>9/20</span><div class="track"><div class="fill ok" style="width:45%"></div></div></div></td><td><div class="cellbar"><span>9/20</span><div class="track"><div class="fill ok" style="width:45%"></div></div></div></td></tr>
+          <tr><th scope="row">Intra-EU supply</th><td><div class="cellbar"><span>0/20</span><div class="track"><div class="fill ok" style="width:0%"></div></div></div></td><td><div class="cellbar"><span>5/20</span><div class="track"><div class="fill ok" style="width:25%"></div></div></div></td><td><div class="cellbar"><span>1/20</span><div class="track"><div class="fill ok" style="width:5%"></div></div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="plain">
+      <li><strong>Intra-EU supply.</strong> The invoice must name the country the goods were delivered to (rule BR-IC-12). The agent rarely wrote it where the standard expects it: BR-IC-12 was the most frequent official-rule red flag, 57 and 68 times. Without the yoke, all 20 of these invoices shipped with fatal errors; with it, they were stopped, and 29 of the 43 blocked invoices come from this scenario.</li>
+      <li><strong>Shipping charges.</strong> When the order had one, the agent placed the charge total out of order in the XML — in 9 of 10 runs, in every setup, identical because no setup checks the schema.</li>
+    </ul>
+    <p class="caption">This tells where a check's feedback must get more precise, and which document structures an agent needs to be shown.</p>
+  </section>
+
+  <section aria-labelledby="s-ships">
+    <div class="label">What ships wrong, by kind</div>
+    <h2 class="title" id="s-ships">Each error disappears exactly where a check covers it.</h2>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col">Per 100 invoices shipped…</th><th scope="col">Agent alone</th><th scope="col">+ yoke: rules</th><th scope="col">+ yoke: rules and order</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">with a fatal official rule</th><td><div class="cellbar"><span>33</span><div class="track"><div class="fill bad" style="width:33%"></div></div></div></td><td><div class="cellbar"><span>0</span><div class="track"><div class="fill bad" style="width:0%"></div></div></div></td><td><div class="cellbar"><span>0</span><div class="track"><div class="fill bad" style="width:0%"></div></div></div></td></tr>
+          <tr><th scope="row">with an amount that differs from the order</th><td><div class="cellbar"><span>26</span><div class="track"><div class="fill bad" style="width:26%"></div></div></div></td><td><div class="cellbar"><span>11</span><div class="track"><div class="fill bad" style="width:11%"></div></div></div></td><td><div class="cellbar"><span>0</span><div class="track"><div class="fill bad" style="width:0%"></div></div></div></td></tr>
+          <tr><th scope="row">… of which valid for every official rule and the schema</th><td><div class="cellbar"><span>11</span><div class="track"><div class="fill bad" style="width:11%"></div></div></div></td><td><div class="cellbar"><span>11</span><div class="track"><div class="fill bad" style="width:11%"></div></div></div></td><td><div class="cellbar"><span>0</span><div class="track"><div class="fill bad" style="width:0%"></div></div></div></td></tr>
+          <tr><th scope="row">with an XML schema violation</th><td><div class="cellbar"><span>26</span><div class="track"><div class="fill bad" style="width:26%"></div></div></div></td><td><div class="cellbar"><span>11</span><div class="track"><div class="fill bad" style="width:11%"></div></div></div></td><td><div class="cellbar"><span>11</span><div class="track"><div class="fill bad" style="width:11%"></div></div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">One invoice can have several kinds of error, so the rows overlap. Bars on a 0–100 scale.</p>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col">Checked at every write</th><th scope="col">Agent alone</th><th scope="col">+ yoke: rules</th><th scope="col">+ yoke: rules and order</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Content: the official CEN rules</th><td class="no">no</td><td class="yes">yes</td><td class="yes">yes</td></tr>
+          <tr><th scope="row">Amounts: the invoice against its order</th><td class="no">no</td><td class="no">no</td><td class="yes">yes</td></tr>
+          <tr><th scope="row">Structure: the XML schema</th><td class="no">no</td><td class="no">no</td><td class="no">no — next</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Declared in the protocol before the full run. Where the answer is yes, the error count above is zero; where it is no, errors ship.</p>
+  </section>
+
+  <section aria-labelledby="s-potential">
+    <div class="label">The product potential, in numbers</div>
+    <h2 class="title" id="s-potential">What the measured rates mean for a company's invoices.</h2>
+    <p class="intro">The rates below are the ones measured. The costs are yours: change them. The defaults are illustrative assumptions, not measurements.</p>
+    <div class="calc">
+      <form class="inputs" id="calc-form" novalidate>
+        <div class="field">
+          <label for="volume">Invoices written by the agent, per month</label>
+          <span class="hint">Any volume; the rates scale with it.</span>
+          <div class="input"><input id="volume" type="number" inputmode="numeric" min="0" step="1000" value="10000"></div>
+        </div>
+        <div class="field">
+          <label for="defect">Cost of one wrong invoice that ships</label>
+          <span class="hint">A credit note, a new invoice, a customer call. A rejection or a VAT adjustment costs more.</span>
+          <div class="input"><span>€</span><input id="defect" type="number" inputmode="decimal" min="0" step="1" value="30"></div>
+        </div>
+        <div class="field">
+          <label for="handle">Cost of one blocked invoice handled by a person</label>
+          <span class="hint">About 7 minutes of an accountant at €40 an hour.</span>
+          <div class="input"><span>€</span><input id="handle" type="number" inputmode="decimal" min="0" step="0.5" value="5"></div>
+        </div>
+      </form>
+      <div class="table-wrap">
+        <table class="data" aria-describedby="calc-summary">
+          <thead><tr><th scope="col">Per month</th><th scope="col">Correct</th><th scope="col">To a person</th><th scope="col">Shipped wrong</th><th scope="col">Total cost</th><th scope="col">Against the agent alone</th></tr></thead>
+          <tbody id="calc-body"></tbody>
+        </table>
+      </div>
+      <p class="summary" id="calc-summary" aria-live="polite"></p>
+      <p class="assumptions">Total cost = model tokens + blocked invoices handled by a person + wrong invoices that ship. Model costs are measured in USD at list prices (2.5, 4.3 and 5.7 cents per invoice) and counted 1 USD = 1 €; the difference is negligible here. The last row is a projection, not a measurement: it assumes the schema step blocks the 11 % of invoices that now ship with a schema violation, and rescues none of them.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-hyp">
+    <div class="label">Declared before the run</div>
+    <h2 class="title" id="s-hyp">Five hypotheses, five answers — including the unfavourable one.</h2>
+    <div class="table-wrap">
+      <table class="data">
+        <thead><tr><th scope="col"></th><th scope="col">Hypothesis</th><th scope="col">Result</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">H1</th><td>The yoke on the official rules increases correct invoices.</td><td><span class="chip ok">supported</span> 50 → 64 %, p = 0.005</td></tr>
+          <tr><th scope="row">H2</th><td>Risk: the yoke makes the agent bend the order to pass the rules — more valid-but-wrong invoices.</td><td><span class="chip neutral">not observed</span> 11 → 11</td></tr>
+          <tr><th scope="row">H3</th><td>Sanity: the first attempt is equally good in every setup.</td><td><span class="chip ok">holds</span> 50, 51, 48 %</td></tr>
+          <tr><th scope="row">H4</th><td>The yoke on the rules and the order increases correct invoices.</td><td><span class="chip ok">supported</span> 50 → 60 %, p = 0.021</td></tr>
+          <tr><th scope="row">H5</th><td>Risk: checking the order makes the agent give up more often.</td><td><span class="chip warn">observed</span> 0, 14, 29 % blocked</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">p-values: exact two-sided McNemar test on paired runs, Holm-adjusted for the two tested comparisons. Between the two yoked setups there is no difference that 100 pairs can detect (p = 0.39).</p>
+  </section>
+
+  <section aria-labelledby="s-method">
+    <div class="label">How it was measured</div>
+    <h2 class="title" id="s-method">Pre-registered, graded by judges that are not Keyross.</h2>
+    <dl class="facts">
+      <div class="fact"><dt>Tasks</dt><dd>50 fictitious purchase orders in five scenarios: domestic, exempt line, intra-EU supply, reverse charge, allowances and charges. Each run twice.</dd></div>
+      <div class="fact"><dt>Setups</dt><dd>The same Deep Agent: alone, with <code>Yoke(gauge="einvoice")</code>, and with the order in the yoke's context. 300 runs.</dd></div>
+      <div class="fact"><dt>Model</dt><dd>Claude Haiku 4.5, provider defaults, the same prompt with one worked example; at most 4 writes and 12 model calls per run.</dd></div>
+      <div class="fact"><dt>Judges</dt><dd>easybill's EN 16931 validator (CEN rules 1.3.16), the official Factur-X 1.09 schema, and the match with the order. None of them is Keyross.</dd></div>
+      <div class="fact"><dt>Protocol</dt><dd>Written and frozen before the first paid run; six dated deviations, each with its reason; two interim looks disclosed; every result published.</dd></div>
+      <div class="fact"><dt>Human review</dt><dd>21 delivered invoices drawn at random and blind, 7 per setup — in progress; its agreement with the judges will be added.</dd></div>
+    </dl>
+  </section>
+
+  <section aria-labelledby="s-limits">
+    <div class="label">What this does not show yet</div>
+    <h2 class="title" id="s-limits">The easiest version of the task, on purpose.</h2>
+    <ul class="plain">
+      <li><strong>Reading.</strong> The agent received a structured order, so the right invoice could be computed and 300 invoices graded. Real inputs are emails and PDFs: harder for the agent, and where a check matters most. The error rates measured here are likely a floor.</li>
+      <li><strong>One model, one prompt.</strong> A stronger model or a richer example would change how often the agent is blocked.</li>
+      <li><strong>By construction.</strong> In the setup that checks the order, the yoke and the order judge test the same property with separate code: its zero wrong amounts is expected. What it measures is whether the agent gets there — and it didn't, 29 times in 100.</li>
+      <li><strong>Parties, dates, payment details</strong> are not compared with the order by any automated judge; the human review reads them.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="s-next">
+    <div class="label">Next</div>
+    <h2 class="title" id="s-next">Each next step is measured with the same benchmark.</h2>
+    <ul class="plain next">
+      <li><strong>The schema step.</strong> Check the XML structure before the official rules. Target: no invoice shipped wrong without anyone being told.</li>
+      <li><strong>Sharper feedback, never the answer.</strong> Name the line and the field that failed — never the expected value. Target: fewer invoices blocked for a person.</li>
+      <li><strong>Messy input.</strong> The same 50 orders as emails and PDFs, with the same answer key and the same judges: the case agents are actually used for.</li>
+      <li><strong>Supplier invoices.</strong> The received PDF checked against the company's own purchase order — the check the order setup already runs.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div class="motto">Gauges measure. The yoke couples your agent to them. Flags decide what ships.</div>
+    <div>Keyross · run <span class="mono">20260923T162255Z</span> · commit <span class="mono">1855858</span> · CEN validation artefacts <span class="mono">1.3.16</span> · 12.57 USD for 300 runs.</div>
+    <div>Judge: easybill/en16931-validator 0.7.0, image <span class="mono" style="overflow-wrap:anywhere">sha256:e2f84d3d371e95d9eae2da0ccaef5a13bf01f2e58278e9080994ae763d8914dd</span>.</div>
+    <div>The protocol, the raw results, every delivered invoice and the script that recomputes every number on this page: <a href="https://github.com/Keyross-oss/keyross/tree/main/bench/einvoice">bench/einvoice</a> in the Keyross repository.</div>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var setups = [
+    { name: "Agent alone", correct: 0.50, blocked: 0.00, silent: 0.50, model: 0.0252, projected: false },
+    { name: "+ yoke: official rules", correct: 0.64, blocked: 0.14, silent: 0.22, model: 0.0432, projected: false },
+    { name: "+ yoke: rules and order", correct: 0.60, blocked: 0.29, silent: 0.11, model: 0.0573, projected: false },
+    { name: "+ the schema step (projection)", correct: 0.60, blocked: 0.40, silent: 0.00, model: 0.0573, projected: true }
+  ];
+  function el(id) { return document.getElementById(id); }
+  function read(id, fallback) {
+    var v = parseFloat(el(id).value);
+    return isFinite(v) && v >= 0 ? v : fallback;
+  }
+  function count(v) { return Math.round(v).toLocaleString("en-GB"); }
+  function euros(v) { return "€" + Math.round(v).toLocaleString("en-GB"); }
+  function cents(v) { return "€" + v.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+  function render() {
+    var n = read("volume", 10000), d = read("defect", 30), h = read("handle", 5);
+    var rows = setups.map(function (s) {
+      return { s: s, cost: n * (s.model + s.blocked * h + s.silent * d) };
+    });
+    var base = rows[0].cost;
+    el("calc-body").innerHTML = rows.map(function (r, i) {
+      var diff = base - r.cost;
+      var against = i === 0 ? "—" : (diff >= 0 ? "saves " : "costs ") + euros(Math.abs(diff));
+      return "<tr" + (r.s.projected ? ' class="projected"' : "") + "><th scope=\"row\">" + r.s.name + "</th>" +
+        "<td>" + count(n * r.s.correct) + "</td><td>" + count(n * r.s.blocked) + "</td><td>" + count(n * r.s.silent) + "</td>" +
+        "<td>" + euros(r.cost) + "</td><td>" + against + "</td></tr>";
+    }).join("");
+
+    var alone = setups[0], order = setups[2];
+    var saving = base - rows[2].cost;
+    var fewer = n * (alone.silent - order.silent);
+    var breakEven = (order.model - alone.model + order.blocked * h) / (alone.silent - order.silent);
+    el("calc-summary").innerHTML =
+      "With these costs, the yoke on the rules and the order <strong>" + (saving >= 0 ? "saves " : "costs ") + euros(Math.abs(saving)) +
+      " a month</strong> against the agent alone: " + count(fewer) + " fewer invoices ship wrong — " +
+      count(n * (order.correct - alone.correct)) + " more are correct and " + count(n * order.blocked) +
+      " are stopped for a person. It pays for itself as soon as a wrong invoice costs more than <strong>" + cents(breakEven) + "</strong>.";
+  }
+
+  ["volume", "defect", "handle"].forEach(function (id) { el(id).addEventListener("input", render); });
+  el("calc-form").addEventListener("submit", function (e) { e.preventDefault(); });
+  render();
+})();
+</script>
+
+</body>
+</html>

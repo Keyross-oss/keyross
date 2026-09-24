@@ -250,6 +250,12 @@ def report(path: Path) -> str:
         ("cost, USD at list prices", mean(lambda r: r.get("cost_usd"), digits=4)),
         ("yoke checks", mean(lambda r: r["yoke_checks"], yoked=True)),
         ("yoke check time (ms)", mean(lambda r: r["yoke_check_ms"], yoked=True))], first="per run"), ""]
+    for arm in (a for a in arms if a != "without"):
+        rs, checks = of[arm], sum(r["yoke_checks"] for r in of[arm])
+        per = [r["yoke_check_ms"] / r["yoke_checks"] for r in rs if r["yoke_checks"]]
+        if checks:
+            out += [f"Time per check, {ARMS[arm]}: {sum(r['yoke_check_ms'] for r in rs) / checks:.1f} ms mean over {checks} checks "
+                    f"(median per run {statistics.median(per):.1f} ms). The per-run figure above is this time times the number of checks.", ""]
     for arm in (a for a in arms if a != "without" and "without" in of):
         pairs = list(zip(of["without"], of[arm]))
         tok = [y["tokens"] - x["tokens"] for x, y in pairs]
@@ -261,6 +267,17 @@ def report(path: Path) -> str:
         out += [f"Paired overhead, {ARMS[arm]} − without yoke (95 % bootstrap CI): tokens {t_mean:+.0f} ({t_lo:+.0f} to {t_hi:+.0f}, "
                 f"{100 * t_mean / base_tok:+.0f} %) · seconds {s_mean:+.1f} ({s_lo:+.1f} to {s_hi:+.1f})"
                 + (f" · cost {statistics.fmean(cost):+.4f} USD per invoice (list prices)" if cost else "") + ".", ""]
+
+    yoked = [a for a in arms if a != "without"]
+    if yoked:
+        out += ["## Rescues — runs that received a red flag", "", *_table(yoked, [
+            ("runs with at least one red flag", lambda arm: str(sum(r["pit_stops"] > 0 for r in of[arm]))),
+            ("… corrected, then correct (a rescue)", lambda arm: str(sum(r["pit_stops"] > 0 and r["correct"] for r in of[arm]))),
+            ("… not delivered", lambda arm: str(sum(r["pit_stops"] > 0 and not r["delivered"] for r in of[arm]))),
+            ("… delivered, still not correct", lambda arm: str(sum(r["pit_stops"] > 0 and r["delivered"] and not r["correct"] for r in of[arm])))],
+            first="within the arm"), "",
+            "A rescue is counted within one arm. The paired table of the primary endpoint compares arms: a block won there can also "
+            "come from a first write that was right in one arm and wrong in the other.", ""]
 
     judged = [r["agree"] for r in ok if r.get("agree") is not None] + [r["first_agree"] for r in ok if r.get("first_agree") is not None]
     out += ["## Keyross against the independent validator", "",

@@ -141,3 +141,25 @@ def test_the_worked_example_is_correct_and_not_a_task(tmp_path):
     order = {"id": "example", "scenario": "example", **json.loads((EXAMPLE_DIR / "example-order.json").read_text(encoding="utf-8"))}
     assert grade(order, (EXAMPLE_DIR / "example-invoice.xml").read_text(encoding="utf-8"))["correct"]
     assert order["invoice"]["number"] not in {o["invoice"]["number"] for o in load_orders()} and order["invoice"]["number"] in SYSTEM_PROMPT
+
+
+def test_the_published_numbers_match_the_raw_results():
+    """The benchmark README and the public page state the numbers the published run's raw results give."""
+    from bench.einvoice.judges import VALIDATOR_DIGEST
+    run = ROOT / "bench" / "einvoice" / "results" / "20260923T162255Z-claude-haiku-4-5.jsonl"
+    rows = [json.loads(line) for line in run.read_text(encoding="utf-8").splitlines() if line.strip()]
+    correct = {arm: sum(r["correct"] for r in rows if r["arm"] == arm) for arm in ("without", "with", "with_order")}
+    judged = [r[k] for r in rows for k in ("agree", "first_agree") if r.get(k) is not None]
+    ordered = [r[k] for r in rows for k in ("order_agree", "first_order_agree") if r.get(k) is not None]
+    per_check = {arm: sum(r["yoke_check_ms"] for r in rows if r["arm"] == arm) / sum(r["yoke_checks"] for r in rows if r["arm"] == arm)
+                 for arm in ("with", "with_order")}
+    cost = sum(r["cost_usd"] for r in rows)
+    readme = (ROOT / "bench" / "einvoice" / "README.md").read_text(encoding="utf-8")
+    page = (ROOT / "docs" / "bench" / "index.html").read_text(encoding="utf-8")
+    assert (correct["without"], correct["with"], correct["with_order"]) == (50, 64, 60)
+    for text in (readme, page):
+        assert f"{sum(judged)} of {len(judged)}" in text
+        assert f"{sum(ordered)} of {len(ordered)}" in text
+        assert f"{per_check['with']:.1f}" in text and f"{per_check['with_order']:.1f}" in text
+        assert f"{cost:.2f} USD" in text and VALIDATOR_DIGEST in text
+        assert "claude.ai" not in text
