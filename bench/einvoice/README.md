@@ -2,7 +2,7 @@
 
 Does the yoke change what an agent ships, and at what cost? The same Deep Agent turns a purchase order into an EN 16931 invoice (UN/CEFACT CII, the XML of Factur-X), in three arms: without the yoke; with `Yoke(gauge="einvoice")`, the official rules; and with the official rules and the order, `Yoke(gauge="einvoice", ctx={"order": order})`. Same model, prompt and limits in every arm. **None of the judges is Keyross**, so the yoke is never graded by its own code.
 
-The protocol was written and frozen before the first paid run: [PROTOCOL.md](PROTOCOL.md), with its six dated deviations. This page reports the full run of 23 September 2026 — measured numbers only. Every number here is recomputed from the raw results by the command under *Files*. The blind human review is pending.
+The protocol was written and frozen before the first paid run: [PROTOCOL.md](PROTOCOL.md), with its six dated deviations. This page reports the full run of 23 September 2026 — measured numbers only. Every number here is recomputed from the raw results by the command under *Files*. The blind human review agrees with the three judges on 21 of 21 invoices.
 
 ## The run
 
@@ -123,7 +123,7 @@ The per-run check time is the per-check time times the number of checks in the r
 - **The XML schema.** No arm's yoke checks it; 11 % of invoices ship with a schema violation in both yoked arms.
 - **Arm 3's zero.** Its order check and the order judge test the same property; its 0 % of wrong amounts is by construction (stated before the run).
 - **Tasks seen in the pilots.** The pilots ran on order-01 to order-05, among the 50 tasks; they informed deviations 2 to 5, all general.
-- **Parties, dates, payment details.** No automated judge compares them with the order; the human review reads them.
+- **Parties, dates, payment details.** No automated judge compares them with the order; the human review read them on 21 invoices.
 - **Interim looks.** Two descriptive looks during the run, at the owner's request; no test, nothing changed (deviation 6).
 
 ## Next measurements
@@ -133,9 +133,24 @@ The per-run check time is the per-check time times the number of checks in the r
 - **Messy input** — the same orders as emails or PDFs, with the same answer key and the same judges.
 - **One tolerance** for the order judge and the delta oracles ([issue #1](https://github.com/Keyross-oss/keyross/issues/1)).
 
-## Human review — pending
+## Human review — blind, 21 of 21 agree
 
-21 delivered invoices, 7 per arm, drawn with `random.Random(2027)` and renamed so the arm is hidden (`review.py sample`). The reviewer's verdicts and their agreement with the three judges will be added here, with every disagreement.
+21 delivered invoices, 7 per arm, were drawn with `random.Random(2027)` and renamed so the arm was hidden (`review.py sample`). On 24 September 2026 the reviewer, the project's owner, compared each with its order, blind to the arm, and wrote `correct` or `incorrect` with what is wrong. The notes were written in French and are published translated.
+
+| | without yoke | yoke: rules | yoke: rules + order |
+|---|---|---|---|
+| the reviewer agrees with the three judges | 7/7 | 7/7 | 7/7 |
+| incorrect, for the judges and for the reviewer | 3 | 1 | 0 |
+
+No disagreement. The four incorrect invoices, as the reviewer found them:
+- invoice-06 (no yoke): 12.75 × 89.95 written 1,146.81 and 0.5 × 89.95 written 45.00, carried into the totals — valid but wrong;
+- invoice-14 (no yoke): 5 × 7.45 written 37.50, carried into the VAT and the totals — valid but wrong;
+- invoice-21 (yoke with the rules only): 12.75 × 89.95 written 1,146.81 — valid but wrong, which the official rules cannot see;
+- invoice-05 (no yoke): amounts left unrounded (0.5 × 33.33 = 16.665). The validator rejects it, so it is incorrect for the three judges together; but it is one of the 10 half-cent cases, where the order judge alone accepts the amounts and Keyross' delta oracles refuse them. The reviewer read the amounts as wrong — evidence for the stricter tolerance ([issue #1](https://github.com/Keyross-oss/keyross/issues/1)).
+
+What the review cannot tell: it reads what the invoice says, not its XML structure. The one schema-invalid invoice of the sample also breaks the official rules, so no invoice in it fails on the schema alone, and the review does not test the schema judge. The reviewer knows the study's aims; only the arm was hidden.
+
+Files: [REVIEW.md](results/20260923T162255Z-claude-haiku-4-5-review/REVIEW.md) (the sheet), [review.csv](results/20260923T162255Z-claude-haiku-4-5-review/review.csv) (the verdicts), [SCORE.md](results/20260923T162255Z-claude-haiku-4-5-review/SCORE.md), the key [20260923T162255Z-claude-haiku-4-5-review-key.json](results/20260923T162255Z-claude-haiku-4-5-review-key.json).
 
 ## Design, in short
 

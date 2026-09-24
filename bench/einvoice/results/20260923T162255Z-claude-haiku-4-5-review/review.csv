@@ -1,0 +1,22 @@
+invoice,verdict,what is wrong
+invoice-01,correct,
+invoice-02,correct,
+invoice-03,correct,
+invoice-04,correct,
+invoice-05,incorrect,"Amounts not rounded to 2 decimals: line 2 = 16.665 (0.5 × 33.33 → 16.67), line total 556.365, total without VAT 551.265, VAT 110.253, total with VAT / amount due 661.518 (expected ≈ 556.37 / 551.27 / 110.25 / 661.52)"
+invoice-06,incorrect,"Wrong line amounts: line 3 = 1146.81 instead of 12.75 × 89.95 = 1146.86; line 5 = 45.00 instead of 0.5 × 89.95 = 44.98. The totals are wrong as a result (expected total without VAT 1692.04, VAT 243.42, total with VAT 1935.46)"
+invoice-07,correct,
+invoice-08,correct,
+invoice-09,correct,
+invoice-10,correct,
+invoice-11,correct,
+invoice-12,correct,
+invoice-13,correct,
+invoice-14,incorrect,"Line 1 = 37.50 instead of 5 × 7.45 = 37.25; taxable amount at 20 % 77.48 (expected 77.23), VAT 15.50 (expected 15.45), totals 389.80 / 46.40 / 436.20 (expected 389.55 / 46.35 / 435.90)"
+invoice-15,correct,
+invoice-16,correct,
+invoice-17,correct,
+invoice-18,correct,
+invoice-19,correct,
+invoice-20,correct,
+invoice-21,incorrect,"Line 3 = 1146.81 instead of 12.75 × 89.95 = 1146.86; the AE taxable amount and the totals are 3458.57 (expected 3458.62)"

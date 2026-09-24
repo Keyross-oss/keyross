@@ -1,0 +1,128 @@
+{
+  "invoice-01": {
+    "task": "order-25",
+    "arm": "with_order",
+    "rep": 2,
+    "correct": true
+  },
+  "invoice-02": {
+    "task": "order-22",
+    "arm": "with_order",
+    "rep": 2,
+    "correct": true
+  },
+  "invoice-03": {
+    "task": "order-07",
+    "arm": "with_order",
+    "rep": 1,
+    "correct": true
+  },
+  "invoice-04": {
+    "task": "order-29",
+    "arm": "with",
+    "rep": 2,
+    "correct": true
+  },
+  "invoice-05": {
+    "task": "order-30",
+    "arm": "without",
+    "rep": 2,
+    "correct": false
+  },
+  "invoice-06": {
+    "task": "order-07",
+    "arm": "without",
+    "rep": 2,
+    "correct": false
+  },
+  "invoice-07": {
+    "task": "order-42",
+    "arm": "without",
+    "rep": 2,
+    "correct": true
+  },
+  "invoice-08": {
+    "task": "order-13",
+    "arm": "with",
+    "rep": 2,
+    "correct": true
+  },
+  "invoice-09": {
+    "task": "order-26",
+    "arm": "with_order",
+    "rep": 2,
+    "correct": true
+  },
+  "invoice-10": {
+    "task": "order-13",
+    "arm": "with",
+    "rep": 1,
+    "correct": true
+  },
+  "invoice-11": {
+    "task": "order-06",
+    "arm": "without",
+    "rep": 1,
+    "correct": true
+  },
+  "invoice-12": {
+    "task": "order-46",
+    "arm": "with_order",
+    "rep": 1,
+    "correct": true
+  },
+  "invoice-13": {
+    "task": "order-06",
+    "arm": "with_order",
+    "rep": 2,
+    "correct": true
+  },
+  "invoice-14": {
+    "task": "order-26",
+    "arm": "without",
+    "rep": 2,
+    "correct": false
+  },
+  "invoice-15": {
+    "task": "order-01",
+    "arm": "without",
+    "rep": 2,
+    "correct": true
+  },
+  "invoice-16": {
+    "task": "order-45",
+    "arm": "with",
+    "rep": 1,
+    "correct": true
+  },
+  "invoice-17": {
+    "task": "order-25",
+    "arm": "with",
+    "rep": 1,
+    "correct": true
+  },
+  "invoice-18": {
+    "task": "order-21",
+    "arm": "without",
+    "rep": 2,
+    "correct": true
+  },
+  "invoice-19": {
+    "task": "order-47",
+    "arm": "with",
+    "rep": 1,
+    "correct": true
+  },
+  "invoice-20": {
+    "task": "order-32",
+    "arm": "with_order",
+    "rep": 1,
+    "correct": true
+  },
+  "invoice-21": {
+    "task": "order-19",
+    "arm": "with",
+    "rep": 2,
+    "correct": false
+  }
+}

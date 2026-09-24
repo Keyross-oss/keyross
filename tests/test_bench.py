@@ -154,6 +154,11 @@ def test_the_published_numbers_match_the_raw_results():
     per_check = {arm: sum(r["yoke_check_ms"] for r in rows if r["arm"] == arm) / sum(r["yoke_checks"] for r in rows if r["arm"] == arm)
                  for arm in ("with", "with_order")}
     cost = sum(r["cost_usd"] for r in rows)
+    review = run.parent / f"{run.stem}-review"
+    key = json.loads((run.parent / f"{run.stem}-review-key.json").read_text(encoding="utf-8"))
+    with open(review / "review.csv", newline="", encoding="utf-8") as f:
+        verdicts = {row["invoice"]: row["verdict"] == "correct" for row in __import__("csv").DictReader(f)}
+    agreed = sum(verdicts[name] == k["correct"] for name, k in key.items())
     readme = (ROOT / "bench" / "einvoice" / "README.md").read_text(encoding="utf-8")
     page = (ROOT / "docs" / "bench" / "index.html").read_text(encoding="utf-8")
     assert (correct["without"], correct["with"], correct["with_order"]) == (50, 64, 60)
@@ -162,4 +167,5 @@ def test_the_published_numbers_match_the_raw_results():
         assert f"{sum(ordered)} of {len(ordered)}" in text
         assert f"{per_check['with']:.1f}" in text and f"{per_check['with_order']:.1f}" in text
         assert f"{cost:.2f} USD" in text and VALIDATOR_DIGEST in text
+        assert f"{agreed} of {len(key)}" in text
         assert "claude.ai" not in text
