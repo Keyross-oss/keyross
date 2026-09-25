@@ -144,6 +144,8 @@ table.data td{font-variant-numeric:tabular-nums}
 .calc tr.projected th,.calc tr.projected td{color:var(--muted);font-style:italic}
 .summary{margin-top:20px;background:var(--accent-soft);border-radius:10px;padding:16px 18px;font-size:16.5px;line-height:1.55}
 .summary strong{font-weight:700}
+.summary span{display:block}
+.summary .lead{font-weight:700;margin-bottom:6px}
 .assumptions{margin-top:14px;font-size:13.5px;color:var(--muted);max-width:80ch}
 
 /* method grid */
@@ -339,15 +341,15 @@ footer .motto{font-family:var(--display);font-weight:700;font-size:16px;color:va
   </section>
 
   <section aria-labelledby="s-potential">
-    <div class="label">The product potential, in numbers</div>
-    <h2 class="title" id="s-potential">What the measured rates mean for a company's invoices.</h2>
+    <div class="label">The measured rates, priced</div>
+    <h2 class="title" id="s-potential">What these rates cost at your volume.</h2>
     <p class="intro">The rates below are the ones measured. The costs are yours: change them. The defaults are illustrative assumptions, not measurements.</p>
     <div class="calc">
       <form class="inputs" id="calc-form" novalidate>
         <div class="field">
           <label for="volume">Invoices written by the agent, per month</label>
           <span class="hint">Any volume; the rates scale with it.</span>
-          <div class="input"><input id="volume" type="number" inputmode="numeric" min="0" step="1000" value="10000"></div>
+          <div class="input"><input id="volume" type="number" inputmode="numeric" min="0" step="500" value="1000"></div>
         </div>
         <div class="field">
           <label for="defect">Cost of one wrong invoice that ships</label>
@@ -362,12 +364,12 @@ footer .motto{font-family:var(--display);font-weight:700;font-size:16px;color:va
       </form>
       <div class="table-wrap">
         <table class="data" aria-describedby="calc-summary">
-          <thead><tr><th scope="col">Per month</th><th scope="col">Correct</th><th scope="col">To a person</th><th scope="col">Shipped wrong</th><th scope="col">Total cost</th><th scope="col">Against the agent alone</th></tr></thead>
+          <thead><tr><th scope="col">Per month</th><th scope="col">Correct</th><th scope="col">To a person</th><th scope="col">Shipped wrong</th><th scope="col">Total cost</th><th scope="col">Difference vs agent alone</th></tr></thead>
           <tbody id="calc-body"></tbody>
         </table>
       </div>
       <p class="summary" id="calc-summary" aria-live="polite"></p>
-      <p class="assumptions">Total cost = model tokens + blocked invoices handled by a person + wrong invoices that ship. Model costs are measured in USD at list prices (2.5, 4.3 and 5.7 cents per invoice) and counted 1 USD = 1 €; the difference is negligible here. The last row is a projection, not a measurement: it assumes the schema step blocks the 11 % of invoices that now ship with a schema violation, and rescues none of them.</p>
+      <p class="assumptions">Total cost = model tokens + blocked invoices handled by a person + wrong invoices that ship. Difference = a setup's total cost minus the agent alone's: negative is cheaper. Model costs are measured in USD at list prices (2.5, 4.3 and 5.7 cents per invoice) and counted 1 USD = 1 €; the difference is negligible here. The last row is a projection, not a measurement: it assumes the schema step blocks the 11 % of invoices that now ship with a schema violation, and rescues none of them.</p>
     </div>
   </section>
 
@@ -450,28 +452,30 @@ footer .motto{font-family:var(--display);font-weight:700;font-size:16px;color:va
   function cents(v) { return "€" + v.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
   function render() {
-    var n = read("volume", 10000), d = read("defect", 30), h = read("handle", 5);
+    var n = read("volume", 1000), d = read("defect", 30), h = read("handle", 5);
     var rows = setups.map(function (s) {
       return { s: s, cost: n * (s.model + s.blocked * h + s.silent * d) };
     });
     var base = rows[0].cost;
     el("calc-body").innerHTML = rows.map(function (r, i) {
-      var diff = base - r.cost;
-      var against = i === 0 ? "—" : (diff >= 0 ? "saves " : "costs ") + euros(Math.abs(diff));
+      var diff = r.cost - base;
+      var against = i === 0 ? "—" : (diff < 0 ? "−" : "+") + euros(Math.abs(diff));
       return "<tr" + (r.s.projected ? ' class="projected"' : "") + "><th scope=\"row\">" + r.s.name + "</th>" +
         "<td>" + count(n * r.s.correct) + "</td><td>" + count(n * r.s.blocked) + "</td><td>" + count(n * r.s.silent) + "</td>" +
         "<td>" + euros(r.cost) + "</td><td>" + against + "</td></tr>";
     }).join("");
 
     var alone = setups[0], order = setups[2];
-    var saving = base - rows[2].cost;
+    var diff = rows[2].cost - base;
     var fewer = n * (alone.silent - order.silent);
     var breakEven = (order.model - alone.model + order.blocked * h) / (alone.silent - order.silent);
     el("calc-summary").innerHTML =
-      "With these costs, the yoke on the rules and the order <strong>" + (saving >= 0 ? "saves " : "costs ") + euros(Math.abs(saving)) +
-      " a month</strong> against the agent alone: " + count(fewer) + " fewer invoices ship wrong — " +
-      count(n * (order.correct - alone.correct)) + " more are correct and " + count(n * order.blocked) +
-      " are stopped for a person. It pays for itself as soon as a wrong invoice costs more than <strong>" + cents(breakEven) + "</strong>.";
+      "<span class=\"lead\">Break-even: the yoke on the rules and the order costs less than no yoke once a wrong invoice costs more than " +
+      cents(breakEven) + ".</span>" +
+      "<span>The threshold does not depend on the volume; it moves with the cost of handling a blocked invoice.</span>" +
+      "<span>At the costs above, the difference between the agent alone and the yoke on the rules and the order is " + euros(Math.abs(diff)) +
+      " a month, " + (diff < 0 ? "lower" : "higher") + " with the yoke: " + count(fewer) + " fewer invoices ship wrong — " +
+      count(n * (order.correct - alone.correct)) + " more are correct and " + count(n * order.blocked) + " are stopped for a person.</span>";
   }
 
   ["volume", "defect", "handle"].forEach(function (id) { el(id).addEventListener("input", render); });
