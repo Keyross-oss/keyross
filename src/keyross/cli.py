@@ -21,7 +21,7 @@ DEFAULT_CONFIG = """# keyross.yaml — the configuration of your agent's compile
 gauges: [core]            # gauges to load (modules keyross.gauges.<name>); add your own: [core, mycompany.invoices]
 adapters: []             # official validators to run, pinned (empty = every adapter of the loaded gauges), e.g. [einvoice.schematron]
 oracles_dir: oracles     # your own oracles (@oracle, @contract)
-badset_dir: badset       # one bad case per oracle: badset/<oracle_id>.xlsx
+badset_dir: badset       # one bad case per oracle of yours: badset/<oracle_id>.xlsx|csv (a gauge ships its own)
 context:
   units: [u, m, m2, m3, ml, kg, t, ens, ff, h, j, l]   # unit vocabulary — adapt it
 report_dir: .keyross/reports
@@ -37,6 +37,12 @@ def total_positive(doc):
     bad = [{"rid": l.rid, "amount": l.amount} for l in doc.amount_lines() if (l.amount or 0) < 0]
     return Verdict.fail(f"{len(bad)} negative amount(s)", "amount.negative", rows=bad) if bad else Verdict.ok()
 '''
+
+# the bad case of the sample oracle: a table with a negative amount, which mine.total.positive must catch (keyross test)
+SAMPLE_BAD_CASE = """designation;qty;unit;unit_price;amount
+Office chair;3;u;49.90;149.70
+Credit;1;u;-20.00;-20.00
+"""
 
 
 def _load_config(path: str = "keyross.yaml") -> dict:
@@ -58,7 +64,9 @@ def cmd_init(args: argparse.Namespace) -> int:
     Path("keyross.yaml").write_text(DEFAULT_CONFIG, encoding="utf-8")
     Path("oracles").mkdir(exist_ok=True); Path("badset").mkdir(exist_ok=True)
     Path("oracles/mine.py").write_text(SAMPLE_ORACLE, encoding="utf-8")
-    print("created keyross.yaml, oracles/mine.py, badset/. Next: keyross check <file.xlsx>")
+    Path("badset/mine.total.positive.csv").write_text(SAMPLE_BAD_CASE, encoding="utf-8")
+    print("created keyross.yaml, oracles/mine.py, badset/mine.total.positive.csv.\n"
+          "Next: keyross check <file.xlsx> · for EN 16931 invoices, first: keyross add einvoice")
     return 0
 
 
@@ -107,7 +115,8 @@ def cmd_gate(args: argparse.Namespace) -> int:
 def cmd_test(args: argparse.Namespace) -> int:
     cfg = _load_config(); _load_oracles(cfg)
     rc = 0
-    for oid, ok, msg in run_badset(cfg.get("badset_dir", "badset"), gauge=args.gauge, ctx=dict(cfg.get("context", {}))):
+    for oid, ok, msg in run_badset(cfg.get("badset_dir", "badset"), gauge=args.gauge, ctx=dict(cfg.get("context", {})),
+                                   gauges=cfg.get("gauges", [])):
         print(f"  {'✔' if ok else '✘'} {oid:<28} {msg}"); rc = rc or (0 if ok else 1)
     return rc
 

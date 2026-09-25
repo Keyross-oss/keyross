@@ -1,5 +1,6 @@
 # Pinned rule artifacts are verified by SHA-256 and bad cases are compared byte for byte: never convert their line endings.
 src/keyross/gauges/*/rules/** -text
+src/keyross/gauges/*/badset/** -text
 badset/** -text
 tests/fixtures/** -text
 # The benchmark's worked example is part of the system prompt: the same bytes on every platform.

@@ -1,6 +1,6 @@
 ## What this PR adds
 
-- [ ] one oracle (id: `…`) and its bad case in `badset/`, or
+- [ ] one oracle (id: `…`) and its bad case in the gauge's `badset/`, or
 - [ ] a gauge (`gauges/<name>/`) with at least five oracles and their badset, or
 - [ ] a fix / a doc change
 

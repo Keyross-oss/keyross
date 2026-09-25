@@ -49,7 +49,7 @@ The order format:
 
 ## Bad set
 
-At least one bad case per rule family. Each case is a public Factur-X example with one deliberate corruption. `keyross test` fails if a family has no case, or if a case does not raise its rule.
+At least one bad case per rule family, shipped with the gauge (`badset/` in its package), so `keyross test` checks the installed gauge in any project. Each case is a public Factur-X example with one deliberate corruption. `keyross test` fails if a family has no case, or if a case does not raise its rule.
 
 | Case | Source | Corruption |
 |---|---|---|

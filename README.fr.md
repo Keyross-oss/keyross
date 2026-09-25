@@ -29,6 +29,7 @@ Pour **rendre les agents responsables devant les compilateurs que les documents 
 ```bash
 pip install "keyross[einvoice]"
 keyross init                  # keyross.yaml, oracles/, badset/
+keyross add einvoice          # le gauge EN 16931 : les règles officielles du CEN, épinglées
 keyross check facture.xml     # une facture EN 16931 (UBL / CII) → les règles officielles du CEN → green / yellow / red, exit 0 / 1 / 2
 keyross check devis.xlsx      # un devis ou tout tableau chiffré → le gauge core
 keyross test                  # chaque oracle attrape-t-il son cas faux ? (les tests des tests)

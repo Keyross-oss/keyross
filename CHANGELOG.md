@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.1 (25 September 2026)
+- fix: the README's five-minute path failed from a fresh install. `keyross check invoice.xml` was red until the einvoice gauge was added: the README now runs `keyross add einvoice` after `init`, and the red verdict says so (`no loaded gauge validates invoice.xml — an EN 16931 invoice? keyross add einvoice`). `keyross test` failed on 30 bad cases: a gauge now ships its bad cases in its own package (`keyross/gauges/<gauge>/badset/`, as docs/spec/gauge.md says), looked up after the project's `badset/`; and `keyross init` writes the bad case of its sample oracle (`badset/mine.total.positive.csv`). A test replays the path in an empty folder
+
 ## 0.1.0 (24 September 2026)
 - the first public release
 - bench: the blind human review — 21 delivered invoices, 7 per arm, reviewed on 24 September 2026 blind to the arm: the reviewer agrees with the three judges on 21 of 21 (7/7 per arm), no disagreement. The four incorrect invoices (3 without the yoke, 1 with the rules only, 0 with the rules and the order) are the ones the judges found; one of them is a half-cent case, where the reviewer, like the delta oracles, reads the unrounded amounts as wrong (issue #1). The sheet, the verdicts (translated from French), the score and the key are published; the review reads content, not XML structure, and does not test the schema judge

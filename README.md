@@ -29,6 +29,7 @@ To **make agents accountable to the compilers that official documents already ha
 ```bash
 pip install "keyross[einvoice]"
 keyross init                  # keyross.yaml, oracles/, badset/
+keyross add einvoice          # the EN 16931 gauge: the official CEN rules, pinned
 keyross check invoice.xml     # an EN 16931 invoice (UBL / CII) → the official CEN rules → green / yellow / red, exit 0 / 1 / 2
 keyross check quote.xlsx      # a quote or any priced table → the core gauge
 keyross test                  # does every oracle catch its bad case? (tests for the tests)

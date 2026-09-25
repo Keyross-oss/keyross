@@ -154,14 +154,17 @@ class ExternalValidatorAdapter:
     def rule_ids(self) -> set[str]:
         return {s.id for s in registry.all(kind="adapter", gauge=self.gauge)}
 
-    def badset(self, badset_dir: str | Path) -> list[tuple[str, bool, str]]:
-        """`badset/<gauge>.<rule>[.<variant>].<ext>` must raise <rule>; every rule family must have at least one bad case."""
-        d, results, covered = Path(badset_dir), [], set()
+    def badset(self, badset_dir: str | Path | list[Path]) -> list[tuple[str, bool, str]]:
+        """`<gauge>.<rule>[.<variant>].<ext>` must raise <rule>; every rule family must have at least one bad case. Several
+        dirs (the project's badset, the gauge's own): a file name found in an earlier dir hides the same name in a later one."""
+        dirs = [Path(d) for d in badset_dir] if isinstance(badset_dir, list) else [Path(badset_dir)]
+        results, covered, seen = [], set(), set()
         known = self.rule_ids()
         own = [s.id for s in registry.all(gauge=self.gauge) if s.kind != "adapter"]   # the gauge's other oracles have bad cases too
-        for f in sorted(d.glob(f"{self.gauge}.*")):
-            if not self.accepts(f) or any(f.name.startswith(oid + ".") for oid in own):
+        for f in sorted((f for d in dirs for f in d.glob(f"{self.gauge}.*")), key=lambda f: f.name):
+            if f.name in seen or not self.accepts(f) or any(f.name.startswith(oid + ".") for oid in own):
                 continue
+            seen.add(f.name)
             oid = f"{self.gauge}.{f.name[len(self.gauge) + 1:].split('.')[0]}"
             if oid not in known:
                 results.append((oid, False, f"{f.name}: no such rule in {self.pin().tool} {self.pin().version}"))

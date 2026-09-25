@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "keyross"
-version = "0.1.0"
+version = "0.1.1"
 description = "Keyross — a compiler and a package manager for your agent's document oracles: official validators adapted, your own added, one lock, one gate."
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -37,7 +37,8 @@ packages = ["src/keyross"]
 
 [tool.hatch.build]
 include = ["src/keyross/**/*.py", "src/keyross/**/*.json", "src/keyross/**/*.yaml", "src/keyross/**/*.md",
-           "src/keyross/gauges/*/rules/**"]
+           "src/keyross/gauges/*/rules/**",
+           "src/keyross/gauges/*/badset/**"]            # a gauge ships its bad cases (docs/spec/gauge.md)
 
 [tool.ruff]
 line-length = 110

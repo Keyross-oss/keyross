@@ -107,7 +107,7 @@ def test_first_pass_rate_from_the_telemetry(tmp_path):
 
 @saxon
 def test_einvoice_yoke_runs_the_official_rules():
-    draft = (ROOT / "badset" / "einvoice.br-co-10.xml").read_text(encoding="utf-8")
+    draft = (ROOT / "src" / "keyross" / "gauges" / "einvoice" / "badset" / "einvoice.br-co-10.xml").read_text(encoding="utf-8")
     right = (ROOT / "tests" / "fixtures" / "einvoice" / "facturx-en16931.cii.xml").read_text(encoding="utf-8")
     out = run([write("/invoice.xml", draft, 1), write("/invoice.xml", right, 2)], Yoke(gauge="einvoice"))
     red, green = tool_messages(out)
@@ -121,7 +121,7 @@ def test_saxon_survives_the_agent_threads():
     """saxonche objects created on a worker thread and freed on the main thread crashed the process at exit."""
     code = ("import threading, keyross.gauges.einvoice as g\n"
             "from keyross.core.runner import check_file\n"
-            "f = 'badset/einvoice.br-29.xml'\n"
+            "f = 'src/keyross/gauges/einvoice/badset/einvoice.br-29.xml'\n"
             "t = threading.Thread(target=lambda: check_file(f, gauge='einvoice')); t.start(); t.join()\n"
             "assert check_file(f, gauge='einvoice').hard_failures\n")
     proc = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True, text=True, timeout=120,
@@ -196,7 +196,7 @@ def test_the_yoke_with_the_order_catches_what_the_official_rules_cannot():
     import json
     fixtures = ROOT / "tests" / "fixtures" / "einvoice"
     order = json.loads((fixtures / "delta-order.json").read_text(encoding="utf-8"))
-    wrong = (ROOT / "badset" / "einvoice.delta.order.vat.xml").read_text(encoding="utf-8")    # valid for the CEN rules
+    wrong = (ROOT / "src" / "keyross" / "gauges" / "einvoice" / "badset" / "einvoice.delta.order.vat.xml").read_text(encoding="utf-8")    # valid for the CEN rules
     right = (fixtures / "delta-order.cii.xml").read_text(encoding="utf-8")
     rules_only = run([write("/invoice.xml", wrong, 1)], Yoke(gauge="einvoice"))
     assert tool_messages(rules_only)[0].status == "success"                                   # the official rules let it through

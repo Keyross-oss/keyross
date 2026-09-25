@@ -109,7 +109,8 @@ def run_adapters(path: str, *, gauge: str | None = None, only: list[str] | None 
             continue
         report.verdicts.extend(a.verdicts(path))
     if not report.verdicts:
-        v = Verdict.fail(f"no loaded gauge validates {path}", "document.unsupported")
+        hint = " — an EN 16931 invoice? keyross add einvoice" if Path(path).suffix.lower() == ".xml" else ""
+        v = Verdict.fail(f"no loaded gauge validates {Path(path).name}{hint}", "document.unsupported")
         v.oracle_id = "keyross.check"
         report.verdicts.append(v)
     report.duration_ms = round((time.perf_counter() - t0) * 1000)

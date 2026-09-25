@@ -100,7 +100,7 @@ def test_keyross_agrees_with_the_independent_validator():
     """Same fatal rules, bad cases and clean invoices alike: a verdict that differs from the official rules is a bug."""
     from bench.einvoice.grade import grade
     order = load_orders()[0]
-    files = sorted((ROOT / "badset").glob("einvoice.*.xml")) + sorted((ROOT / "tests" / "fixtures" / "einvoice").glob("*.xml"))
+    files = sorted((ROOT / "src" / "keyross" / "gauges" / "einvoice" / "badset").glob("einvoice.*.xml")) + sorted((ROOT / "tests" / "fixtures" / "einvoice").glob("*.xml"))
     disagree = [f.name for f in files if not grade(order, f.read_text(encoding="utf-8"))["agree"]]
     assert not disagree, disagree
 

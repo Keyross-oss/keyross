@@ -14,7 +14,8 @@ from keyross.gauges.einvoice.adapters.schematron import GAUGE_DIR, CenSchematron
 
 ROOT = Path(__file__).resolve().parent.parent
 FIXTURES = ROOT / "tests" / "fixtures" / "einvoice"
-BADSET = sorted(p for p in (ROOT / "badset").glob("einvoice.*.xml") if not p.name.startswith("einvoice.delta."))   # the CEN rules' cases
+BADSET_DIR = GAUGE_DIR / "badset"                    # the gauge ships its bad cases
+BADSET = sorted(p for p in BADSET_DIR.glob("einvoice.*.xml") if not p.name.startswith("einvoice.delta."))   # the CEN rules' cases
 CLEAN = sorted(FIXTURES.glob("*.xml"))
 
 saxon = pytest.mark.skipif(__import__("importlib").util.find_spec("saxonche") is None, reason="pip install 'keyross[einvoice]'")
@@ -50,7 +51,7 @@ def test_every_bad_case_raises_its_rule(path):
 
 @saxon
 def test_badset_covers_every_rule_family():
-    results = adapter.badset(ROOT / "badset")
+    results = adapter.badset(BADSET_DIR)
     assert results and all(ok for _, ok, _ in results), [r for r in results if not r[1]]
 
 
@@ -162,8 +163,31 @@ def test_delta_oracles_skip_without_an_order():
 @saxon
 def test_delta_oracles_catch_an_invoice_valid_for_the_official_rules():
     """One cent of VAT, carried into every total: coherent, inside BR-CO-17's tolerance — only the order sees it."""
-    rep = _delta_report(ROOT / "badset" / "einvoice.delta.order.vat.xml", _delta_order())
+    rep = _delta_report(BADSET_DIR / "einvoice.delta.order.vat.xml", _delta_order())
     red = sorted(v.category for v in rep.hard_failures)
     assert red == ["order.totals", "order.vat"]                                   # no official rule fails
     v = next(v for v in rep.hard_failures if v.category == "order.vat")
     assert v.minimal() == {"status": "fail", "flag": "red", "category": "order.vat"} and v.evidence["deviations"][0]["expected"]
+
+
+@saxon
+def test_the_five_minute_path_works_in_an_empty_folder(tmp_path):
+    """The README's first steps with a fresh install: init, check an invoice (a hint until einvoice is added), add einvoice,
+    check, test. A fresh process, so that no gauge is loaded before keyross.yaml says so."""
+    import subprocess
+    import sys
+    (tmp_path / "invoice.xml").write_bytes((FIXTURES / "cen-cii-example1.xml").read_bytes())
+
+    def keyross(*args: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-c", "import sys; from keyross.cli import main; sys.exit(main(sys.argv[1:]))", *args],
+                              cwd=tmp_path, capture_output=True, text=True, encoding="utf-8", timeout=300,
+                              env={**__import__("os").environ, "PYTHONPATH": str(ROOT / "src"), "PYTHONIOENCODING": "utf-8"})
+
+    assert keyross("init").returncode == 0
+    before = keyross("check", "invoice.xml")
+    assert before.returncode == 2 and "keyross add einvoice" in before.stdout
+    assert keyross("add", "einvoice").returncode == 0
+    assert keyross("check", "invoice.xml").returncode == 0
+    tested = keyross("test")
+    assert tested.returncode == 0, tested.stdout[-3000:]
+    assert "mine.total.positive" in tested.stdout and "einvoice.delta.order.vat" in tested.stdout
