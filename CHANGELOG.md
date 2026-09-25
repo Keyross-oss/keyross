@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.1.1 (25 September 2026)
+- the archive: Keyross is on Zenodo, DOI 10.5281/zenodo.22938584 (every version); the badge in the README, the DOI in CITATION.cff
 - fix: the README's five-minute path failed from a fresh install. `keyross check invoice.xml` was red until the einvoice gauge was added: the README now runs `keyross add einvoice` after `init`, and the red verdict says so (`no loaded gauge validates invoice.xml — an EN 16931 invoice? keyross add einvoice`). `keyross test` failed on 30 bad cases: a gauge now ships its bad cases in its own package (`keyross/gauges/<gauge>/badset/`, as docs/spec/gauge.md says), looked up after the project's `badset/`; and `keyross init` writes the bad case of its sample oracle (`badset/mine.total.positive.csv`). A test replays the path in an empty folder
 
 ## 0.1.0 (24 September 2026)

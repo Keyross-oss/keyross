@@ -1,5 +1,7 @@
 # Keyross — un compilateur et un registre de gauges pour les documents de ton agent
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22938584.svg)](https://doi.org/10.5281/zenodo.22938584)
+
 > Ton agent sait déjà lire, planifier et éditer. Ce qu'il n'a pas, c'est un **compilateur** : quelque chose de déterministe qui dit si ce qu'il a produit est juste — après chaque action, en quelques secondes, sans modèle dans la boucle de vérification.
 >
 > **Les gauges mesurent. Le yoke y attelle ton agent. Les flags décident de ce qui part.**

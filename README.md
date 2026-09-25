@@ -1,5 +1,7 @@
 # Keyross — a compiler and a registry of gauges for your agent's documents
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22938584.svg)](https://doi.org/10.5281/zenodo.22938584)
+
 > Your agent already knows how to read, plan and edit. What it lacks is a **compiler**: something deterministic that says whether what it produced is right — after every action, in seconds, with no model in the verification loop.
 >
 > **Gauges measure. The yoke couples your agent to them. Flags decide what ships.**
