@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use Keyross or its benchmark, please cite it as below."
 title: "Keyross"
-abstract: "A compiler for agent outputs. Gauges measure, the yoke couples your agent to them, flags decide what ships."
+abstract: "Ready-to-use verifiers for your agent loop — official rules compiled into checks your agent must pass before it acts. Pinned, deterministic, replayable. Gauges measure, the yoke couples your agent to them, flags decide what ships."
 type: software
 authors:
   - family-names: Amri
@@ -14,6 +14,7 @@ repository-code: "https://github.com/Keyross-oss/keyross"
 url: "https://keyross-oss.github.io/keyross/bench/"
 keywords:
   - ai-agents
+  - verifiers
   - agent-validation
   - e-invoicing
   - EN 16931

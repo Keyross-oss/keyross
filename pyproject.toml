@@ -1,16 +1,17 @@
 [build-system]
-requires = ["hatchling>=1.25"]
+requires = ["hatchling>=1.25", "hatch-fancy-pypi-readme>=24.1"]
 build-backend = "hatchling.build"
 
 [project]
 name = "keyross"
 version = "0.1.1"
-description = "Keyross — a compiler and a package manager for your agent's document oracles: official validators adapted, your own added, one lock, one gate."
-readme = "README.md"
+description = "Ready-to-use verifiers for your agent loop — official rules compiled into checks your agent must pass before it acts. Pinned, deterministic, replayable."
+dynamic = ["readme"]                 # README.md, its links made absolute for PyPI (the fancy-pypi-readme hook below)
 license = { text = "Apache-2.0" }
 requires-python = ">=3.11"
 authors = [{ name = "Wassim Amri" }]
-keywords = ["agents", "verification", "oracles", "deterministic", "llm", "kubernetes"]
+keywords = ["ai-agents", "llm-agents", "verifiers", "deterministic", "e-invoicing", "en16931", "deepagents", "langchain",
+            "claude-code", "codex", "pre-commit"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
@@ -32,6 +33,28 @@ dev = ["pytest>=8", "ruff>=0.6"]
 [project.scripts]
 keyross = "keyross.cli:main"
 
+[project.urls]
+Homepage = "https://github.com/Keyross-oss/keyross"
+Changelog = "https://github.com/Keyross-oss/keyross/blob/main/CHANGELOG.md"
+Issues = "https://github.com/Keyross-oss/keyross/issues"
+Benchmark = "https://keyross-oss.github.io/keyross/bench/"
+Citation = "https://doi.org/10.5281/zenodo.22938584"
+
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "README.md"
+
+# PyPI cannot resolve paths relative to the repository: images point to the raw files, links to the files on GitHub
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '\]\((?!https?://|#|mailto:)([^)\s]+\.(?:png|svg|gif|jpe?g))\)'
+replacement = '](https://raw.githubusercontent.com/Keyross-oss/keyross/main/\1)'
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '\]\((?!https?://|#|mailto:)([^)\s]+)\)'
+replacement = '](https://github.com/Keyross-oss/keyross/blob/main/\1)'
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/keyross"]
 
@@ -39,6 +62,9 @@ packages = ["src/keyross"]
 include = ["src/keyross/**/*.py", "src/keyross/**/*.json", "src/keyross/**/*.yaml", "src/keyross/**/*.md",
            "src/keyross/gauges/*/rules/**",
            "src/keyross/gauges/*/badset/**"]            # a gauge ships its bad cases (docs/spec/gauge.md)
+
+[tool.hatch.build.targets.sdist.force-include]
+"README.md" = "README.md"            # the sdist keeps the README the description is built from
 
 [tool.ruff]
 line-length = 110
