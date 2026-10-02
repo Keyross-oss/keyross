@@ -1,30 +1,81 @@
-# Keyross — a compiler and a registry of gauges for your agent's documents
+# Keyross
 
+[![CI](https://github.com/Keyross-oss/keyross/actions/workflows/ci.yml/badge.svg)](https://github.com/Keyross-oss/keyross/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/keyross)](https://pypi.org/project/keyross/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22938584.svg)](https://doi.org/10.5281/zenodo.22938584)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-> Your agent already knows how to read, plan and edit. What it lacks is a **compiler**: something deterministic that says whether what it produced is right — after every action, in seconds, with no model in the verification loop.
->
-> **Gauges measure. The yoke couples your agent to them. Flags decide what ships.**
+**Ready-to-use verifiers for your agent loop.** Official rules compiled into checks your agent must pass before it acts — pinned, deterministic, replayable.
 
-![keyross check on an agent's invoice: red flag on the draft (BR-CO-10, BR-CO-13), green flag once the total is fixed](docs/demo.gif)
+> The reference layer autonomous agents must pass before they act.
 
-## An example: one e-invoice
+![Where Keyross fits in your agent stack: models think, agents write, Keyross verifies, the world ships. Green ships with a report; red is reverted and the rule ids go back to the agent.](docs/assets/keyross_stack.svg)
 
-EN 16931 is the European standard for electronic invoices, the base of the mandates rolling out across the EU (France since September 2026). Its rules are public: CEN publishes them as official validation artefacts — 1,562 rule ids, for example **BR-CO-10** *the sum of the invoice lines equals the line total* or **BR-E-10** *an exempt line states its exemption reason*. The `einvoice` gauge runs those artefacts unmodified; Keyross rewrites none of them.
+```bash
+pip install "keyross[einvoice]"
+keyross add einvoice          # the official EN 16931 rules, as a gauge
+keyross check invoice.xml     # green / yellow / red — exit 0 / 1 / 2
+```
+
+**Not a guardrail.** A guardrail judges, probabilistically. A gauge runs the rule and returns its id. **Not a test suite either:** if pytest can test it, use pytest — Keyross verifies what leaves the agent.
+
+## Measured on one standard: e-invoices
+
+EN 16931 is the European standard for electronic invoices, the base of the mandates rolling out across the EU (France since September 2026). CEN publishes its rules as official validation artefacts — 1,562 rule ids, such as **BR-CO-10** *the sum of the invoice lines equals the line total*. The `einvoice` gauge runs them unmodified, offline, pinned by SHA-256; Keyross rewrites none of them. Its delta oracles add what the standard cannot know: the invoice against its order.
 
 ![An agent writes an invoice that declares a line total of 150.70 instead of 149.70; the yoke runs the official CEN rules, BR-CO-10 and BR-CO-13 fail, the write is reverted, the agent gets the rule ids only and writes 149.70: green flag, the invoice ships](docs/einvoice_example.png)
 
-An agent receives an order — 3 office chairs at 49.90 net, VAT 20 % — and writes the invoice. It gets the line total wrong: 150.70 instead of 149.70. With the yoke, the write is measured at once: BR-CO-10 and BR-CO-13 fail, the file is restored, and the agent receives one line — `red flag: BR-CO-10, BR-CO-13 — the write was reverted; fix and retry` — then writes the invoice again, right. The model never sees the rule text or the evidence: the official rules decide, not the model. Without the yoke, nothing measures the invoice: it ships.
+A pre-registered benchmark — the same agent with one model (Claude Haiku 4.5), 300 runs on 23 September 2026, graded by judges that are not Keyross:
 
-Run it offline: `python examples/deepagents/invoice_agent.py`.
+| per 100 invoices | without Keyross | with Keyross (official rules + the order) |
+|---|---|---|
+| official-rule violations shipped | 33 (95 % CI 25–43) | **0** (0–4) |
+| shipped wrong, nobody told | 50 | 11 — all XML schema errors, which the gauge does not check yet |
+| held for a human | 0 | 29 |
+| cost per invoice | 0.025 USD | 0.057 USD |
 
-**Measured.** In a pre-registered benchmark — the same agent, 300 runs, graded by judges that are not Keyross — 50 invoices in 100 shipped wrong without the yoke, and nothing said so. With the yoke on the official rules and the order: 11, all XML schema errors, which the yoke does not check yet. Correct invoices rose from 50 % to 64 % with the official rules alone (Holm-adjusted p = 0.005). The results and the raw data: [bench/einvoice](bench/einvoice/README.md) · the page, with a cost calculator: [keyross-oss.github.io/keyross/bench/](https://keyross-oss.github.io/keyross/bench/).
+Protocol, raw data, every delivered invoice, a blind human review (21/21 agree with the judges): [bench/einvoice](bench/einvoice/README.md) · the page, with a cost model: [keyross-oss.github.io/keyross/bench](https://keyross-oss.github.io/keyross/bench/).
 
-## Why this repository exists
+## On the shelf
 
-To **make agents accountable to the compilers that official documents already have — and to write the ones they don't.** Official standards ship their own validators (the CEN rules for EN 16931 e-invoices, the ESAs' rules for the DORA register); Keyross never rewrites them. It runs them as gauges — pinned, executed outside the model, replayed in CI — and adds the checks a standard cannot know: your reference data, consistency across documents, the contracts of the agent's own actions. See [GAUGES.md](GAUGES.md) for the gauges and the good first contributions.
+| | Status | What it verifies |
+|---|---|---|
+| `einvoice` | **shipped** | EN 16931 invoices (UBL, CII — the XML of Factur-X): the official CEN rules, and the invoice against its order |
+| `core` | **shipped** | priced tables — quotes, bills of quantities: totals, duplicates, units, numbering, rows conserved |
+| `rules` | planned | your `AGENTS.md` / `CLAUDE.md` rules — scope, file size, tests, dependencies, public API — run on the diff, git as the only truth |
+| `payments` | planned | a payment run against what it cannot rewrite: supplier master data, open invoices, IBAN checksum, sanctions lists |
 
-**Think pre-commit, for agent outputs.** pre-commit wrote no linter; it put every linter in one place, pinned, with one config and one command. Keyross does the same for the checks an agent's documents must pass: one config, one lock, one report, one exit code.
+Want one that is not here? Open a discussion in [**Wanted verifier**](https://github.com/Keyross-oss/keyross/discussions/new?category=wanted-verifier): the document your agent got wrong, and where the truth lives. More in [GAUGES.md](GAUGES.md).
+
+## Where it plugs in
+
+| | Status |
+|---|---|
+| `keyross gate <folder>` — every gauge replayed outside the agent, an exit code, in any CI | **shipped** |
+| [GitHub Action](integrations/github-action/README.md) — the gate in a workflow | **shipped** |
+| [The yoke](src/keyross/yoke/README.md) for Deep Agents and LangChain — every write measured, a red write reverted, only the rule ids back to the agent | **shipped** |
+| `pre-commit` hook — every commit, whatever the agent | planned |
+| Native hooks for Claude Code, Codex CLI, Gemini CLI | planned |
+| An MCP server | later |
+
+Nothing requires an account, a cloud or a cluster; no model and no network run during a check.
+
+## Three words: gauge, yoke, flags
+
+![Gauges: the rules, as code. Yoke: at every write of your agent. Flags: green ships, yellow warns, red blocks](docs/overview.png)
+
+| Word | What it is |
+|---|---|
+| **Gauge** | the rules, as code: a versioned set of deterministic checks for one document family, tested against its bad cases and pinned by the lock. Official validators run unmodified; your own checks are added. A model never reads it. |
+| **Yoke** | what couples the agent to its gauges: it measures every document the agent writes, reverts a red write and returns only the rule ids. |
+| **Flags** | the verdict: **green** ships, **yellow** warns, **red** blocks — the same in the loop and in CI, exit 0 / 1 / 2. |
+
+```python
+from keyross.yoke import Yoke
+agent = create_deep_agent(..., middleware=[Yoke(gauge="einvoice")])   # Deep Agents / LangChain
+```
+
+A gauge is not a skill, a prompt or a `CLAUDE.md`: those are text a model reads and may follow. A gauge is code the harness runs and the model never sees. *A skill asks. A gauge measures.*
 
 ## Five minutes
 
@@ -32,87 +83,38 @@ To **make agents accountable to the compilers that official documents already ha
 pip install "keyross[einvoice]"
 keyross init                  # keyross.yaml, oracles/, badset/
 keyross add einvoice          # the EN 16931 gauge: the official CEN rules, pinned
-keyross check invoice.xml     # an EN 16931 invoice (UBL / CII) → the official CEN rules → green / yellow / red, exit 0 / 1 / 2
+keyross check invoice.xml     # an EN 16931 invoice (UBL / CII) → green / yellow / red, exit 0 / 1 / 2
 keyross check quote.xlsx      # a quote or any priced table → the core gauge
 keyross test                  # does every oracle catch its bad case? (tests for the tests)
 keyross lint                  # refuse any oracle that calls a model or the network
 keyross lock                  # pin the oracles: the answer to "what verified this run?"
 ```
 
-## What it is, in three words
-
-![Gauges: the rules, as code. Yoke: at every write of your agent. Flags: green ships, yellow warns, red blocks](docs/overview.png)
-
-| Word | What it is | Analogy with code |
-|---|---|---|
-| **Gauge** | The rules, as code: an installable, versioned set of deterministic checks for one document family — official validators run unmodified, your own checks added. Written by humans, never learned; a model never reads them. | the compiler, the test suite |
-| **Yoke** | What couples your agent to its gauges: it measures every document the agent writes, reverts a red write and returns only the rule ids. A LangChain / Deep Agents middleware today; a Claude Code hook and an MCP server planned. | the test runner wired into the build |
-| **Flags** | The verdict: **green** ships, **yellow** warns, **red** blocks. The same flags in the agent loop and in CI, where `keyross gate` replays every gauge outside the agent (scrutineering): exit 0 / 1 / 2. | compiler errors and warnings |
-
-Claude Code is reliable because code has a compiler, tests and CI. Your business documents — quotes, invoices, claims, KYC files — have none of that. Keyross writes it. → [MANIFESTO.md](MANIFESTO.md)
-
-## The yoke
-
-One line couples an agent to its gauges:
-
-```python
-from keyross.yoke import Yoke
-agent = create_deep_agent(..., middleware=[Yoke(gauge="einvoice")])   # Deep Agents / LangChain
-```
-
-Think of a wheel alignment. The model runs straight; the rules run straight; without a yoke they do not run *parallel*, and the output drifts a little at every step — until an error ships with a confident sentence. The yoke measures after every writing tool: red means revert and retry — a pit stop — and only the rule ids come back; green means continue. Over time the **first-pass rate** — green without a retry, `keyross stats` — is the health of the whole system: a falling rate means the model, the data or the rules drifted.
-
-![Without a yoke the output drifts until it ships; with a yoke every writing tool pulls it back — first-pass rate, measured](docs/yoke.gif)
-
-The yoke measures; it does not bound: budgets and protected columns stay in your harness. How it works, backends, plain LangChain agents: [src/keyross/yoke](src/keyross/yoke/README.md).
-
-## A gauge is not a skill, a prompt or an instruction file
-
-A Claude Code skill, a system prompt, a `CLAUDE.md`: text that a model reads and may or may not follow. A gauge is the opposite: **code that a model never reads**. *A skill asks. A gauge measures.*
-
-| | A skill / prompt | A gauge |
-|---|---|---|
-| What it is | instructions to a model | code: checks, official validators, bad cases that test them |
-| Who runs it | the model, at its discretion | the harness, the CI — never the model |
-| Result | a behaviour, probabilistic | a verdict, deterministic: the same document, the same flag, forever |
-| Can the agent see it? | yes, it is in its context | no — it receives a flag and the rule ids |
-
-## The registry
-
-Rules live in gauges — versioned, tested against their bad cases, updated from one place; a gauge knows the revision of the standard it implements. Think Semgrep's rule registry, for documents.
-
-```bash
-keyross gauges                # installed gauges vs the registry
-keyross add einvoice          # install a gauge, pin it in keyross.lock
-keyross outdated              # are we on the latest rules?
-```
-
-`update` and `audit` arrive in 0.3, signed gauges in 0.4. Format: [docs/spec/gauge.md](docs/spec/gauge.md).
-
-## Plugging it into a stack
-
-| Level | How | Status |
-|---|---|---|
-| 0 — scrutineering in CI | `keyross gate outputs/ --fail-on hard`: every gauge replayed outside the agent, an exit code, like pytest | shipped |
-| 1 — the yoke, in the loop | `Yoke(gauge=...)` in a Deep Agents or LangChain agent — `pip install "keyross[yoke]"` | shipped |
-| 2 — the Claude Code hook | a `PostToolUse` hook runs `keyross check` on every file the agent writes — code the harness executes, not a skill | 0.5 |
-| 3 — the yoke, as a service | `keyross serve --mcp`, called by the platform, invisible to the model | 0.5 |
-
-Nothing requires an account, a cloud or a cluster. Everything runs locally. Where each door sits and what comes out of it: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-
-## Going further
-
-- [docs/CONCEPTS.md](docs/CONCEPTS.md) — invariants, contracts and sentinels; the flags, including black; the rules the tool enforces; writing an oracle
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — where the gauges run, what comes out of every door
-- [bench/einvoice](bench/einvoice/README.md) — the same agent without the yoke, with the official rules, and with the rules and the order, graded by judges that are not Keyross; pre-registered protocol
-- [GAUGES.md](GAUGES.md) · [CONTRIBUTING.md](CONTRIBUTING.md) · [GOVERNANCE.md](GOVERNANCE.md) · [SECURITY.md](SECURITY.md)
+Every check writes a report; the lock pins what ran; `keyross gate` replays it all outside the agent. A real example to replay: [docs/audit-trail.md](docs/audit-trail.md).
 
 ## Status and roadmap
 
-`0.1` — check, gate, test, lint, lock, report, static doctor; the `core` gauge and the homologated [`einvoice`](src/keyross/gauges/einvoice/README.md) gauge (the official CEN EN 16931 artefacts 1.3.16, executed unmodified, and delta oracles: the invoice against its order); the Deep Agents / LangChain yoke and `keyross stats` · `0.2` — the XML schema step in `einvoice`, Factur-X PDF, more delta oracles (supplier master data, the `issue_invoice` contract) · `0.3` — gauges from git, `update` / `audit`, the seal · `0.4` — signed gauges, doctor on a throwaway cluster, CI action · `0.5` — the Claude Code hook and plugin, the MCP server · then `dora.register`, `aiact.annex4`, `governance`.
+**0.1.2 (this release)** — the front page: the stack diagram, the GitHub Action, the audit trail, Discussions. Planned next, in this order — an order, not a promise of dates:
 
-This repository verifies itself: its CI runs `keyross test`, `keyross lint` and `keyross lock --check` on every commit.
+- **0.1.3** — `rules`: your `AGENTS.md` / `CLAUDE.md` rules enforced on every commit, and the `pre-commit` hook
+- **0.1.4** — `payments` in `packages/`; the Claude Code hook
+- **0.2** — `keyross add` copies packages from this repository's index; the XML schema step in `einvoice`; native hooks for Codex CLI and Gemini CLI; a benchmark of rules across coding agents
+- **0.3** — what is really finished of the above
+- **Later** — `keyross new` (write a verifier, prove it on its bad cases), an MCP server
+
+This repository verifies itself: its CI runs 81 tests, `keyross test`, `keyross lint`, `keyross lock --check` and the GitHub Action on every commit.
+
+## Going further
+
+- [docs/audit-trail.md](docs/audit-trail.md) — what was verified, and how a third party replays it
+- [docs/CONCEPTS.md](docs/CONCEPTS.md) — invariants, contracts and sentinels; the flags; writing an oracle
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — where the gauges run, what comes out of every door
+- [MANIFESTO.md](MANIFESTO.md) · [GAUGES.md](GAUGES.md) · [CONTRIBUTING.md](CONTRIBUTING.md) · [GOVERNANCE.md](GOVERNANCE.md) · [SECURITY.md](SECURITY.md)
+
+## Who maintains this
+
+Keyross is written and maintained by [Wassim Amri](https://github.com/amri-wassim), a practitioner who builds agents for documents where an error costs money. Issues and Discussions are read; security reports go through [SECURITY.md](SECURITY.md).
 
 ## License
 
-[Apache-2.0](LICENSE). The engine and the public gauges are open; contributions under the Developer Certificate of Origin (`git commit -s`), no CLA. Sector gauges written on a mission belong to the client unless generalized and contributed back.
+[Apache-2.0](LICENSE). The engine and the public gauges are open, and stay open; contributions under the Developer Certificate of Origin (`git commit -s`), no CLA. Cite it: [10.5281/zenodo.22938584](https://doi.org/10.5281/zenodo.22938584).
