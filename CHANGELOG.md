@@ -1,7 +1,9 @@
 # Changelog
 
 ## Unreleased
+- planned for 0.1.2 (3 October 2026), a release of the front page, with no new gauge: a README whose first screen says what Keyross does; the repository's description and topics; one public roadmap in the README, GAUGES.md and the gauge index; the stubs moved (`action/` becomes `integrations/github-action/`, a composite action that runs `keyross gate`; `demo-k8s/` becomes `examples/k8s/`, marked planned); `docs/audit-trail.md`; GitHub Discussions with a "Wanted verifier" template
 - docs: the French translations leave the repository (README.fr.md, MANIFESTO.fr.md); French will live on keyross.org
+- repository: the description and the topics say what Keyross is — ready-to-use verifiers for an agent loop, official rules compiled into checks, pinned, deterministic, replayable
 
 ## 0.1.1 (25 September 2026)
 - the archive: Keyross is on Zenodo, DOI 10.5281/zenodo.22938584 (every version); the badge in the README, the DOI in CITATION.cff
