@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" font-family="DejaVu Sans, Helvetica Neue, Arial, sans-serif">
+<title>Where Keyross fits in your agent stack</title>
+<rect width="1280" height="720" fill="#2b3238"/>
+<text x="60" y="84" font-size="40" font-weight="bold" fill="#e9ecef">Where Keyross fits in your agent stack</text>
+<text x="60" y="118" font-size="20" fill="#a7b0b8">Models think. Agents write. Keyross verifies — before anything leaves the loop.</text>
+<rect x="60" y="170" width="230" height="300" rx="10" fill="#384047" stroke="#505860" stroke-width="2"/>
+<text x="80" y="214" font-size="26" font-weight="bold" fill="#e9ecef">MODELS</text>
+<text x="80" y="240" font-size="18" fill="#a7b0b8">think</text>
+<rect x="320" y="170" width="230" height="300" rx="10" fill="#384047" stroke="#505860" stroke-width="2"/>
+<text x="340" y="214" font-size="26" font-weight="bold" fill="#e9ecef">AGENTS</text>
+<text x="340" y="240" font-size="18" fill="#a7b0b8">write</text>
+<rect x="1030" y="170" width="190" height="300" rx="10" fill="#384047" stroke="#505860" stroke-width="2"/>
+<text x="1050" y="214" font-size="26" font-weight="bold" fill="#e9ecef">THE WORLD</text>
+<text x="1050" y="240" font-size="18" fill="#a7b0b8">ships</text>
+<rect x="580" y="154" width="420" height="332" rx="14" fill="#faf7ec" stroke="#22a04a" stroke-width="4"/>
+<text x="602" y="200" font-size="30" font-weight="bold" fill="#17212b">KEYROSS</text>
+<text x="602" y="228" font-size="20" fill="#5b6772">verifies</text>
+<g font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="15" fill="#e9ecef">
+<text x="80" y="280">Claude · GPT · Gemini</text>
+<text x="80" y="304">Mistral · open weights</text>
+<text x="80" y="352">reason, plan, draft</text>
+<text x="340" y="280">Claude Code</text>
+<text x="340" y="304">Codex CLI · Gemini CLI</text>
+<text x="340" y="328">LangChain · Deep Agents</text>
+<text x="340" y="352">your own loop</text>
+<text x="340" y="400">prompts, plans, writes</text>
+<text x="1050" y="280">commits &amp; PRs</text>
+<text x="1050" y="328">invoices &amp; docs</text>
+<text x="1050" y="376">payments &amp; actions</text>
+<text x="1050" y="424">the things you can&#x27;t</text>
+<text x="1050" y="448">take back</text>
+</g>
+<text x="602" y="264" font-size="14" font-weight="bold" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#5b6772">verifiers</text>
+<rect x="700" y="253" width="12" height="12" rx="2" fill="#17212b"/>
+<text x="717" y="264" font-size="12" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#5b6772">shipped</text>
+<rect x="790" y="253" width="12" height="12" rx="2" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/>
+<text x="807" y="264" font-size="12" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#5b6772">planned</text>
+<g font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="13" font-weight="bold" text-anchor="middle">
+<rect x="602" y="276" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="293" fill="#5b6772">rules</text>
+<rect x="602" y="305" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="322" fill="#5b6772">comments</text>
+<rect x="602" y="334" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="351" fill="#5b6772">pr</text>
+<rect x="602" y="363" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="380" fill="#5b6772">expense</text>
+<rect x="602" y="392" width="96" height="24" rx="5" fill="#17212b"/><text x="650" y="409" fill="#faf7ec">einvoice</text>
+<rect x="602" y="421" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="438" fill="#5b6772">payments</text>
+</g>
+<g font-size="14" fill="#17212b">
+<text x="708" y="293">your CLAUDE.md rules, on every commit</text>
+<text x="708" y="322">the code&#x27;s comments, kept fresh</text>
+<text x="708" y="351">what the agent claims vs what git saw</text>
+<text x="708" y="380">totals, dates, policy, receipts</text>
+<text x="708" y="409">EN 16931 — official rules, unmodified</text>
+<text x="708" y="438">IBAN · master data · duplicates · sanctions</text>
+</g>
+<text x="602" y="466" font-size="13" font-weight="bold" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#22a04a">deterministic · rule ids · no model · locked</text>
+<line x1="292" y1="320" x2="306" y2="320" stroke="#a7b0b8" stroke-width="3"/><polygon points="318,320 304,312 304,328" fill="#a7b0b8"/>
+<line x1="552" y1="320" x2="566" y2="320" stroke="#a7b0b8" stroke-width="3"/><polygon points="578,320 564,312 564,328" fill="#a7b0b8"/>
+<line x1="1002" y1="320" x2="1016" y2="320" stroke="#22a04a" stroke-width="4"/><polygon points="1028,320 1014,312 1014,328" fill="#22a04a"/>
+<text x="1000" y="140" font-size="13" font-weight="bold" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#22a04a" text-anchor="middle">green: ships, with a report · audit receipt (planned)</text>
+<path d="M 700 486 C 700 554, 440 554, 440 474" fill="none" stroke="#c8281b" stroke-width="3"/><polygon points="440,472 432,488 448,488" fill="#c8281b"/>
+<text x="570" y="572" font-size="13" font-weight="bold" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#ff8a7a" text-anchor="middle">red: the write is reverted, the rule ids go back to the agent, it rewrites</text>
+<rect x="60" y="590" width="373" height="100" rx="8" fill="#384047" stroke="#505860" stroke-width="2"/>
+<text x="76" y="612" font-size="12" font-weight="bold" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#a7b0b8">DEV</text>
+<text x="76" y="638" font-size="21" font-weight="bold" fill="#e9ecef">Review the verdicts, not the diff.</text>
+<text x="76" y="664" font-size="13" fill="#a7b0b8">With rules (planned): 45 files → 3 red lines.</text>
+<rect x="453" y="590" width="373" height="100" rx="8" fill="#384047" stroke="#505860" stroke-width="2"/>
+<text x="469" y="612" font-size="12" font-weight="bold" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#a7b0b8">CFO</text>
+<text x="469" y="638" font-size="21" font-weight="bold" fill="#e9ecef">Let the agent send it.</text>
+<text x="469" y="664" font-size="13" fill="#a7b0b8">Measured on invoices: 33 → 0 official-rule</text>
+<text x="469" y="681" font-size="13" fill="#a7b0b8">violations shipped per 100, with one model.</text>
+<rect x="846" y="590" width="373" height="100" rx="8" fill="#384047" stroke="#505860" stroke-width="2"/>
+<text x="862" y="612" font-size="12" font-weight="bold" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#a7b0b8">COMPLIANCE</text>
+<text x="862" y="638" font-size="21" font-weight="bold" fill="#e9ecef">Evidence, not trust.</text>
+<text x="862" y="664" font-size="13" fill="#a7b0b8">Report and lock, replayable by a third party.</text>
+<text x="862" y="681" font-size="13" fill="#a7b0b8">Audit receipt (planned).</text>
+<text x="60" y="712" font-size="13" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#a7b0b8">Tests verify it works. Keyross verifies what leaves the agent.   ·   pip install keyross   ·   keyross add einvoice</text>
+</svg>
