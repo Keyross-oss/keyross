@@ -7,3 +7,5 @@ tests/fixtures/** -text
 bench/einvoice/example/** -text
 # A published benchmark run is kept byte for byte: the invoices as the agent delivered them.
 bench/einvoice/results/** -text
+# The audit trail example is replayed byte for byte: the invoice as the agent delivered it.
+docs/audit-trail/** -text
