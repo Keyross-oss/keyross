@@ -1,0 +1,34 @@
+name: Keyross gate
+description: Replay the Keyross gate on a folder of agent outputs in CI — the same verdicts as in the agent loop, as an exit code.
+branding: { icon: check-square, color: green }
+inputs:
+  path:
+    description: The folder of outputs to gate (xlsx, csv, xml), relative to working-directory.
+    required: true
+  spec:
+    description: What pip installs — a version, extras or a path, e.g. "keyross[einvoice]==0.1.2" or ".[einvoice]".
+    default: keyross
+  fail-on:
+    description: "hard: fail on a red flag (default) · soft: fail on a yellow flag too."
+    default: hard
+  working-directory:
+    description: The folder that holds keyross.yaml (the gauges to load).
+    default: "."
+  python-version:
+    description: The Python version to run Keyross with.
+    default: "3.12"
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with: { python-version: "${{ inputs.python-version }}" }
+    - name: Install Keyross
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env: { SPEC: "${{ inputs.spec }}" }
+      run: python -m pip install --quiet "$SPEC"
+    - name: keyross gate
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env: { GATE_PATH: "${{ inputs.path }}", FAIL_ON: "${{ inputs.fail-on }}" }
+      run: keyross gate "$GATE_PATH" --fail-on "$FAIL_ON"

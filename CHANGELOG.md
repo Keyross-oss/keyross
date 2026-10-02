@@ -2,6 +2,7 @@
 
 ## Unreleased
 - planned for 0.1.2 (3 October 2026), a release of the front page, with no new gauge: a README whose first screen says what Keyross does; the repository's description and topics; one public roadmap in the README, GAUGES.md and the gauge index; the stubs moved (`action/` becomes `integrations/github-action/`, a composite action that runs `keyross gate`; `demo-k8s/` becomes `examples/k8s/`, marked planned); `docs/audit-trail.md`; GitHub Discussions with a "Wanted verifier" template
+- integrations: `action/` becomes `integrations/github-action/`, a composite action that installs Keyross and runs `keyross gate` on a folder; CI runs it on this repository on every commit (green on clean invoices, red on the bad set). `demo-k8s/` becomes `examples/k8s/`, marked planned, with no date
 - index: the gauge index lists what exists and what is planned in this repository — `core` and `einvoice`, then `rules` and `payments` (planned, `packages/`); `dora.register`, `aiact.annex4` and the commercial `governance` entry leave it
 - docs: the French translations leave the repository (README.fr.md, MANIFESTO.fr.md); French will live on keyross.org
 - repository: the description and the topics say what Keyross is — ready-to-use verifiers for an agent loop, official rules compiled into checks, pinned, deterministic, replayable

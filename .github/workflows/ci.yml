@@ -23,3 +23,18 @@ jobs:
       - run: keyross test          # the tests of the tests
       - run: keyross lint          # no model inside an oracle
       - run: keyross lock --check  # pinning is respected
+  action:                          # the GitHub Action of integrations/github-action, run on this repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: the gate passes on clean invoices
+        uses: ./integrations/github-action
+        with: { path: tests/fixtures/einvoice, spec: ".[einvoice]" }
+      - name: the gate fails on the bad set
+        id: bad
+        continue-on-error: true
+        uses: ./integrations/github-action
+        with: { path: src/keyross/gauges/einvoice/badset, spec: ".[einvoice]" }
+      - name: the red was a red
+        if: steps.bad.outcome != 'failure'
+        run: echo "the gate did not fail on the bad set" && exit 1
