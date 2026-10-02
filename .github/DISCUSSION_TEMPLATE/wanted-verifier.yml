@@ -1,0 +1,42 @@
+title: "Wanted: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A verifier is worth building when the truth is out of the agent's reach — git, an official rule, a registry, your own data — so that "be careful" cannot replace it. Tell us the document, where the truth lives, and what should turn red. Anonymise everything.
+  - type: input
+    id: document
+    attributes:
+      label: The document the agent writes
+      description: An invoice, a payment run, a visa application, a pull request, a legal brief…
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What the agent got wrong
+      description: A real case if you have one, anonymised. Valid but wrong is the most interesting kind.
+    validations:
+      required: true
+  - type: textarea
+    id: truth
+    attributes:
+      label: Where the truth lives
+      description: The official rule, register, list, standard or internal data that decides — and whether an official validator or test set already exists.
+    validations:
+      required: true
+  - type: textarea
+    id: checks
+    attributes:
+      label: The checks
+      description: One per line. Each one should be decidable by code alone and return a rule id when it fails.
+  - type: dropdown
+    id: who
+    attributes:
+      label: Would you build it?
+      options:
+        - I would like to write it, with help
+        - I can provide bad cases (wrong documents it must catch)
+        - I am asking for it
+    validations:
+      required: true
