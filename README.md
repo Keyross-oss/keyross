@@ -113,8 +113,6 @@ Nothing requires an account, a cloud or a cluster. Everything runs locally. Wher
 
 This repository verifies itself: its CI runs `keyross test`, `keyross lint` and `keyross lock --check` on every commit.
 
-*Version française : [README.fr.md](README.fr.md) · [MANIFESTO.fr.md](MANIFESTO.fr.md)*
-
 ## License
 
 [Apache-2.0](LICENSE). The engine and the public gauges are open; contributions under the Developer Certificate of Origin (`git commit -s`), no CLA. Sector gauges written on a mission belong to the client unless generalized and contributed back.
