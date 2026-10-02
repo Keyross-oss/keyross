@@ -36,20 +36,16 @@
 <rect x="790" y="253" width="12" height="12" rx="2" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/>
 <text x="807" y="264" font-size="12" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#5b6772">planned</text>
 <g font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="13" font-weight="bold" text-anchor="middle">
-<rect x="602" y="276" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="293" fill="#5b6772">rules</text>
-<rect x="602" y="305" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="322" fill="#5b6772">comments</text>
-<rect x="602" y="334" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="351" fill="#5b6772">pr</text>
-<rect x="602" y="363" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="380" fill="#5b6772">expense</text>
-<rect x="602" y="392" width="96" height="24" rx="5" fill="#17212b"/><text x="650" y="409" fill="#faf7ec">einvoice</text>
-<rect x="602" y="421" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="438" fill="#5b6772">payments</text>
+<rect x="602" y="282" width="96" height="24" rx="5" fill="#17212b"/><text x="650" y="299" fill="#faf7ec">einvoice</text>
+<rect x="602" y="321" width="96" height="24" rx="5" fill="#17212b"/><text x="650" y="338" fill="#faf7ec">core</text>
+<rect x="602" y="360" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="377" fill="#5b6772">rules</text>
+<rect x="602" y="399" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="416" fill="#5b6772">payments</text>
 </g>
 <g font-size="14" fill="#17212b">
-<text x="708" y="293">your CLAUDE.md rules, on every commit</text>
-<text x="708" y="322">the code&#x27;s comments, kept fresh</text>
-<text x="708" y="351">what the agent claims vs what git saw</text>
-<text x="708" y="380">totals, dates, policy, receipts</text>
-<text x="708" y="409">EN 16931 — official rules, unmodified</text>
-<text x="708" y="438">IBAN · master data · duplicates · sanctions</text>
+<text x="708" y="299">EN 16931 — official rules, unmodified</text>
+<text x="708" y="338">priced tables: totals, duplicates, units</text>
+<text x="708" y="377">your CLAUDE.md rules, on every commit</text>
+<text x="708" y="416">IBAN · master data · duplicates · sanctions</text>
 </g>
 <text x="602" y="466" font-size="13" font-weight="bold" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#22a04a">deterministic · rule ids · no model · locked</text>
 <line x1="292" y1="320" x2="306" y2="320" stroke="#a7b0b8" stroke-width="3"/><polygon points="318,320 304,312 304,328" fill="#a7b0b8"/>
@@ -61,7 +57,7 @@
 <rect x="60" y="590" width="373" height="100" rx="8" fill="#384047" stroke="#505860" stroke-width="2"/>
 <text x="76" y="612" font-size="12" font-weight="bold" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#a7b0b8">DEV</text>
 <text x="76" y="638" font-size="21" font-weight="bold" fill="#e9ecef">Review the verdicts, not the diff.</text>
-<text x="76" y="664" font-size="13" fill="#a7b0b8">With rules (planned): 45 files → 3 red lines.</text>
+<text x="76" y="664" font-size="13" fill="#a7b0b8">In CI: keyross gate — exit 0 / 1 / 2.</text>
 <rect x="453" y="590" width="373" height="100" rx="8" fill="#384047" stroke="#505860" stroke-width="2"/>
 <text x="469" y="612" font-size="12" font-weight="bold" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#a7b0b8">CFO</text>
 <text x="469" y="638" font-size="21" font-weight="bold" fill="#e9ecef">Let the agent send it.</text>
@@ -72,5 +68,5 @@
 <text x="862" y="638" font-size="21" font-weight="bold" fill="#e9ecef">Evidence, not trust.</text>
 <text x="862" y="664" font-size="13" fill="#a7b0b8">Report and lock, replayable by a third party.</text>
 <text x="862" y="681" font-size="13" fill="#a7b0b8">Audit receipt (planned).</text>
-<text x="60" y="712" font-size="13" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#a7b0b8">Tests verify it works. Keyross verifies what leaves the agent.   ·   pip install keyross   ·   keyross add einvoice</text>
+<text x="60" y="712" font-size="13" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#a7b0b8">Tests verify it works. Keyross verifies what leaves the agent.   ·   pip install "keyross[einvoice]"   ·   keyross add einvoice</text>
 </svg>

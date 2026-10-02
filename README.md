@@ -99,10 +99,9 @@ Every check writes a report; the lock pins what ran; `keyross gate` replays it a
 - **0.1.3** — `rules`: your `AGENTS.md` / `CLAUDE.md` rules enforced on every commit, and the `pre-commit` hook
 - **0.1.4** — `payments` in `packages/`; the Claude Code hook
 - **0.2** — `keyross add` copies packages from this repository's index; the XML schema step in `einvoice`; native hooks for Codex CLI and Gemini CLI; a benchmark of rules across coding agents
-- **0.3** — what is really finished of the above
 - **Later** — `keyross new` (write a verifier, prove it on its bad cases), an MCP server
 
-This repository verifies itself: its CI runs 81 tests, `keyross test`, `keyross lint`, `keyross lock --check` and the GitHub Action on every commit.
+This repository verifies itself: on every commit, its CI runs the tests (one checks the table above against the benchmark's raw results), `keyross test`, `keyross lint`, `keyross lock --check` and the GitHub Action.
 
 ## Going further
 
