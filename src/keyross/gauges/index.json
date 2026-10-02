@@ -4,6 +4,9 @@
     "core": { "latest": "0.1.0", "source": "builtin:keyross.gauges.core", "license": "Apache-2.0", "owner": "keyross" },
     "einvoice": { "latest": "0.2.0", "source": "builtin:keyross.gauges.einvoice", "license": "Apache-2.0", "owner": "keyross", "requires": "keyross[einvoice]" },
     "rules": { "latest": null, "source": "github:Keyross-oss/keyross/packages/rules", "license": "Apache-2.0", "owner": "keyross", "status": "planned" },
+    "comments": { "latest": null, "source": "github:Keyross-oss/keyross/packages/comments", "license": "Apache-2.0", "owner": "keyross", "status": "planned" },
+    "pr": { "latest": null, "source": "github:Keyross-oss/keyross/packages/pr", "license": "Apache-2.0", "owner": "keyross", "status": "planned" },
+    "expense": { "latest": null, "source": "github:Keyross-oss/keyross/packages/expense", "license": "Apache-2.0", "owner": "keyross", "status": "planned" },
     "payments": { "latest": null, "source": "github:Keyross-oss/keyross/packages/payments", "license": "Apache-2.0", "owner": "keyross", "status": "planned" }
   }
 }

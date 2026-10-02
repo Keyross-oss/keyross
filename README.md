@@ -43,6 +43,9 @@ Protocol, raw data, every delivered invoice, a blind human review (21/21 agree w
 | `einvoice` | **shipped** | EN 16931 invoices (UBL, CII — the XML of Factur-X): the official CEN rules, and the invoice against its order |
 | `core` | **shipped** | priced tables — quotes, bills of quantities: totals, duplicates, units, numbering, rows conserved |
 | `rules` | planned | your `AGENTS.md` / `CLAUDE.md` rules — scope, file size, tests, dependencies, public API — run on the diff, git as the only truth |
+| `comments` | planned | the comments and docstrings an agent writes or leaves behind, against the code: parameters, names and references that still exist |
+| `pr` | planned | a pull request's description against what git saw: the files it says it changed, the tests it says it added |
+| `expense` | planned | an expense report against its receipts and the expense policy: totals, dates, ceilings, duplicates |
 | `payments` | planned | a payment run against what it cannot rewrite: supplier master data, open invoices, IBAN checksum, sanctions lists |
 
 Want one that is not here? Open a discussion in [**Wanted verifier**](https://github.com/Keyross-oss/keyross/discussions/new?category=wanted-verifier): the document your agent got wrong, and where the truth lives. More in [GAUGES.md](GAUGES.md).
@@ -99,7 +102,7 @@ Every check writes a report; the lock pins what ran; `keyross gate` replays it a
 - **0.1.3** — `rules`: your `AGENTS.md` / `CLAUDE.md` rules enforced on every commit, and the `pre-commit` hook
 - **0.1.4** — `payments` in `packages/`; the Claude Code hook
 - **0.2** — `keyross add` copies packages from this repository's index; the XML schema step in `einvoice`; native hooks for Codex CLI and Gemini CLI; a benchmark of rules across coding agents
-- **Later** — `keyross new` (write a verifier, prove it on its bad cases), an MCP server
+- **Later** — `comments`, `pr` and `expense`; `keyross new` (write a verifier, prove it on its bad cases); an MCP server
 
 This repository verifies itself: on every commit, its CI runs the tests (one checks the table above against the benchmark's raw results), `keyross test`, `keyross lint`, `keyross lock --check` and the GitHub Action.
 

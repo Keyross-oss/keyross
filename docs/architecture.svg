@@ -13,11 +13,11 @@
 <text x="386" y="218" font-size="15" font-style="italic" text-anchor="start" fill="#6A7179">official EN 16931 Schematron</text>
 <text x="386" y="238" font-size="15" font-style="italic" text-anchor="start" fill="#6A7179">homologated + delta oracles</text>
 <rect x="664" y="166" width="272" height="78" rx="12" fill="#FFFFFF" stroke="#2C6E78" stroke-width="2.5"/>
-<text x="678" y="194" font-size="21" font-weight="700" text-anchor="start" fill="#1A2C4E">rules</text>
-<text x="678" y="218" font-size="15" font-style="italic" text-anchor="start" fill="#6A7179">planned · your rules on the diff</text>
+<text x="678" y="194" font-size="21" font-weight="700" text-anchor="start" fill="#1A2C4E">rules · pr · comments</text>
+<text x="678" y="218" font-size="15" font-style="italic" text-anchor="start" fill="#6A7179">planned · on the diff, with git</text>
 <rect x="956" y="166" width="272" height="78" rx="12" fill="#FFFFFF" stroke="#2C6E78" stroke-width="2.5"/>
-<text x="970" y="194" font-size="21" font-weight="700" text-anchor="start" fill="#1A2C4E">payments</text>
-<text x="970" y="218" font-size="15" font-style="italic" text-anchor="start" fill="#6A7179">planned · IBAN, master data</text>
+<text x="970" y="194" font-size="21" font-weight="700" text-anchor="start" fill="#1A2C4E">expense · payments</text>
+<text x="970" y="218" font-size="15" font-style="italic" text-anchor="start" fill="#6A7179">planned · receipts, master data</text>
 <rect x="1248" y="166" width="272" height="78" rx="12" fill="#FFFFFF" stroke="#2C6E78" stroke-width="2.5"/>
 <text x="1262" y="194" font-size="21" font-weight="700" text-anchor="start" fill="#1A2C4E">yours</text>
 <text x="1262" y="218" font-size="15" font-style="italic" text-anchor="start" fill="#6A7179">your oracles + reference data</text>

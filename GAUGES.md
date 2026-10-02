@@ -17,6 +17,9 @@ Two homes. **Built-in gauges** ship inside the `keyross` package (`core`, `einvo
 | `core` | **shipped** | priced tables (quotes, bills of quantities, any priced sheet): schema, totals, duplicates, unit vocabulary, numbering, conservation (a sentinel); the `delete_rows` contract | ours |
 | `einvoice` | **shipped** (gauge 0.2.0) | EN 16931 electronic invoices (UBL, CII — the XML of Factur-X): the official CEN validation artefacts 1.3.16 run unmodified, one oracle per rule id (1,562), offline, pinned by SHA-256; delta oracles that check the invoice against its order. Measured in a [pre-registered benchmark](bench/einvoice/README.md) | official, never rewritten |
 | `rules` | planned | your `AGENTS.md` / `CLAUDE.md` rules — scope, file size, tests, dependencies, public API, secrets — run on the diff, with git as the only truth | yours, in ten lines |
+| `comments` | planned | the comments and docstrings in a diff, against the code they describe: documented parameters that match the signature, names and references that still exist | the code itself, in git |
+| `pr` | planned | a pull request's description against what git saw: the files it says it changed, the tests it says it added | git |
+| `expense` | planned | an expense report against its receipts and the expense policy: totals, dates, ceilings, duplicates | your policy, as data |
 | `payments` | planned | a payment run checked against what the run cannot rewrite: the supplier master data, the open invoices, the IBAN checksum, sanctions lists, the bank calendar | ISO 13616, ISO 20022, official lists |
 
 The same list is in the registry index (`src/keyross/gauges/index.json`), which `keyross gauges` reads. Nothing planned is announced as shipped; a planned gauge appears here when its first version is in this repository with its bad cases.

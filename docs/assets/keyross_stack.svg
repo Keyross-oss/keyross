@@ -36,18 +36,24 @@
 <rect x="790" y="253" width="12" height="12" rx="2" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/>
 <text x="807" y="264" font-size="12" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#5b6772">planned</text>
 <g font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="13" font-weight="bold" text-anchor="middle">
-<rect x="602" y="282" width="96" height="24" rx="5" fill="#17212b"/><text x="650" y="299" fill="#faf7ec">einvoice</text>
-<rect x="602" y="321" width="96" height="24" rx="5" fill="#17212b"/><text x="650" y="338" fill="#faf7ec">core</text>
-<rect x="602" y="360" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="377" fill="#5b6772">rules</text>
-<rect x="602" y="399" width="96" height="24" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="416" fill="#5b6772">payments</text>
+<rect x="602" y="272" width="96" height="22" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="288" fill="#5b6772">rules</text>
+<rect x="602" y="298" width="96" height="22" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="314" fill="#5b6772">comments</text>
+<rect x="602" y="324" width="96" height="22" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="340" fill="#5b6772">pr</text>
+<rect x="602" y="350" width="96" height="22" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="366" fill="#5b6772">expense</text>
+<rect x="602" y="376" width="96" height="22" rx="5" fill="#17212b"/><text x="650" y="392" fill="#faf7ec">einvoice</text>
+<rect x="602" y="402" width="96" height="22" rx="5" fill="#17212b"/><text x="650" y="418" fill="#faf7ec">core</text>
+<rect x="602" y="428" width="96" height="22" rx="5" fill="#ebe5d3" stroke="#8a948f" stroke-width="1.2"/><text x="650" y="444" fill="#5b6772">payments</text>
 </g>
 <g font-size="14" fill="#17212b">
-<text x="708" y="299">EN 16931 — official rules, unmodified</text>
-<text x="708" y="338">priced tables: totals, duplicates, units</text>
-<text x="708" y="377">your CLAUDE.md rules, on every commit</text>
-<text x="708" y="416">IBAN · master data · duplicates · sanctions</text>
+<text x="708" y="288">your CLAUDE.md rules, on every commit</text>
+<text x="708" y="314">the code&#x27;s comments, kept fresh</text>
+<text x="708" y="340">what the agent claims vs what git saw</text>
+<text x="708" y="366">totals, dates, policy, receipts</text>
+<text x="708" y="392">EN 16931 — official rules, unmodified</text>
+<text x="708" y="418">priced tables: totals, duplicates, units</text>
+<text x="708" y="444">IBAN · master data · duplicates · sanctions</text>
 </g>
-<text x="602" y="466" font-size="13" font-weight="bold" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#22a04a">deterministic · rule ids · no model · locked</text>
+<text x="602" y="472" font-size="13" font-weight="bold" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" fill="#22a04a">deterministic · rule ids · no model · locked</text>
 <line x1="292" y1="320" x2="306" y2="320" stroke="#a7b0b8" stroke-width="3"/><polygon points="318,320 304,312 304,328" fill="#a7b0b8"/>
 <line x1="552" y1="320" x2="566" y2="320" stroke="#a7b0b8" stroke-width="3"/><polygon points="578,320 564,312 564,328" fill="#a7b0b8"/>
 <line x1="1002" y1="320" x2="1016" y2="320" stroke="#22a04a" stroke-width="4"/><polygon points="1028,320 1014,312 1014,328" fill="#22a04a"/>

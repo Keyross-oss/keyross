@@ -2,7 +2,7 @@
 
 ![Full architecture: registry → installed gauges → three doors → outputs](architecture.png)
 
-**The registry** (`keyross gauges · add · outdated`) holds the gauges: `core`, `einvoice` (the official CEN EN 16931 artefacts, run unmodified, and delta oracles against the order), the planned packages (`rules`, `payments`), and yours. **Installed gauges** are pinned in `keyross.lock` — ids, versions, checksums of the official artifacts — and deployed where the documents are: your machine, your CI, your cluster. Never a SaaS that receives files.
+**The registry** (`keyross gauges · add · outdated`) holds the gauges: `core`, `einvoice` (the official CEN EN 16931 artefacts, run unmodified, and delta oracles against the order), the planned packages (`rules`, `comments`, `pr`, `expense`, `payments`), and yours. **Installed gauges** are pinned in `keyross.lock` — ids, versions, checksums of the official artifacts — and deployed where the documents are: your machine, your CI, your cluster. Never a SaaS that receives files.
 
 ## Three doors — two yokes and scrutineering
 
