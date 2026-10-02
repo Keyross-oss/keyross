@@ -1,47 +1,44 @@
 # Gauges — the registry
 
-*A gauge is the installable instrument: a versioned, calibrated set of oracles for one document family. Official validators adapted (homologated), your own oracles added. Gauges measure; the yoke couples your agent to them; scrutineering decides.*
+*A gauge is the unit: a versioned set of oracles for one document family, tested against its bad cases and pinned by the lock. Official rules run unmodified; your own checks are added. Gauges measure; the yoke couples your agent to them; flags decide what ships.*
 
-`keyross gauges` · `keyross add <gauge>@<version>` · `keyross outdated` · `keyross update` (0.3). Every gauge is a versioned, signed unit with its own badset and a changelog that cites the revision of the standard behind each version. Format: [docs/spec/gauge.md](docs/spec/gauge.md).
+`keyross gauges` · `keyross add <gauge>` · `keyross outdated`. Format: [docs/spec/gauge.md](docs/spec/gauge.md).
 
-The goal of this repository is to **make agents accountable to the compilers that official documents already have — and to write the ones they don't**. Official standards ship their own validators (the CEN Schematron for EN 16931 invoices, the ESAs' validation rules for the DORA register): we do not rewrite those rules. A gauge **wraps the official validator as an oracle** — pinned by release and checksum, executed by the harness, minimal feedback to the agent, replayed at the gate — and adds the **delta oracles** the standard cannot know: cross-document consistency, the client's reference data, the action contracts of the agent. Pick one below, or propose yours.
+Two homes. **Built-in gauges** ship inside the `keyross` package (`core`, `einvoice`). **Packages** will live in `packages/<name>/` in this repository, and `keyross add` will copy them into yours from this repository's index (0.2): you read the code, you own it, the lock pins it.
 
-**Rule of the house: if a public validator exists, the gauge adapts it; it never reimplements it.** A verdict that disagrees with the official validator is a bug in the gauge.
+**Rule of the house: if a public validator exists, the gauge runs it; it never reimplements it.** A verdict that disagrees with the official validator is a bug in the gauge. Then the gauge adds the **delta oracles** the standard cannot know: your reference data, consistency across documents, the contracts of the agent's actions.
 
-**A gauge is code, not a skill or a prompt.** It contains oracles (pure functions), adapters that execute official validators pinned by version and checksum, and the bad cases that test them. Nothing in a gauge is ever read by a model; the model only receives a flag and a category. A gauge that ships a prompt file, a `CLAUDE.md` or instructions to a model is not a gauge and is not merged.
+**A gauge is code, not a skill or a prompt.** It contains oracles (pure functions), adapters that execute official validators pinned by version and checksum, and the bad cases that test them. Nothing in a gauge is ever read by a model; the model only receives a flag and a category. A gauge that ships a prompt file, a `CLAUDE.md` or instructions to a model is not merged.
 
-## Gauges, in order of priority
+## On the shelf
 
-| # | Gauge | Status | What it compiles | Rules | Deadline / driver | Owner |
-|---|---|---|---|---|---|---|
-| 1 | `core` | **shipped (0.1)** | the universal invariants of priced documents: schema, totals, duplicates, unit vocabulary, numbering, conservation (sentinel); `delete_rows` contract | ours | — | maintainers |
-| 2 | `einvoice` | **adapter shipped (0.1.0)** — delta oracles next | electronic invoices — EN 16931 (Factur-X, UBL, CII), Peppol BIS Billing. **Adapter** (shipped): runs the official CEN validation artefacts 1.3.16 unmodified (Saxon-HE, offline) as one oracle per rule id — 1,562 ids, BR-*, BR-CO-*, BR-CL-*, syntax rules — pinned by release + SHA-256, one bad case per rule family; **delta oracles**: invoice vs order / delivery, supplier and contract reference data, agent action contracts | official validators exist (ConnectingEurope/eInvoicing-EN16931, KoSIT, phive, easybill, Klarfakt) — reused, never rewritten | e-invoicing mandatory in several member states; France rolling out since September 2026 | wanted — good first gauge |
-| 3 | `dora.register` | planned | the DORA Register of Information (xBRL-CSV, 15 templates). **Adapter**: the ESAs' published validation rules and the open validators (DORA ROI Validator — Python, MIT; `dora-lei-check` for LEI status); **delta oracles**: register vs the contracts and the localisation table actually held by the entity, third parties called by agents vs third parties declared | official rules + open validators exist — reused | annual submission by every EU financial entity | Keyross |
-| 4 | `aiact.annex4` | planned | the EU AI Act technical documentation (Annex IV). Scaffolds exist (`plusultra-tools/ai-act-conformity-pack`); the Keyross oracle is the part nobody has: **consistency of the documentation with the actual traces** of the telemetry (versions, human oversight, logging, third parties) | EU regulation | 2 December 2027 | Keyross |
-| 5 | `governance` | planned | the behavioural evidence read from the telemetry: pinned versions, decision linkage, gate executed, human oversight, masked egress, third parties declared, retention, incident timeline, sentinel coverage, policy promotion, canary alive, registry complete. Complementary to the governance planes that enforce *permissions* and keep *audit chains* (Agent Governance Toolkit, Regulus, air-adk-trust): they say who may call what; these oracles say whether the outputs were verified and how | ours | audits (DORA, AI Act) | maintainers |
-| 6 | `security` | planned | OWASP-style checks on the loop: tool order respected, footprint bounded, no secret in outputs or logs, egress to declared hosts only, injection markers in inputs | ours | — | wanted |
-| — | `construction.quotes` | calibration field | bills of quantities and quotes (DCE / devis) — the first real field, used to calibrate `core`; not a headline gauge | ours | — | Keyross |
+| Gauge | Status | What it checks | Rules |
+|---|---|---|---|
+| `core` | **shipped** | priced tables (quotes, bills of quantities, any priced sheet): schema, totals, duplicates, unit vocabulary, numbering, conservation (a sentinel); the `delete_rows` contract | ours |
+| `einvoice` | **shipped** (gauge 0.2.0) | EN 16931 electronic invoices (UBL, CII — the XML of Factur-X): the official CEN validation artefacts 1.3.16 run unmodified, one oracle per rule id (1,562), offline, pinned by SHA-256; delta oracles that check the invoice against its order. Measured in a [pre-registered benchmark](bench/einvoice/README.md) | official, never rewritten |
+| `rules` | planned | your `AGENTS.md` / `CLAUDE.md` rules — scope, file size, tests, dependencies, public API, secrets — run on the diff, with git as the only truth | yours, in ten lines |
+| `payments` | planned | a payment run checked against what the run cannot rewrite: the supplier master data, the open invoices, the IBAN checksum, sanctions lists, the bank calendar | ISO 13616, ISO 20022, official lists |
+
+The same list is in the registry index (`src/keyross/gauges/index.json`), which `keyross gauges` reads. Nothing planned is announced as shipped; a planned gauge appears here when its first version is in this repository with its bad cases.
+
+**Want a verifier that is not here?** Tell us the document your agent got wrong, and where the truth lives: open a discussion in the **Wanted verifier** category.
 
 ## Good first contributions
 
-**For `einvoice` — the adapter, not the rules.** The BR-* rules already exist as official Schematron; do not rewrite them.
+**For `einvoice` — the gauge, never the rules.** The BR-* rules already exist as official Schematron; do not rewrite them.
 
-- ~~`einvoice.schematron`~~ and ~~the UBL / CII loaders to the canonical `Invoice`~~ — shipped in 0.1.0 ([gauge README](src/keyross/gauges/einvoice/README.md))
+- ~~`einvoice.schematron`~~, ~~the UBL / CII loaders~~ — shipped in 0.1.0; ~~`einvoice.delta.order_match`~~ — shipped in gauge 0.2.0 as `einvoice.delta.order.header`, `.lines`, `.vat`, `.totals` ([gauge README](src/keyross/gauges/einvoice/README.md))
+- `einvoice.dates.ordered` — the payment due date (BT-9) is not before the issue date (BT-2): no EN 16931 rule checks it. Load BT-9 in the UBL and CII loaders, write the oracle, add one bad invoice
 - `einvoice.facturx.pdf` — extract the CII XML embedded in a Factur-X PDF, offline, then run the same adapter
-- `einvoice.delta.order_match` — invoice lines vs the purchase order (quantities, prices, references) — a delta oracle the standard cannot know
-- `einvoice.delta.supplier_reference` — seller identifiers vs the client's supplier master data
+- `einvoice.delta.supplier_reference` — seller identifiers against the client's supplier master data
 - `einvoice.contract.issue_invoice` — the action contract of an agent that issues an invoice: what it announced is what was written
 
-**Generic, useful today**
-
-- `core.amount.sign` — no negative amount unless the document type allows credit lines
-- `core.line.qty_pu_amount` — every priced line has all three of qty, unit price, amount, or none
-- `core.dates.ordered` — issue date ≤ due date; no future date beyond a tolerance
+**For `core` — needs real documents first.** `core.amount.sign` (a negative amount is legitimate on a discount or a credit line) and `core.line.qty_pu_amount` (lump-sum and "for the record" lines carry no unit price) only make sense once calibrated on real priced tables; bring a few anonymised ones with the proposal.
 
 Open an issue with the **New oracle** template; the bad case is half of the work.
 
 ## Where the gauges plug in
 
-- **Level 0** — `keyross gate` in CI, on the files your systems already produce.
-- **Level 1** — inside the loop: the Deep Agents / LangChain middleware; the **Claude Code hook** (`PostToolUse`) and the **Claude Code plugin**, so every invoice, spreadsheet, CSV or YAML an agent writes is compiled where the developer already works.
-- **Level 2** — as a service: the MCP server (`keyross serve --mcp`), callable from any harness (Claude, Codex, Deep Agents, platforms).
+- **In CI** — `keyross gate` on a folder of outputs, or the [GitHub Action](integrations/github-action/README.md) (shipped). A `pre-commit` hook is planned.
+- **In the loop** — the [yoke](src/keyross/yoke/README.md) for Deep Agents and LangChain (shipped): every write is measured, a red write is reverted, the agent gets the rule ids. Native hooks for Claude Code, Codex CLI and Gemini CLI are planned.
+- **As a service** — an MCP server, later.
