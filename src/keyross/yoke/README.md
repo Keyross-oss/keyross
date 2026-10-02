@@ -5,8 +5,8 @@ A yoke attaches a harness to Keyross, the way a wheel alignment makes two wheels
 | Yoke | Harness | How | Status |
 |---|---|---|---|
 | `yoke/deepagents.py` | Deep Agents / LangChain 1.x (`wrap_tool_call`, `awrap_tool_call`) | `Yoke(gauge="einvoice")` (`KeyrossMiddleware` alias) — reads the written document back through the agent's backend, runs the gauges, restores it on red | shipped — `pip install 'keyross[yoke]'` |
-| Claude Code hook | Claude Code (`PostToolUse`) | `keyross check "$FILE" --json` on every file the agent writes — code executed by the harness, not a skill | 0.5 |
-| MCP server | any platform | `keyross serve --mcp` — guard mode (called by the platform, invisible to the model) or tool mode (minimal feedback, scrutineering mandatory) | 0.5 |
+| Native hooks | Claude Code, Codex CLI, Gemini CLI | a hook runs the gauges on what the session wrote and returns the rule ids — code executed by the harness, not a skill | planned |
+| MCP server | any platform | guard mode (called by the platform, invisible to the model) or tool mode (minimal feedback, scrutineering mandatory) | later |
 
 `keyross yoke <harness>` prints the recipe. The yoke assumes the harness has its own limiters (budgets, protected columns, deletion cap): the yoke measures, it does not bound.
 

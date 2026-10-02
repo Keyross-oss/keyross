@@ -46,7 +46,7 @@ oracles:                             # declared, so the lock can pin them before
   - { id: einvoice.delta.supplier_reference, severity: soft, version: 1 }
 regulatory:                          # when the rules apply — part of the package
   - { standard: "EN 16931", revision: "2017+A1", effective: "2026-09-01", scope: "FR B2B reception" }
-signature: sigstore                  # the gauge is signed; keyross verifies before installing (0.4)
+signature: sigstore                  # planned: the gauge is signed; keyross verifies before installing
 ```
 
 ## Commands

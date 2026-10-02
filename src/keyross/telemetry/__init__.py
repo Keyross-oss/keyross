@@ -1,4 +1,4 @@
-"""Telemetry: the events of every run — decisions, verdicts, sealed runs. JSONL locally; ClickHouse in production."""
+"""Telemetry: the events of every run — decisions, verdicts. JSONL, locally."""
 from __future__ import annotations
 
 import json

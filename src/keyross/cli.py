@@ -172,7 +172,7 @@ def cmd_add(args: argparse.Namespace) -> int:
         print(f"unknown gauge: {name} — see `keyross gauges`"); return 1
     src = idx[name]["source"]
     if not src.startswith("builtin:"):
-        print(f"{name}: source {src} — installing from git arrives in 0.3; the gauge is {idx[name].get('status', 'planned')}"); return 1
+        print(f"{name}: source {src} — copying packages from this repository's index arrives in 0.2; the gauge is {idx[name].get('status', 'planned')}"); return 1
     cfg = _load_config()
     if name in cfg.get("gauges", []):
         print(f"{name} already in keyross.yaml"); return 0
@@ -195,14 +195,17 @@ def cmd_outdated(args: argparse.Namespace) -> int:
 
 
 def cmd_yoke(args: argparse.Namespace) -> int:
-    """The yoke: couple an agent to its gauges (0.2: prints the integration recipe for the chosen harness)."""
+    """The yoke: couple an agent to its gauges — prints the integration recipe for the chosen harness."""
     recipes = {
         "deepagents": ("# pip install 'keyross[yoke]'\nfrom keyross.yoke import Yoke\nfrom keyross.telemetry import JsonlTelemetry\n"
                        "agent = create_deep_agent(..., middleware=[Yoke(gauge=\"einvoice\", telemetry=JsonlTelemetry())])\n"
                        "# another backend than the default StateBackend? pass the same one: Yoke(..., backend=backend)\n"
                        "# then: keyross stats   (first-pass rate)"),
-        "claude-code": "# .claude/settings.json → hooks.PostToolUse: on Write|Edit run `keyross check \"$FILE\" --json`\n# code executed by the harness — not a skill the model reads",
-        "mcp": "keyross serve --mcp --mode guard   # 0.5 — called by the platform; --mode tool exposes verify with minimal feedback",
+        "claude-code": ("# planned: a Claude Code hook that runs the gauges on what the session wrote and returns the rule ids —\n"
+                        "# code executed by the harness, not a skill the model reads\n"
+                        "# today: keyross gate <folder> in CI (integrations/github-action), or the yoke for Deep Agents / LangChain"),
+        "mcp": ("# later: an MCP server — guard mode (called by the platform) or tool mode (verify, minimal feedback)\n"
+                "# today: keyross gate <folder> in CI, or the yoke for Deep Agents / LangChain"),
     }
     if args.harness not in recipes:
         print(f"unknown harness: {args.harness} — one of {', '.join(recipes)}"); return 1
