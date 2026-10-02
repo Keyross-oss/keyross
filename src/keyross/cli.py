@@ -166,7 +166,7 @@ def cmd_gauges(args: argparse.Namespace) -> int:
 
 
 def cmd_add(args: argparse.Namespace) -> int:
-    """Add a gauge from the registry index to keyross.yaml (v1: built-in gauges; git sources in 0.3)."""
+    """Add a gauge from the registry index to keyross.yaml (v1: built-in gauges; packages from this repository's index in 0.2)."""
     name = args.gauge.split("@")[0]; idx = _index()
     if name not in idx:
         print(f"unknown gauge: {name} — see `keyross gauges`"); return 1
