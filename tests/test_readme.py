@@ -3,6 +3,8 @@ No extra needed: the raw results and the interval are plain Python."""
 import json
 from pathlib import Path
 
+import yaml
+
 from bench.einvoice.stats import wilson
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -41,3 +43,14 @@ def test_the_readme_table_is_the_raw_results():
     assert f"| cost per invoice | {cost(without):.3f} USD | {cost(keyross):.3f} USD |" in readme
     stack = (ROOT / "docs" / "assets" / "keyross_stack.svg").read_text(encoding="utf-8")
     assert f"{fatal(without)} → {fatal(keyross)} official-rule" in stack
+
+
+def test_the_en16931_badge_is_the_version_the_gauge_runs():
+    """The badge states a fact — the CEN release the einvoice gauge executes — never a certification."""
+    gauge = ROOT / "src" / "keyross" / "gauges" / "einvoice"
+    adapter = yaml.safe_load((gauge / "gauge.yaml").read_text(encoding="utf-8"))["adapters"][0]
+    version = adapter["version"]
+    assert adapter["id"] == "einvoice.schematron" and (gauge / "rules" / f"cen-{version}").is_dir()
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert (f"[![EN 16931: official CEN rules {version}](https://img.shields.io/badge/EN%2016931-official%20CEN%20rules%20"
+            f"{version}-003399)](src/keyross/gauges/einvoice/README.md)") in readme

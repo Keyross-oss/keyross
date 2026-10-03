@@ -4,6 +4,7 @@
 [![PyPI](https://img.shields.io/pypi/v/keyross)](https://pypi.org/project/keyross/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22938584.svg)](https://doi.org/10.5281/zenodo.22938584)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+[![EN 16931: official CEN rules 1.3.16](https://img.shields.io/badge/EN%2016931-official%20CEN%20rules%201.3.16-003399)](src/keyross/gauges/einvoice/README.md)
 
 **Ready-to-use verifiers for your agent loop.** Official rules compiled into checks your agent must pass before it acts — pinned, deterministic, replayable.
 
