@@ -6,9 +6,9 @@ type: software
 authors:
   - family-names: Amri
     given-names: Wassim
-version: 0.1.1
+version: 0.1.2
 doi: 10.5281/zenodo.22938584            # every version; 0.1.0 is 10.5281/zenodo.22938585
-date-released: 2026-09-25
+date-released: 2026-10-03
 license: Apache-2.0
 repository-code: "https://github.com/Keyross-oss/keyross"
 url: "https://keyross-oss.github.io/keyross/bench/"

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "keyross"
-version = "0.1.1"
+version = "0.1.2"
 description = "Ready-to-use verifiers for your agent loop — official rules compiled into checks your agent must pass before it acts. Pinned, deterministic, replayable."
 dynamic = ["readme"]                 # README.md, its links made absolute for PyPI (the fancy-pypi-readme hook below)
 license = { text = "Apache-2.0" }
