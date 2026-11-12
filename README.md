@@ -109,6 +109,7 @@ This repository verifies itself: on every commit, its CI runs the tests (one che
 
 ## Going further
 
+- [docs/blueprint](docs/blueprint/README.md) — reviewing an AI agent before production: six steps, twelve questions, and where Keyross fits
 - [docs/audit-trail.md](docs/audit-trail.md) — what was verified, and how a third party replays it
 - [docs/CONCEPTS.md](docs/CONCEPTS.md) — invariants, contracts and sentinels; the flags; writing an oracle
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — where the gauges run, what comes out of every door
