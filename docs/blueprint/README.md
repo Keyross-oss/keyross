@@ -97,6 +97,9 @@ The steps say what to check; the lifecycle says when. Some vendors call it the a
 
 > This blueprint is tool-neutral. Keyross covers step 5 for documents: its gauges run official rules outside the model, and its yoke reverts a red write before it is delivered and returns only the rule ids. It also leaves the trace that step 6 asks for, for what it verifies: every `keyross check` writes [a report](https://github.com/Keyross-oss/keyross/blob/main/docs/audit-trail.md), the yoke can log each verdict, and a lock pins what ran. Guardrails — probabilistic filters on prompts and outputs — belong to step 2: they reduce noise and replace no downstream control. Steps 1, 3 and 4, encryption and drift monitoring are not Keyross features.
 
+- **[The e-invoice benchmark](https://keyross-oss.github.io/keyross/bench/)** — how step 5 was measured: 300 runs, graded by three judges that are not Keyross, with the protocol and the raw results.
+- **[Keyross on GitHub](../../README.md)** — the README: what Keyross is, where it plugs in, and how to try it in five minutes.
+
 ## Scope and limits
 
 - This is a review grid for one agent. It is not a governance framework: roles, committees and risk appetite are yours.

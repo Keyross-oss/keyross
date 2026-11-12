@@ -227,6 +227,14 @@ ul.plain li::before{content:"";position:absolute;left:2px;top:.62em;width:8px;he
 .fits{margin-top:76px;background:var(--accent-soft);border-radius:14px;padding:clamp(18px,3vw,28px)}
 .fits h2{margin:0;font-family:var(--display);font-weight:700;font-size:22px;line-height:1.2;letter-spacing:-.005em}
 .fits p{margin-top:10px;font-size:16.5px;line-height:1.6;max-width:74ch}
+.fits .go{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}
+.fits .go a{display:flex;flex-direction:column;gap:4px;height:100%;padding:16px 18px;background:var(--surface);border:1px solid var(--rule);border-radius:12px;color:var(--ink);text-decoration:none}
+.fits .go a:hover{border-color:var(--accent)}
+.fits .go a:hover .go-title{text-decoration:underline;text-decoration-color:var(--accent)}
+.go-title{font-family:var(--display);font-weight:700;font-size:18px;line-height:1.3}
+.go-title::after{content:" →";content:" →" / "";color:var(--accent)}
+.go-text{font-size:15px;line-height:1.5;color:var(--ink-2)}
+.go-url{margin-top:auto;padding-top:6px;font-family:var(--mono);font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
 
 /* references */
 .disclaimer{display:inline-block;margin-top:18px;padding:8px 14px;border-radius:8px;background:var(--warn-soft);color:var(--warn-ink);font-weight:600;font-size:15px}
@@ -278,6 +286,7 @@ footer{margin-top:80px;padding-top:22px;border-top:1px solid var(--rule);font-si
         <li><a href="#patterns">Four patterns</a></li>
         <li><a href="#regimes">Baseline, reinforced, measured</a></li>
         <li><a href="#lifecycle">The lifecycle: four reviews</a></li>
+        <li><a href="#keyross">Where Keyross fits</a></li>
         <li><a href="#scope">Scope and limits</a></li>
         <li><a href="#references">References</a></li>
       </ol>
@@ -537,6 +546,10 @@ footer{margin-top:80px;padding-top:22px;border-top:1px solid var(--rule);font-si
   <aside class="fits" id="keyross" aria-labelledby="h-keyross">
     <h2 id="h-keyross">Where Keyross fits</h2>
     <p>This blueprint is tool-neutral. <a href="https://github.com/Keyross-oss/keyross">Keyross</a> covers <a href="#step-5">step 5</a> for documents: its gauges run official rules outside the model, and its yoke reverts a red write before it is delivered and returns only the rule ids. It also leaves the trace that <a href="#step-6">step 6</a> asks for, for what it verifies: every <code>keyross check</code> writes <a href="https://github.com/Keyross-oss/keyross/blob/main/docs/audit-trail.md">a report</a>, the yoke can log each verdict, and a lock pins what ran. Guardrails — probabilistic filters on prompts and outputs — belong to <a href="#step-2">step 2</a>: they reduce noise and replace no downstream control. Steps 1, 3 and 4, encryption and drift monitoring are not Keyross features.</p>
+    <ul class="go" role="list">
+      <li><a href="../bench/"><span class="go-title">The e-invoice benchmark</span><span class="go-text">How step 5 was measured: 300 runs, graded by three judges that are not Keyross, with the protocol and the raw results.</span><span class="go-url" aria-hidden="true">keyross-oss.github.io/keyross/bench</span></a></li>
+      <li><a href="https://github.com/Keyross-oss/keyross#readme"><span class="go-title">Keyross on GitHub</span><span class="go-text">The README: what Keyross is, where it plugs in, and how to try it in five minutes.</span><span class="go-url" aria-hidden="true">github.com/Keyross-oss/keyross</span></a></li>
+    </ul>
   </aside>
 
   <section id="scope" aria-labelledby="h-scope">
