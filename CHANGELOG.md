@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- docs: the agent review blueprint, `docs/blueprint/` — "The agent proposes, the verifier disposes": six steps, four patterns and twelve review questions to review an AI agent before production, mapped to DORA's ICT risk management standards (Delegated Regulation (EU) 2024/1774), the ANSSI–BSI zero-trust principles for LLM-based systems and the OWASP agentic risks, with the lifecycle in four reviews. Tool-neutral: Keyross appears in one box, which says what it covers (step 5, for documents, and the trace of what it verifies) and what it does not; a scope-and-limits section says what the grid leaves to existing processes (third parties, incidents, resilience testing), what it does not map (personal data, the AI Act, ISO/IEC 42001), and that the author maintains Keyross. A standalone page in the benchmark page's style, light and dark, no JavaScript, served at keyross-oss.github.io/keyross/blueprint/, and the same content in Markdown for GitHub; text and figures under CC BY 4.0
+- tests: the blueprint's measured step — per 100 runs, 33 → 0 invoices delivered with an official-rule violation, 50 → 64 correct invoices, 14 runs blocked, 15 ms per check — is the published run's raw results, in the page and its Markdown; the benchmark page states the same figures
+
 ## 0.1.2 (3 October 2026)
 - the front page, with no new gauge: a README whose first screen says what Keyross does; the repository's description and topics; one public roadmap in the README, GAUGES.md and the gauge index; the stubs moved (`action/` becomes `integrations/github-action/`, a composite action that runs `keyross gate`; `demo-k8s/` becomes `examples/k8s/`, marked planned); `docs/audit-trail.md`; GitHub Discussions with a "Wanted verifier" template
 - docs: an EN 16931 badge in the README states the official CEN rules the `einvoice` gauge runs (1.3.16) — a fact, not a certification; a test keeps it equal to the version the gauge executes

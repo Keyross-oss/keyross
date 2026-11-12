@@ -169,3 +169,27 @@ def test_the_published_numbers_match_the_raw_results():
         assert f"{cost:.2f} USD" in text and VALIDATOR_DIGEST in text
         assert f"{agreed} of {len(key)}" in text
         assert "claude.ai" not in text
+
+
+def test_the_blueprint_quotes_the_raw_results():
+    """The agent review blueprint measures its step 5 with this benchmark — the yoke on the official rules against the
+    agent alone, per 100 runs: 33 → 0 invoices delivered with an official-rule violation, 50 → 64 correct invoices,
+    14 runs blocked instead of delivered; 15 ms per check. The page and its Markdown state what the raw results give,
+    and so does the benchmark page."""
+    run = ROOT / "bench" / "einvoice" / "results" / "20260923T162255Z-claude-haiku-4-5.jsonl"
+    rows = [json.loads(line) for line in run.read_text(encoding="utf-8").splitlines() if line.strip()]
+    arms = {arm: [r for r in rows if r["arm"] == arm] for arm in ("without", "with", "with_order")}
+    assert all(len(runs) == 100 for runs in arms.values())                                  # per 100 runs
+    fatal = {arm: sum(r["delivered"] and not r["valid"] for r in runs) for arm, runs in arms.items()}
+    correct = {arm: sum(r["correct"] for r in runs) for arm, runs in arms.items()}
+    blocked = {arm: sum(not r["delivered"] for r in runs) for arm, runs in arms.items()}
+    assert blocked["without"] == 0                                                          # blocked instead of delivered
+    yoked = arms["with"] + arms["with_order"]
+    per_check = sum(r["yoke_check_ms"] for r in yoked) / sum(r["yoke_checks"] for r in yoked)
+    for page in ("docs/blueprint/index.html", "docs/blueprint/README.md", "docs/bench/index.html"):
+        text = (ROOT / page).read_text(encoding="utf-8")
+        assert f"{fatal['without']} → {fatal['with']}" in text and f"{correct['without']} → {correct['with']}" in text, page
+        assert f"{per_check:.0f} ms" in text, page
+    for page in ("docs/blueprint/index.html", "docs/blueprint/README.md"):
+        text = (ROOT / page).read_text(encoding="utf-8")
+        assert "per 100 runs" in text and f"{blocked['with']} runs" in text and "claude.ai" not in text, page
