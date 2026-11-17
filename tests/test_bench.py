@@ -197,13 +197,16 @@ def test_the_blueprint_quotes_the_raw_results():
         assert "per 100 runs" in text and f"{blocked['with']} runs" in text and "claude.ai" not in text, page
 
 
-def test_the_benchmark_page_declares_its_share_image():
-    """A link to the benchmark page shows its figure, not an empty frame: the page declares an Open Graph image that the
-    site serves, at the size it states, in the 1.91:1 frame of a link preview."""
-    html = (ROOT / "docs" / "bench" / "index.html").read_text(encoding="utf-8")
+@pytest.mark.parametrize("page", ["bench", "blueprint"])
+def test_the_published_pages_declare_their_share_image(page):
+    """A link to the benchmark page or to the blueprint shows a picture, not an empty frame: each page declares an Open
+    Graph image that the site serves, at the size it states, in the 1.91:1 frame of a link preview, and a description of
+    at least 100 characters, LinkedIn's minimum."""
+    html = (ROOT / "docs" / page / "index.html").read_text(encoding="utf-8")
     meta = dict(re.findall(r'<meta property="(og:[a-z:]+)" content="([^"]*)">', html))
     site = "https://keyross-oss.github.io/keyross/"
-    assert meta["og:url"] == site + "bench/" and meta["og:image"].startswith(site)
+    assert meta["og:url"] == f"{site}{page}/" and meta["og:image"].startswith(site)
+    assert len(meta["og:description"]) >= 100
     png = (ROOT / "docs" / meta["og:image"][len(site):]).read_bytes()
     assert png[:8] == b"\x89PNG\r\n\x1a\n"
     width, height = struct.unpack(">II", png[16:24])
