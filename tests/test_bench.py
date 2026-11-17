@@ -2,6 +2,8 @@
 a harness that runs offline. Tests that need the independent validator skip when it is not running (CI starts it)."""
 import copy
 import json
+import re
+import struct
 from collections import Counter
 from datetime import date
 from pathlib import Path
@@ -193,3 +195,17 @@ def test_the_blueprint_quotes_the_raw_results():
     for page in ("docs/blueprint/index.html", "docs/blueprint/README.md"):
         text = (ROOT / page).read_text(encoding="utf-8")
         assert "per 100 runs" in text and f"{blocked['with']} runs" in text and "claude.ai" not in text, page
+
+
+def test_the_benchmark_page_declares_its_share_image():
+    """A link to the benchmark page shows its figure, not an empty frame: the page declares an Open Graph image that the
+    site serves, at the size it states, in the 1.91:1 frame of a link preview."""
+    html = (ROOT / "docs" / "bench" / "index.html").read_text(encoding="utf-8")
+    meta = dict(re.findall(r'<meta property="(og:[a-z:]+)" content="([^"]*)">', html))
+    site = "https://keyross-oss.github.io/keyross/"
+    assert meta["og:url"] == site + "bench/" and meta["og:image"].startswith(site)
+    png = (ROOT / "docs" / meta["og:image"][len(site):]).read_bytes()
+    assert png[:8] == b"\x89PNG\r\n\x1a\n"
+    width, height = struct.unpack(">II", png[16:24])
+    assert (str(width), str(height)) == (meta["og:image:width"], meta["og:image:height"])
+    assert 1.85 < width / height < 1.95

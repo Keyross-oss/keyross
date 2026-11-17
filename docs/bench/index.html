@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="A pre-registered 300-run benchmark of Keyross' yoke on an AI agent writing EN 16931 e-invoices.">
 <title>Keyross E-Invoice Benchmark</title>
+<link rel="canonical" href="https://keyross-oss.github.io/keyross/bench/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Keyross E-Invoice Benchmark">
+<meta property="og:description" content="A pre-registered 300-run benchmark of Keyross' yoke on an AI agent writing EN 16931 e-invoices.">
+<meta property="og:url" content="https://keyross-oss.github.io/keyross/bench/">
+<meta property="og:image" content="https://keyross-oss.github.io/keyross/assets/bench_share.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1254">
+<meta property="og:image:alt" content="What 100 invoices became, per setup. Agent alone: 50 correct, 0 blocked, 50 shipped wrong. Yoke on the official rules: 64 correct, 14 blocked, 22 shipped wrong. Yoke on the rules and the order: 60 correct, 29 blocked, 11 shipped wrong.">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Schibsted+Grotesk:wght@600;700;800&display=swap">
@@ -160,6 +171,17 @@ ul.plain li::before{content:"";position:absolute;left:2px;top:.62em;width:8px;he
 ul.plain.next li::before{background:var(--accent)}
 ul.plain strong{color:var(--ink);font-weight:600}
 
+/* going further: the blueprint and the repository */
+.go{list-style:none;margin:22px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}
+.go a{display:flex;flex-direction:column;gap:4px;height:100%;padding:16px 18px;background:var(--surface);border:1px solid var(--rule);border-radius:12px;color:var(--ink);text-decoration:none}
+.go a:hover{border-color:var(--accent)}
+.go a:hover .go-title{text-decoration:underline;text-decoration-color:var(--accent)}
+.go-title{font-family:var(--display);font-weight:700;font-size:18px;line-height:1.3}
+.go-title::after{content:" →";content:" →" / "";color:var(--accent)}
+.go-text{font-size:15px;line-height:1.5;color:var(--ink-2)}
+.go-url{margin-top:auto;padding-top:6px;font-family:var(--mono);font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.eyebrow a{color:inherit}
+
 footer{margin-top:80px;padding-top:22px;border-top:1px solid var(--rule);font-size:13.5px;color:var(--muted);display:grid;gap:6px}
 footer .motto{font-family:var(--display);font-weight:700;font-size:16px;color:var(--ink)}
 
@@ -175,7 +197,7 @@ footer .motto{font-family:var(--display);font-weight:700;font-size:16px;color:va
 <body>
 <main class="page">
   <header>
-    <div class="eyebrow"><b>Keyross</b><span>Pre-registered benchmark</span><span>300 runs</span><span>23 September 2026</span></div>
+    <div class="eyebrow"><b><a href="https://github.com/Keyross-oss/keyross">Keyross</a></b><span>Pre-registered benchmark</span><span>300 runs</span><span>23 September 2026</span></div>
     <h1>Half the invoices an AI agent wrote were wrong, and nothing said so.</h1>
     <p class="lede">Keyross' <strong>yoke</strong> checks every document an agent writes, at the moment it writes it, against the official rules and your own data. It doesn't make the agent smarter. It <strong>stops wrong invoices from leaving silently</strong>. We measured that on 300 runs, graded by three judges that are not Keyross.</p>
   </header>
@@ -423,6 +445,15 @@ footer .motto{font-family:var(--display);font-weight:700;font-size:16px;color:va
       <li><strong>Sharper feedback, never the answer.</strong> Name the line and the field that failed — never the expected value. Target: fewer invoices blocked for a person.</li>
       <li><strong>Messy input.</strong> The same 50 orders as emails and PDFs, with the same answer key and the same judges: the case agents are actually used for.</li>
       <li><strong>Supplier invoices.</strong> The received PDF checked against the company's own purchase order — the check the order setup already runs.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="s-further">
+    <div class="label">Going further</div>
+    <h2 class="title" id="s-further">One step of an agent review, and the code behind it.</h2>
+    <ul class="go" role="list">
+      <li><a href="../blueprint/"><span class="go-title">The agent review blueprint</span><span class="go-text">Six steps and twelve review questions to review an AI agent before production, mapped to DORA, ANSSI–BSI and OWASP. This benchmark measures its step 5.</span><span class="go-url" aria-hidden="true">keyross-oss.github.io/keyross/blueprint</span></a></li>
+      <li><a href="https://github.com/Keyross-oss/keyross#readme"><span class="go-title">Keyross on GitHub</span><span class="go-text">The README: what Keyross is, where it plugs in, and how to try it in five minutes.</span><span class="go-url" aria-hidden="true">github.com/Keyross-oss/keyross</span></a></li>
     </ul>
   </section>
 
