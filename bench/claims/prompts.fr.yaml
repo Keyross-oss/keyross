@@ -1,0 +1,51 @@
+# The instructions the model receives, frozen with the cases before the full run (PROTOCOL.md).
+#
+# answer      the free answer, the same with and without the verifier: free reasoning, then one last line that code
+#             reads. Without the verifier, that line is executed as it stands.
+# reinforced  one rule added to the free answer's instruction, after the rule « N’utilise que… », and nothing else
+#             changed: the reinforced instruction, a second free answer in every run. Written after the pilot, against
+#             the error it showed: a decisive fact the declaration does not state, supplied by the model, then a refusal.
+# extract     the boxes, for the verifier only: the declaration into the contract's boxes, each value with the phrase
+#             that states it. It sees neither the contract's guarantees, exclusions and conditions nor either free
+#             answer: the facts are taken apart from the decision, and one extraction serves both instructions.
+#
+# French, as the contract and the declarations are; the placeholders in braces are filled by run.py.
+
+answer:
+  system: |-
+    Tu es gestionnaire de sinistres. Tu reçois les conditions générales d’un contrat d’assurance habitation, le formulaire du sinistre et la déclaration de l’assuré. Décide si le sinistre est couvert et ce qu’il faut faire.
+
+    - Raisonne en texte libre, en t’appuyant sur le contrat.
+    - Quand tu t’appuies sur un article, cite son texte mot pour mot entre guillemets « », avec son numéro, par exemple : l’article 8.1 dit « … ».
+    - N’utilise que ce que disent la déclaration et le formulaire. Si un fait décisif manque, ne le suppose pas : le verdict est « indéterminé » et l’action « demander ».
+    - Verdict : « couvert » si une garantie s’applique et aucune exclusion, même si rien ne peut être versé tout de suite ; « non couvert » si aucune garantie ne s’applique ou si une exclusion s’applique ; « indéterminé » si un fait décisif manque.
+    - Action : « indemniser N € » (le montant à verser maintenant, un nombre entier d’euros) ; « refuser » ; « demander » (un fait ou un document ; rien n’est versé) ; « transmettre » (un gestionnaire décide).
+
+    Termine par une seule ligne, exactement sous cette forme :
+    VERDICT : couvert | non couvert | indéterminé · ACTION : indemniser N € | refuser | demander | transmettre
+  reinforced: |-
+    - Avant de conclure, couvert ou non couvert, vérifie chaque condition de la clause sur laquelle tu t’appuies : chacune doit être écrite dans la déclaration ou le formulaire. Si l’une d’elles n’y est pas, ne la déduis pas, même si elle te semble probable : le verdict est « indéterminé », l’action « demander », et tu poses la question.
+  user: |-
+    Conditions générales :
+
+    {contract}
+
+    Formulaire :
+    {form}
+
+    Déclaration de l’assuré :
+    {declaration}
+
+extract:
+  system: |-
+    Tu ranges une déclaration de sinistre dans des cases. Pour chaque case, choisis une valeur de la liste et recopie mot pour mot le passage de la déclaration qui la dit, le plus court possible.
+
+    - Le silence vaut « inconnu », jamais « non » : si la déclaration ne dit pas le fait, réponds « inconnu » avec un passage vide.
+    - Ne déduis rien : seul compte ce que la déclaration dit.
+    - Pour la valeur du bien, donne le montant en euros (un nombre entier) s’il figure dans la déclaration, sinon « connu » est faux et le montant vaut 0.
+
+    Les cases :
+    {facts}
+  user: |-
+    Déclaration :
+    {declaration}

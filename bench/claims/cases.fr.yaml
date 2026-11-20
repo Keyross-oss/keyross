@@ -1,0 +1,344 @@
+# Twelve labelled claims for the example contract (contract.fr.yaml).
+#
+# Facts, verdicts and actions below are the expected answers. They are written before any
+# model run and frozen by the commit that adds this file.
+#
+# Labelling rule: a fact takes a value only when the declaration states it.
+# Silence is `inconnu`, never `non`. `source` is the phrase of the declaration, word for word.
+#
+# verdict   couvert | non_couvert | indetermine
+# action    indemniser (with an amount) | refuser | demander (a fact or a document; nothing is
+#           paid) | transmettre (a claims handler decides)
+#
+# `because`, `ask` and `documents` follow from the facts and the contract; they are kept here
+# for the reader and are not graded separately.
+
+contract: habitation-exemple@1
+
+cases:
+
+  # ── Vélo · local commun ──────────────────────────────────────────────────────────────
+
+  - id: velo-local-commun
+    title: "Vélo · local commun"
+    base: true
+    probe: "The verdict hangs on a fact the declaration does not give: was anything forced? The complaint and the invoice are there, so a payment is within reach."
+    declaration: >-
+      On m’a volé mon vélo dans le local à vélos de l’immeuble. Il n’était pas fermé à clé.
+      J’ai porté plainte. Facture : 600 €.
+    form: {constat: 2026-11-09, declaration: 2026-11-10}
+    facts:
+      bien:        {value: velo, source: "mon vélo"}
+      evenement:   {value: vol, source: "On m’a volé"}
+      lieu:        {value: local_commun, source: "le local à vélos de l’immeuble"}
+      ferme_a_cle: {value: non, source: "Il n’était pas fermé à clé"}
+      effraction:  {value: inconnu}
+      escalade:    {value: inconnu}
+      fausses_cles: {value: inconnu}
+      flammes:     {value: inconnu}
+      plainte:     {value: oui, source: "J’ai porté plainte"}
+      valeur:      {value: 600, source: "Facture : 600 €"}
+    expected:
+      verdict: indetermine
+      action: {type: demander}
+      because: ["4.2", "6.3"]
+      ask: [effraction]
+      documents: []
+
+  - id: velo-local-commun-antivol
+    title: "Vélo · local commun, antivol sectionné"
+    varies: velo-local-commun
+    probe: "The missing fact, answered yes: the same claim is covered. An unlocked room is not enough to refuse."
+    declaration: >-
+      On m’a volé mon vélo dans le local à vélos de l’immeuble, qui n’est jamais fermé à clé.
+      Il était attaché par un antivol, que j’ai retrouvé sectionné au sol. J’ai porté plainte
+      le lendemain. Facture d’achat : 620 €.
+    form: {constat: 2026-11-09, declaration: 2026-11-11}
+    facts:
+      bien:        {value: velo, source: "mon vélo"}
+      evenement:   {value: vol, source: "On m’a volé"}
+      lieu:        {value: local_commun, source: "le local à vélos de l’immeuble"}
+      ferme_a_cle: {value: non, source: "qui n’est jamais fermé à clé"}
+      effraction:  {value: oui, source: "un antivol, que j’ai retrouvé sectionné"}
+      escalade:    {value: inconnu}
+      fausses_cles: {value: inconnu}
+      flammes:     {value: inconnu}
+      plainte:     {value: oui, source: "J’ai porté plainte"}
+      valeur:      {value: 620, source: "Facture d’achat : 620 €"}
+    expected:
+      verdict: couvert
+      action: {type: indemniser, amount: 470}     # min(620, 1500) - 150
+      because: ["4.2"]
+      ask: []
+      documents: []
+
+  - id: velo-local-commun-rien-force
+    title: "Vélo · local commun, rien de forcé"
+    varies: velo-local-commun
+    probe: "The missing fact, answered no: exclusion 6.3 applies, although a complaint and an invoice are there."
+    declaration: >-
+      Mon vélo a été volé dans le local à vélos commun de l’immeuble. Le local n’est pas fermé
+      à clé et mon vélo n’était pas attaché : rien n’a été forcé. J’ai porté plainte et j’ai
+      la facture : 540 €.
+    form: {constat: 2026-11-12, declaration: 2026-11-13}
+    facts:
+      bien:        {value: velo, source: "Mon vélo"}
+      evenement:   {value: vol, source: "a été volé"}
+      lieu:        {value: local_commun, source: "le local à vélos commun de l’immeuble"}
+      ferme_a_cle: {value: non, source: "Le local n’est pas fermé à clé"}
+      effraction:  {value: non, source: "rien n’a été forcé"}
+      escalade:    {value: inconnu}
+      fausses_cles: {value: inconnu}
+      flammes:     {value: inconnu}
+      plainte:     {value: oui, source: "J’ai porté plainte"}
+      valeur:      {value: 540, source: "la facture : 540 €"}
+    expected:
+      verdict: non_couvert
+      action: {type: refuser}
+      because: ["4.2", "6.3"]
+      ask: []
+      documents: []
+
+  # ── Bougie · table de jardin ─────────────────────────────────────────────────────────
+
+  - id: bougie-table
+    title: "Bougie · table de jardin"
+    base: true
+    probe: "Fire (4.1) or heat alone (6.5)? The declaration names the heat and says nothing of flames; the invoice is there."
+    declaration: >-
+      Une bougie laissée sur la table du jardin a fondu avec la chaleur et a abîmé la table.
+      Facture de la table : 300 €.
+    form: {constat: 2026-08-23, declaration: 2026-08-25}
+    facts:
+      bien:        {value: mobilier_jardin, source: "la table du jardin"}
+      evenement:   {value: feu_ou_chaleur, source: "a fondu avec la chaleur"}
+      lieu:        {value: exterieur, source: "sur la table du jardin"}
+      ferme_a_cle: {value: inconnu}
+      effraction:  {value: inconnu}
+      escalade:    {value: inconnu}
+      fausses_cles: {value: inconnu}
+      flammes:     {value: inconnu}
+      plainte:     {value: inconnu}
+      valeur:      {value: 300, source: "Facture de la table : 300 €"}
+    expected:
+      verdict: indetermine
+      action: {type: demander}
+      because: ["4.1", "4.3", "6.5"]
+      ask: [flammes]
+      documents: []
+
+  - id: bougie-sans-flamme
+    title: "Bougie · aucune flamme"
+    varies: bougie-table
+    probe: "The missing fact, answered no: heat alone, exclusion 6.5 applies."
+    declaration: >-
+      Au retour de vacances, j’ai trouvé ma table de jardin abîmée sur la terrasse : une bougie
+      posée dessus avait fondu au soleil. Elle n’était pas allumée, il n’y a eu aucune flamme.
+      Facture de la table : 380 €.
+    form: {constat: 2026-08-16, declaration: 2026-08-18}
+    facts:
+      bien:        {value: mobilier_jardin, source: "ma table de jardin"}
+      evenement:   {value: feu_ou_chaleur, source: "avait fondu au soleil"}
+      lieu:        {value: exterieur, source: "sur la terrasse"}
+      ferme_a_cle: {value: inconnu}
+      effraction:  {value: inconnu}
+      escalade:    {value: inconnu}
+      fausses_cles: {value: inconnu}
+      flammes:     {value: non, source: "il n’y a eu aucune flamme"}
+      plainte:     {value: inconnu}
+      valeur:      {value: 380, source: "Facture de la table : 380 €"}
+    expected:
+      verdict: non_couvert
+      action: {type: refuser}
+      because: ["6.5"]
+      ask: []
+      documents: []
+
+  - id: bougie-parasol-feu
+    title: "Bougie · le parasol prend feu"
+    varies: bougie-table
+    probe: "The missing fact, answered yes: fire, covered under 4.1 and 4.3. The deductible is easy to forget."
+    declaration: >-
+      Hier soir, sur la terrasse, une bougie est tombée de la table et a mis le feu au parasol :
+      les flammes l’ont entièrement détruit. Facture du parasol : 460 €.
+    form: {constat: 2026-07-18, declaration: 2026-07-19}
+    facts:
+      bien:        {value: mobilier_jardin, source: "au parasol"}
+      evenement:   {value: feu_ou_chaleur, source: "a mis le feu"}
+      lieu:        {value: exterieur, source: "sur la terrasse"}
+      ferme_a_cle: {value: inconnu}
+      effraction:  {value: inconnu}
+      escalade:    {value: inconnu}
+      fausses_cles: {value: inconnu}
+      flammes:     {value: oui, source: "les flammes l’ont entièrement détruit"}
+      plainte:     {value: inconnu}
+      valeur:      {value: 460, source: "Facture du parasol : 460 €"}
+    expected:
+      verdict: couvert
+      action: {type: indemniser, amount: 310}     # min(460, 1000) - 150
+      because: ["4.1", "4.3"]
+      ask: []
+      documents: []
+
+  # ── Trottinette · garage ─────────────────────────────────────────────────────────────
+
+  - id: trottinette-garage
+    title: "Trottinette · garage de la résidence"
+    base: true
+    probe: "Two traps in the wording: « a disparu » is not a theft, « garage de la résidence » is not a private garage."
+    declaration: >-
+      Ma trottinette électrique a disparu du garage de la résidence. J’ai porté plainte.
+      Facture : 520 €.
+    form: {constat: 2026-11-02, declaration: 2026-11-04}
+    facts:
+      bien:        {value: engin_deplacement, source: "Ma trottinette électrique"}
+      evenement:   {value: inconnu, trap: "« a disparu » : vol ou perte ?"}
+      lieu:        {value: inconnu, trap: "« garage de la résidence » : commun ou privatif ?"}
+      ferme_a_cle: {value: inconnu}
+      effraction:  {value: inconnu}
+      escalade:    {value: inconnu}
+      fausses_cles: {value: inconnu}
+      flammes:     {value: inconnu}
+      plainte:     {value: oui, source: "J’ai porté plainte"}
+      valeur:      {value: 520, source: "Facture : 520 €"}
+    expected:
+      verdict: indetermine
+      action: {type: demander}
+      because: ["4.2", "6.2", "6.3"]
+      ask: [evenement, lieu, ferme_a_cle, effraction, escalade, fausses_cles]
+      documents: []
+
+  - id: trottinette-garage-loue-incendie
+    title: "Trottinette · garage loué ailleurs, incendie"
+    varies: trottinette-garage
+    probe: "A guarantee holds (fire, 4.1) and an exclusion removes it (6.1): the rented garage is not at the address."
+    declaration: >-
+      Ma trottinette électrique a été détruite dans l’incendie du garage que je loue à deux
+      rues de chez moi : les flammes l’ont entièrement brûlée. Facture : 450 €.
+    form: {constat: 2026-10-29, declaration: 2026-10-30}
+    facts:
+      bien:        {value: engin_deplacement, source: "Ma trottinette électrique"}
+      evenement:   {value: feu_ou_chaleur, source: "l’incendie du garage"}
+      lieu:        {value: ailleurs, source: "à deux rues de chez moi"}
+      ferme_a_cle: {value: inconnu}
+      effraction:  {value: inconnu}
+      escalade:    {value: inconnu}
+      fausses_cles: {value: inconnu}
+      flammes:     {value: oui, source: "les flammes l’ont entièrement brûlée"}
+      plainte:     {value: inconnu}
+      valeur:      {value: 450, source: "Facture : 450 €"}
+    expected:
+      verdict: non_couvert
+      action: {type: refuser}
+      because: ["4.1", "6.1"]
+      ask: []
+      documents: []
+
+  # ── Vélo · locaux privatifs ──────────────────────────────────────────────────────────
+
+  - id: velo-cave-effraction
+    title: "Vélo · cave fermée, effraction"
+    base: true
+    probe: "Control case: every fact is given. Only the amount can go wrong (the deductible)."
+    declaration: >-
+      Mon vélo a été volé dans ma cave privative fermée à clé. Le cadenas a été forcé, j’ai
+      porté plainte. Facture : 900 €.
+    form: {constat: 2026-11-03, declaration: 2026-11-05}
+    facts:
+      bien:        {value: velo, source: "Mon vélo"}
+      evenement:   {value: vol, source: "a été volé"}
+      lieu:        {value: dependance_privative, source: "ma cave privative"}
+      ferme_a_cle: {value: oui, source: "fermée à clé"}
+      effraction:  {value: oui, source: "Le cadenas a été forcé"}
+      escalade:    {value: inconnu}
+      fausses_cles: {value: inconnu}
+      flammes:     {value: inconnu}
+      plainte:     {value: oui, source: "j’ai porté plainte"}
+      valeur:      {value: 900, source: "Facture : 900 €"}
+    expected:
+      verdict: couvert
+      action: {type: indemniser, amount: 750}     # min(900, 1500) - 150
+      because: ["4.2"]
+      ask: []
+      documents: []
+
+  - id: velo-appartement-plafond
+    title: "Vélo électrique · appartement, plafond"
+    varies: velo-cave-effraction
+    probe: "Covered, and the invoice is above the ceiling of article 5: ceiling first, then the deductible."
+    declaration: >-
+      Pendant mon week-end d’absence, la porte de mon appartement a été forcée et mon vélo
+      électrique, rangé dans l’entrée, a été volé. J’ai porté plainte dès mon retour.
+      Facture d’achat : 2 400 €.
+    form: {constat: 2026-11-08, declaration: 2026-11-10}
+    facts:
+      bien:        {value: velo, source: "mon vélo électrique"}
+      evenement:   {value: vol, source: "a été volé"}
+      lieu:        {value: logement, source: "mon appartement"}
+      ferme_a_cle: {value: inconnu}
+      effraction:  {value: oui, source: "la porte de mon appartement a été forcée"}
+      escalade:    {value: inconnu}
+      fausses_cles: {value: inconnu}
+      flammes:     {value: inconnu}
+      plainte:     {value: oui, source: "J’ai porté plainte"}
+      valeur:      {value: 2400, source: "Facture d’achat : 2 400 €"}
+    expected:
+      verdict: couvert
+      action: {type: indemniser, amount: 1350}    # min(2400, 1500) - 150
+      because: ["4.2"]
+      ask: []
+      documents: []
+
+  - id: velo-cave-sans-plainte
+    title: "Vélo · cave, plainte pas encore déposée"
+    varies: velo-cave-effraction
+    probe: "Covered, and nothing may be paid yet: the complaint article 7.2 requires has not been filed."
+    declaration: >-
+      Mon vélo a été volé dans ma cave privative : la porte, fermée à clé, a été fracturée.
+      Je n’ai pas encore porté plainte. Facture : 780 €.
+    form: {constat: 2026-11-16, declaration: 2026-11-16}
+    facts:
+      bien:        {value: velo, source: "Mon vélo"}
+      evenement:   {value: vol, source: "a été volé"}
+      lieu:        {value: dependance_privative, source: "ma cave privative"}
+      ferme_a_cle: {value: oui, source: "fermée à clé"}
+      effraction:  {value: oui, source: "la porte, fermée à clé, a été fracturée"}
+      escalade:    {value: inconnu}
+      fausses_cles: {value: inconnu}
+      flammes:     {value: inconnu}
+      plainte:     {value: non, source: "Je n’ai pas encore porté plainte"}
+      valeur:      {value: 780, source: "Facture : 780 €"}
+    expected:
+      verdict: couvert
+      action: {type: demander}
+      because: ["4.2"]
+      ask: []
+      documents: [plainte]
+      amount_once_complete: 630                   # min(780, 1500) - 150
+
+  - id: velo-cave-retard
+    title: "Vélo · cave, déclaré quatre semaines après"
+    varies: velo-cave-effraction
+    probe: "Covered, declared 28 days after it was noticed: article 7.1 allows a reduction, a claims handler decides."
+    declaration: >-
+      Mon vélo a été volé dans ma cave privative fermée à clé ; le cadenas de la porte a été
+      coupé. Je m’en suis aperçu le 5 octobre et j’ai porté plainte. Facture : 650 €.
+    form: {constat: 2026-10-05, declaration: 2026-11-02}
+    facts:
+      bien:        {value: velo, source: "Mon vélo"}
+      evenement:   {value: vol, source: "a été volé"}
+      lieu:        {value: dependance_privative, source: "ma cave privative"}
+      ferme_a_cle: {value: oui, source: "fermée à clé"}
+      effraction:  {value: oui, source: "le cadenas de la porte a été coupé"}
+      escalade:    {value: inconnu}
+      fausses_cles: {value: inconnu}
+      flammes:     {value: inconnu}
+      plainte:     {value: oui, source: "j’ai porté plainte"}
+      valeur:      {value: 650, source: "Facture : 650 €"}
+    expected:
+      verdict: couvert
+      action: {type: transmettre}
+      because: ["4.2", "7.1"]
+      ask: []
+      documents: []
+      amount_at_most: 500                         # min(650, 1500) - 150, before any reduction

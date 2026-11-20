@@ -1,0 +1,126 @@
+# The verifier's configuration zone, for the example contract (contract.fr.yaml).
+#
+# It decides what the verifier RECOGNISES, never what it CHECKS: the checks themselves (the source phrase is in the
+# declaration, the quotation is in the contract, negation, doubt, contradiction, the rules, the action) live in
+# verifier.py and cannot be switched off from here. Every change to this file must keep tests/test_claims.py green,
+# which holds the traps; every trace carries this file's fingerprint.
+#
+# Expressions are French, as the declarations are. They are matched on words, ignoring case, accents and punctuation;
+# the longest expression wins where two overlap, so « pas fermé à clé » beats « fermé à clé ».
+#
+# Two modes, both computed from the same recorded model outputs:
+#   strict    a proposed value is kept only if its source phrase holds an expression listed for that value
+#   lenient   a value is also kept when the phrase holds no listed expression, unless a negation, a doubt or an
+#             ambiguous expression listed against that value is in the phrase
+# The benchmark's headline figure is the strict mode (PROTOCOL.md).
+
+version: "1"
+contract: habitation-exemple@1
+
+# Words that turn a positive phrase around. A value backed by a positive expression is refused when one of these
+# words sits elsewhere in the phrase: « je ne crois pas que la porte ait été forcée » never yields effraction = oui.
+negation: [ne, n, pas, jamais, aucun, aucune, sans, rien, ni, non]
+
+# Expressions that make a phrase a belief or a hearsay, not a statement: the fact stays unknown.
+doubt: [je crois, je ne crois, ne crois pas, je pense, je ne pense, ne pense pas, peut-être, il semble, il me semble,
+        apparemment, probablement, sans doute, je ne sais pas, je ne suis pas sûr, je ne suis pas sûre, on m’a dit,
+        on m’a raconté, selon, il paraît, je suppose, aurait été, auraient été]
+
+facts:
+  bien:
+    velo: [vélo, vélos, bicyclette, bicyclettes, vtt, vélo électrique, vélo à assistance électrique]
+    engin_deplacement: [trottinette, trottinettes, gyropode, gyropodes, gyroroue, monoroue, hoverboard]
+    mobilier_jardin: [table de jardin, table du jardin, tables de jardin, chaise de jardin, chaises de jardin,
+                      salon de jardin, mobilier de jardin, parasol, parasols, transat, transats, bain de soleil]
+    autre_bien: []
+  evenement:
+    vol: [vol, volé, volée, volés, volées, voler, dérobé, dérobée, dérobés, cambriolé, cambriolée, cambriolage,
+          cambrioleur, cambrioleurs, subtilisé, subtilisée]
+    perte: [perdu, perdue, perdus, perdues, perte, égaré, égarée, égarés, oublié dans, oubliée dans, oublié sur,
+            oubliée sur, oubli]
+    feu_ou_chaleur: [incendie, feu, flammes, fondu, fondue, fondus, chaleur, brûlé, brûlée, brûlure, carbonisé,
+                     carbonisée, a pris feu]
+    tempete_ou_grele: [grêle, grêlons, tempête, tempêtes, coup de vent, vent violent, rafales]
+    autre: []
+  lieu:
+    logement: [appartement, mon appartement, logement, mon logement, ma maison, mon domicile, chez moi, dans l’entrée,
+               mon salon, ma chambre, ma cuisine]
+    dependance_privative: [cave privative, ma cave, notre cave, mon garage, notre garage, garage privatif, garage privé,
+                           mon box, box privatif, mon grenier, notre grenier, mon cellier]
+    local_commun: [local commun, local à vélos, local à vélo, local vélos, local vélo, local des vélos,
+                   local à poussettes, local poussettes, parking commun, garage commun, cave commune, parties communes,
+                   local collectif]
+    exterieur: [jardin, terrasse, balcon, cour]
+    ailleurs: [rues de chez moi, loin de chez moi, au travail, à mon travail, au bureau, dans la rue,
+               sur la voie publique, à la gare, chez un ami, chez une amie, chez des amis]
+  ferme_a_cle:
+    oui: [fermé à clé, fermée à clé, fermés à clé, fermées à clé, fermé à double tour, fermée à double tour,
+          verrouillé, verrouillée, verrouillés, cadenassé, cadenassée]
+    non: [pas fermé à clé, pas fermée à clé, jamais fermé à clé, jamais fermée à clé, non fermé, non fermée,
+          pas verrouillé, pas verrouillée, laissé ouvert, laissée ouverte, était ouvert, était ouverte,
+          toujours ouvert, toujours ouverte, reste ouvert, reste ouverte]
+  effraction:
+    oui: [forcé, forcée, forcés, forcées, fracturé, fracturée, fracturés, sectionné, sectionnée, coupé, coupée,
+          cassé, cassée, brisé, brisée, arraché, arrachée, scié, sciée, défoncé, défoncée, enfoncé, enfoncée,
+          effraction, forcement]
+    non: [rien n’a été forcé, rien n’a été forcée, pas été forcé, pas été forcée, n’a pas été forcé,
+          n’a pas été forcée, pas forcé, pas forcée, non forcé, non forcée, sans effraction, aucune effraction,
+          pas d’effraction, aucune trace d’effraction, aucun signe d’effraction, pas de trace d’effraction, intact,
+          intacte, intacts, intactes]
+  escalade:
+    oui: [escalade, escaladé, escaladée, escaladant, par la fenêtre, par le balcon, grimpé, enjambé]
+    non: [sans escalade, pas d’escalade, aucune escalade]
+  fausses_cles:
+    oui: [fausse clé, fausses clés, fausse clef, fausses clefs, double des clés, double de clé, passe-partout]
+    non: [pas de fausse clé, aucune fausse clé, sans fausse clé]
+  flammes:
+    oui: [flamme, flammes, a pris feu, ont pris feu, pris feu, mis le feu, en feu, embrasé, embrasée, embrasement,
+          incendie, brûlé, brûlée, brûlés, brûlées, carbonisé, carbonisée]
+    non: [aucune flamme, pas de flamme, pas de flammes, sans flamme, sans flammes, pas pris feu, n’a pas pris feu,
+          pas allumé, pas allumée, n’était pas allumé, n’était pas allumée, sans embrasement, aucun feu]
+  plainte:
+    oui: [porté plainte, déposé plainte, déposé une plainte, plainte déposée, dépôt de plainte, récépissé de plainte]
+    non: [pas porté plainte, pas encore porté plainte, pas déposé plainte, pas encore déposé plainte, pas de plainte,
+          aucune plainte, sans plainte]
+
+# The value of the item: an amount in the phrase, equal to the one proposed, and an invoice (article 8.2).
+valeur:
+  justified_by: [facture]
+  doubt: [environ, à peu près, approximativement, estimé, estimée, estimation, au moins, plus ou moins]
+
+# Phrases that never back these values on their own (`against`): used by the lenient mode, since in strict mode no
+# value lists them anyway. `means`, when given, is what the phrase can still mean: the questions asked about an
+# unknown fact keep to those values (« a disparu » asks « volé ou perdu ? », not about flames). The verdict itself
+# always tries every value.
+ambiguous:
+  evenement:
+    - {expressions: [disparu, disparue, disparus, disparues, volatilisé, volatilisée, introuvable], against: [vol, perte],
+       means: [vol, perte]}
+  lieu:
+    - {expressions: [garage de la résidence, parking de la résidence, garage de l’immeuble, parking de l’immeuble,
+                     sous-sol de la résidence, sous-sol de l’immeuble],
+       against: [logement, dependance_privative, local_commun, exterieur, ailleurs],
+       means: [dependance_privative, local_commun]}
+    - {expressions: [résidence, immeuble, commun, commune, communs, partagé, partagée], against: [logement, dependance_privative]}
+    - {expressions: [devant chez moi, devant la maison, devant l’immeuble, en bas de chez moi],
+       against: [logement, dependance_privative, local_commun, exterieur]}
+  ferme_a_cle:
+    - {expressions: [fermé, fermée, fermés, fermées, clos, close], against: [oui]}
+  effraction:
+    - {expressions: [ouvert, ouverte, abîmé, abîmée, endommagé, endommagée], against: [oui, non]}
+  flammes:
+    - {expressions: [fondu, fondue, chaleur, noirci, noircie, roussi, roussie, fumée], against: [oui, non]}
+  plainte:
+    - {expressions: [main courante, pré-plainte, préplainte, porter plainte], against: [oui]}
+
+# What the verifier asks when a decisive fact stays unknown. Facts grouped in one entry make one question.
+questions:
+  - {facts: [evenement], text: "Le bien a-t-il été volé, perdu, ou endommagé (feu, chaleur, tempête, grêle) ?"}
+  - {facts: [bien], text: "Quel bien est concerné ?"}
+  - {facts: [lieu], text: "Où se trouvait le bien : dans le logement, dans une cave, un garage ou un grenier réservé à votre seul usage, dans un local commun de l’immeuble, à l’extérieur (jardin, terrasse, balcon, cour), ou ailleurs qu’à l’adresse du logement ?"}
+  - {facts: [ferme_a_cle], text: "Le local était-il fermé à clé ?"}
+  - {facts: [effraction, escalade, fausses_cles], text: "Comment le voleur est-il entré : une serrure, un cadenas ou un antivol a-t-il été forcé ou détruit, y a-t-il eu escalade ou usage de fausses clés, ou rien n’a-t-il été forcé ?"}
+  - {facts: [flammes], text: "Y a-t-il eu des flammes, ou seulement de la chaleur ?"}
+documents:
+  plainte: "Merci de déposer plainte auprès de la police : aucune indemnité de vol n’est versée sans ce dépôt (article 7.2)."
+  valeur: "Merci d’envoyer la facture d’achat du bien."

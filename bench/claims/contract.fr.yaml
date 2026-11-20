@@ -1,0 +1,208 @@
+# Example contract for the claims benchmark. Fictional: written for this repository,
+# it reproduces no insurer's policy.
+#
+# The French text is the data under test: quotations are checked against it word for word.
+# Domain terms (facts, values, clause types, actions) stay in French, as the model fills them
+# from a French contract; the structure of this file is in English.
+#
+# Three-valued logic: a condition is true, false or unknown (a fact it reads is `inconnu`).
+#   garantie, exclusion   `when` holds if every listed fact has the listed value, or one of the
+#                         listed values; a list of mappings means "any of these".
+#   condition             gates the payment, never the verdict: `requires`, else `otherwise`.
+#   definition            no rule; it is the text a fact value is tied to.
+
+contract:
+  id: habitation-exemple
+  version: "1"
+  date: 2026-11-19
+  language: fr
+  title: "Assurance habitation — conditions générales (contrat d’exemple)"
+
+# Canonical vocabulary. Each value points to the article that defines it.
+# Every fact also accepts `inconnu`: the declaration does not say.
+facts:
+  bien:
+    label: "Bien"
+    values:
+      velo:              {label: "vélo", article: "2"}
+      engin_deplacement: {label: "engin de déplacement personnel", article: "2"}
+      mobilier_jardin:   {label: "mobilier de jardin", article: "2"}
+      autre_bien:        {label: "autre bien mobilier", article: "2"}
+  evenement:
+    label: "Événement"
+    values:
+      vol:              {label: "vol", article: "4.2"}
+      perte:            {label: "perte ou oubli", article: "6.2"}
+      feu_ou_chaleur:   {label: "feu ou chaleur", article: "4.1"}
+      tempete_ou_grele: {label: "tempête ou grêle", article: "4.3"}
+      autre:            {label: "autre événement", article: null}   # outside this contract: no guarantee names it
+  lieu:
+    label: "Lieu"
+    values:
+      logement:             {label: "logement", article: "1"}
+      dependance_privative: {label: "dépendance privative", article: "1"}
+      local_commun:         {label: "local commun", article: "1"}
+      exterieur:            {label: "extérieur", article: "1"}
+      ailleurs:             {label: "hors de l’adresse du logement", article: "6.1"}
+  ferme_a_cle:
+    label: "Local fermé à clé"
+    article: "1"
+    values: [oui, non]
+  effraction:
+    label: "Effraction"
+    article: "1"
+    values: [oui, non]
+  escalade:
+    label: "Escalade"
+    article: "4.2"
+    values: [oui, non]
+  fausses_cles:
+    label: "Usage de fausses clés"
+    article: "4.2"
+    values: [oui, non]
+  flammes:
+    label: "Flammes"
+    article: "4.1"
+    values: [oui, non]
+  plainte:
+    label: "Plainte déposée"
+    article: "7.2"
+    values: [oui, non]
+  valeur:
+    label: "Valeur d’achat justifiée"
+    article: "8.2"
+    number: EUR
+
+# Typed fields of the claim form. Code reads them; the model never fills them.
+form:
+  constat:     {label: "Sinistre constaté le", type: date}
+  declaration: {label: "Déclaré le", type: date}
+
+clauses:
+  - id: "1"
+    type: definition
+    title: "Définitions"
+    text: >-
+      Logement : l’habitation désignée aux conditions particulières.
+      Dépendance privative : cave, garage ou grenier réservé à l’usage exclusif de l’assuré, à l’adresse du logement.
+      Local commun : local accessible à plusieurs occupants de l’immeuble.
+      Local fermé : local dont tous les accès sont verrouillés à clé.
+      Extérieur : jardin, terrasse, balcon ou cour, à l’adresse du logement.
+      Dispositif de fermeture : serrure, verrou, cadenas ou antivol.
+      Effraction : forcement ou destruction d’un dispositif de fermeture.
+
+  - id: "2"
+    type: definition
+    title: "Biens assurés"
+    text: >-
+      Sont assurés les biens mobiliers à usage privé appartenant à l’assuré, notamment
+      les vélos, avec ou sans assistance électrique, les engins de déplacement personnel
+      (trottinettes, gyropodes), avec ou sans moteur, et le mobilier de jardin
+      (tables, sièges, parasols).
+
+  - id: "3"
+    type: definition
+    title: "Locaux assurés"
+    text: >-
+      Les locaux assurés sont le logement, ses dépendances privatives et les locaux communs
+      de l’immeuble.
+
+  - id: "4.1"
+    type: garantie
+    title: "Incendie"
+    text: "Est garanti l’incendie, c’est-à-dire la combustion avec flammes en dehors d’un foyer normal."
+    when: {evenement: feu_ou_chaleur, flammes: oui}
+
+  - id: "4.2"
+    type: garantie
+    title: "Vol"
+    text: "Est garanti le vol des biens assurés commis dans les locaux assurés, avec effraction, escalade ou usage de fausses clés."
+    when:
+      - {evenement: vol, lieu: [logement, dependance_privative, local_commun], effraction: oui}
+      - {evenement: vol, lieu: [logement, dependance_privative, local_commun], escalade: oui}
+      - {evenement: vol, lieu: [logement, dependance_privative, local_commun], fausses_cles: oui}
+
+  - id: "4.3"
+    type: garantie
+    title: "Biens à l’extérieur"
+    text: "Le mobilier de jardin est garanti contre l’incendie, la tempête et la grêle uniquement."
+    when:
+      - {bien: mobilier_jardin, lieu: exterieur, evenement: tempete_ou_grele}
+      - {bien: mobilier_jardin, lieu: exterieur, evenement: feu_ou_chaleur, flammes: oui}
+
+  - id: "5"
+    type: condition
+    title: "Plafonds"
+    text: >-
+      L’indemnité est limitée, par sinistre, à 1 500 € pour un vélo ou un engin de déplacement
+      personnel, à 1 000 € pour le mobilier de jardin et à 10 000 € pour tout autre bien.
+    ceiling: {velo: 1500, engin_deplacement: 1500, mobilier_jardin: 1000, autre_bien: 10000}
+
+  - id: "6.1"
+    type: exclusion
+    title: "Exclusion"
+    text: "Sont exclus les sinistres survenus hors de l’adresse du logement."
+    when: {lieu: ailleurs}
+
+  - id: "6.2"
+    type: exclusion
+    title: "Exclusion"
+    text: "Sont exclus la perte et l’oubli des biens."
+    when: {evenement: perte}
+
+  - id: "6.3"
+    type: exclusion
+    title: "Exclusion"
+    text: "Sont exclus les vols commis sans effraction dans un local commun non fermé."
+    # Changed after the pilot, from « …, sauf effraction dûment constatée », which let a declaration silent on the
+    # break-in read as « no break-in established », hence a refusal these rules do not make (PROTOCOL.md, Pilot).
+    when: {evenement: vol, lieu: local_commun, ferme_a_cle: non, effraction: non}
+
+  - id: "6.4"
+    type: exclusion
+    title: "Exclusion"
+    text: "Sont exclus les vols commis à l’extérieur."
+    when: {evenement: vol, lieu: exterieur}
+
+  - id: "6.5"
+    type: exclusion
+    title: "Exclusion"
+    text: "Sont exclus les dommages causés par la seule action de la chaleur, sans embrasement."
+    when: {evenement: feu_ou_chaleur, flammes: non}
+
+  - id: "7.1"
+    type: condition
+    title: "Déclaration du sinistre"
+    text: >-
+      L’assuré déclare le sinistre dès que possible et au plus tard dans les huit jours après
+      l’avoir constaté. Si un retard cause un préjudice à l’assureur, l’indemnité peut être
+      réduite à concurrence de ce préjudice.
+    requires: {delai_jours: {max: 8}}     # form: declaration - constat, computed by code
+    otherwise: transmettre                # the reduction is a judgement: a claims handler decides
+
+  - id: "7.2"
+    type: condition
+    title: "Plainte en cas de vol"
+    text: >-
+      En cas de vol, l’assuré dépose plainte auprès de la police. Aucune indemnité de vol n’est
+      versée sans ce dépôt.
+    applies_when: {evenement: vol}
+    requires: {plainte: oui}
+    otherwise: demander                   # a missing document is asked for; nothing is paid
+
+  - id: "8.1"
+    type: condition
+    title: "Franchise"
+    text: "Une franchise de 150 € s’applique à chaque sinistre."
+    deductible: 150
+
+  - id: "8.2"
+    type: condition
+    title: "Calcul de l’indemnité"
+    text: >-
+      La valeur d’achat du bien, justifiée par une facture, est retenue dans la limite du
+      plafond de l’article 5. L’indemnité est égale à ce montant, diminué de la franchise.
+      Aucune indemnité n’est due lorsque ce montant ne dépasse pas la franchise.
+    requires: {valeur: connu}
+    otherwise: demander
+    formula: "max(0, min(valeur, plafond) - franchise)"
