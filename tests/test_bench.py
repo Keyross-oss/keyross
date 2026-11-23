@@ -197,9 +197,9 @@ def test_the_blueprint_quotes_the_raw_results():
         assert "per 100 runs" in text and f"{blocked['with']} runs" in text and "claude.ai" not in text, page
 
 
-@pytest.mark.parametrize("page", ["bench", "blueprint"])
+@pytest.mark.parametrize("page", ["bench", "blueprint", "claims"])
 def test_the_published_pages_declare_their_share_image(page):
-    """A link to the benchmark page or to the blueprint shows a picture, not an empty frame: each page declares an Open
+    """A link to a benchmark page or to the blueprint shows a picture, not an empty frame: each page declares an Open
     Graph image that the site serves, at the size it states, in the 1.91:1 frame of a link preview, and a description of
     at least 100 characters, LinkedIn's minimum."""
     html = (ROOT / "docs" / page / "index.html").read_text(encoding="utf-8")

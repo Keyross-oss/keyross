@@ -329,3 +329,81 @@ def test_quotations_as_the_second_pilot_wrote_them():
     assert kind("L’article 4.2 dit « [Est garanti le vol des vélos en tout lieu] ».") == "not_found"
     paraphrase = V.quotations("L’article 6.5 dit « causé par la seule action de la chaleur, sans embrasement ».", K, decl)[0]
     assert (paraphrase["kind"], paraphrase["closest"], paraphrase["near"]) == ("not_found", "6.5", True)   # pilot 2
+
+
+def test_the_page_export_matches_the_report():
+    """The page's figures come from the raw results through the report's own functions, never typed by hand."""
+    from bench.claims import page as P
+    rows = [R.run_one("scripted", c, 1, "test") for c in CASES]
+    s = P.summary(rows, "dry-run")
+    assert s["arms"]["base.off"]["harmful"] == sum(r["lanes"]["off"]["grade"]["harmful"] for r in rows)
+    assert s["arms"]["reinforced.strict"]["outcomes"].get("correct") == sum(r["lanes_reinforced"]["strict"]["grade"]["correct"] for r in rows)
+    assert {c["id"] for c in s["cases"]} == {c["id"] for c in CASES} and set(s["by_case"]) == {c["id"] for c in CASES}
+    assert s["cost"]["base"]["not_correct"] == sum(not r["lanes"]["strict"]["grade"]["correct"] for r in rows)
+    one = P.runs_of(rows, "velo-local-commun")
+    assert [r["rep"] for r in one["runs"]] == [1]
+    assert one["runs"][0]["base"]["report"]["verdicts"] and "chunks" in one["runs"][0]["reinforced"]
+    assert all("rule" in k for k in s["contract"]["clauses"])               # the page shows a clause condition by condition
+    k63 = next(k for k in s["contract"]["clauses"] if k["id"] == "6.3")
+    assert k63["rule"]["when"] == next(c for c in K["clauses"] if c["id"] == "6.3")["when"]
+
+
+def test_the_page_quotes_the_model_word_for_word_and_only_when_it_erred(monkeypatch):
+    """A sentence of the model is quoted on the page only if it is in its run's answer, and that answer, executed as it
+    stands, was wrong."""
+    from bench.claims import page as P
+    rows = [R.run_one("scripted", c, 1, "test") for c in CASES]
+    wrong = next(r for r in rows if r["lanes"]["off"]["grade"]["harmful"])
+    right = next(r for r in rows if not r["lanes"]["off"]["grade"]["harmful"])
+    said = {r["case"]: r["answer"]["text"][:30] for r in (wrong, right)}
+    monkeypatch.setattr(P, "EXCERPTS", {case: {"base": (1, quote)} for case, quote in said.items()})
+    assert P.excerpts(rows, wrong["case"]) == {"base": {"rep": 1, "quote": said[wrong["case"]]}}
+    assert P.excerpts(rows, right["case"]) == {}                                            # not wrong: not quoted
+    monkeypatch.setattr(P, "EXCERPTS", {wrong["case"]: {"base": (1, "une phrase que le modèle n'a pas écrite")}})
+    assert P.excerpts(rows, wrong["case"]) == {}                                            # not in the answer: not quoted
+    monkeypatch.setattr(P, "EXCERPTS", {wrong["case"]: {"base": (2, said[wrong["case"]])}})
+    assert P.excerpts(rows, wrong["case"]) == {}                                            # no such run: not quoted
+
+
+def test_the_page_quotes_the_published_run_word_for_word():
+    """Every sentence the published page quotes from the model is word for word in the published run, from a run whose
+    decision, executed as it stands, was wrong; none of the chosen sentences is missing."""
+    import json
+    from pathlib import Path
+
+    from bench.claims import page as P
+    data = Path(__file__).resolve().parents[1] / "docs" / "claims" / "data"
+    if not (data / "summary.json").exists():
+        pytest.skip("the page's data is exported from a finished run")
+    s = json.loads((data / "summary.json").read_text(encoding="utf-8"))
+    for c in s["cases"]:
+        chosen = {ins: {"rep": rep, "quote": quote} for ins, (rep, quote) in P.EXCERPTS.get(c["id"], {}).items()}
+        assert c["excerpts"] == chosen, c["id"]
+        runs = {r["rep"]: r for r in json.loads((data / f"{c['id']}.json").read_text(encoding="utf-8"))["runs"]}
+        for ins, e in c["excerpts"].items():
+            a = runs[e["rep"]][ins]
+            assert e["quote"] in a["text"] and a["outcome"]["off"] in ("wrong_payment", "wrong_amount", "wrong_refusal")
+
+
+def test_the_claims_readme_quotes_the_published_figures():
+    """Every figure of the README's results table is the one the page's data holds, exported from the raw results."""
+    import json
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    data = root / "docs" / "claims" / "data" / "summary.json"
+    if not data.exists():
+        pytest.skip("the page's data is exported from a finished run")
+    s = json.loads(data.read_text(encoding="utf-8"))
+    readme = (root / "bench" / "claims" / "README.md").read_text(encoding="utf-8")
+    names = {"base.off": "model alone, base instruction", "reinforced.off": "model alone, reinforced instruction",
+             "base.strict": "with the verifier, base instruction", "reinforced.strict": "with the verifier, reinforced instruction"}
+    for key, name in names.items():
+        o = s["arms"][key]["outcomes"]
+        row = (f"| {name} | **{s['arms'][key]['harmful']}** | {o.get('correct', 0)} | {o.get('unjustified_referral', 0)} | "
+               f"{o.get('mismatch', 0) + o.get('illegible', 0)} |")
+        assert row in readme, row
+    assert f"commit `{s['run']['commit'][0]}`" in readme
+    assert f"{s['run']['cost_usd']:.2f} USD" in readme
+    refusals = sum(s["arms"][k]["outcomes"].get("wrong_refusal", 0) for k in ("base.off", "reinforced.off"))
+    payments = sum(s["arms"][k]["outcomes"].get("wrong_payment", 0) for k in ("base.off", "reinforced.off"))
+    assert f"made {refusals} refusals" in readme and f"and {payments} payments" in readme
