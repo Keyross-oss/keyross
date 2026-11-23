@@ -330,5 +330,17 @@ pilot's error and is measured on the cases it was written against: what it achie
 
 ## Deviations
 
-None since the freeze. The pilots' six fixes and the reinforced instruction, all made before it, are described
-under Pilot and The two instructions.
+None in the design since the freeze. The pilots' six fixes and the reinforced instruction, all made before it, are
+described under Pilot and The two instructions. Two things the frozen report does not say:
+
+- **No quotation is invented.** The report sorts the quotations not in the contract as quoted by a similarity
+  threshold (0.8): close to a passage, a paraphrase; further, invented. It calls 25 of them invented (13 under the base
+  instruction, 12 under the reinforced one). Read one by one after the run, none of the 31 quotations not word for word
+  invents a clause: they are quotations shortened or put in another grammatical form, a quotation with a word added in
+  brackets, quotations of the declaration or of the instruction, and a question the model drafted. The endpoint stands
+  as frozen (answers with at least one quotation not in the contract as quoted: 14/120 and 15/120); the split into
+  paraphrases and inventions does not, the threshold being too coarse for short or condensed quotations. The verifier
+  is unchanged; the page gives this reading, with the 31 quotations.
+- **A first launch was refused.** At 10:29 UTC on 20 November, a first launch of the full run used an invalid API key:
+  its 239 calls were all refused (HTTP 401), none reached the model and nothing was billed. It is not published; the
+  full run started at 10:29:58 with a valid key.
